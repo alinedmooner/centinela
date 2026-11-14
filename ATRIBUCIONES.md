@@ -29,13 +29,14 @@ SDK oficial de Anthropic, [Inspect AI](https://inspect.aisi.org.uk/) (UK AI Secu
 
 - Principios de persuasión: Ferreira, A., Coventry, L. y Lenzini, G. (2015). *Principles of Persuasion in Social Engineering and Their Use in Phishing*.
 - Poner las decisiones en código y convertir cada ataque que funciona en una prueba: [AgentBreak](https://github.com/urcuqui/AgentBreak) (C. Urcuqui).
+- Desarmar enlaces antes de mostrarlos (`hxxp://`, `[.]`) es una costumbre de los equipos de respuesta a incidentes para compartir indicadores sin que se puedan abrir. La sala de revisión la aplica a lo que ve quien revisa.
 - Separar con cuidado los datos para escribir reglas de los datos para medir: lo aprendimos de AgentDojo y de AgentDyn, que muestra que un filtro puede frenar los ataques y a la vez romper las tareas normales.
 
 ## Uso de IA
 
 Este proyecto se hizo en un día, con ayuda de IA, y lo decimos con claridad:
 
-- **Código:** escrito con Claude Code (modelo Claude Fable 5.2), dirigido y revisado por el equipo. Cada commit generado así lleva la línea `Co-Authored-By: Claude`.
+- **Código:** escrito con Claude Code (modelos Claude Fable 5.2 y Claude Opus 5.5), dirigido y revisado por el equipo. Cada PR lo dice en su descripción.
 - **Datos:** las traducciones de los ataques, los mensajes portadores y los mensajes de leads fueron generados con Claude. Cada fila lo indica en los campos `traduccion` o `generado_con_ia`. La revisión humana está en curso; hasta entonces deben tratarse como datos sintéticos.
 - **Documentación y ficha técnica:** redactadas con ayuda de IA y revisadas por el equipo.
 - **Evaluación:** el revisor y el bot de las pruebas son modelos de Anthropic. Las respuestas guardadas están en `resultados/`.
