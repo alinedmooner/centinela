@@ -7,3 +7,6 @@
   X-Content-Type-Options: nosniff
   Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
   Cross-Origin-Opener-Policy: same-origin
+  # no-transform: Cloudflare no modifica las páginas; en particular, no les inyecta su
+  # script de analítica (el sitio promete no tener analítica). Lo demás es la caché por defecto.
+  Cache-Control: public, max-age=0, must-revalidate, no-transform

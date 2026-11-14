@@ -25,6 +25,8 @@ Los mensajes de `datos/leads.jsonl`, los de `datos/portadores.jsonl` y las tradu
 
 SDK oficial de Anthropic, [Inspect AI](https://inspect.aisi.org.uk/) (UK AI Security Institute), transformers, PyTorch, scikit-learn, pytest, ruff, hatchling y uv. Las versiones exactas están en `uv.lock`.
 
+El sitio web (`web/`) usa [Astro](https://astro.build) y se publica en Cloudflare con `cf` y Wrangler; las versiones exactas están en sus `pnpm-lock.yaml`. Sus fuentes son Big Shoulders, Instrument Sans y Martian Mono, de Google Fonts, con licencia SIL Open Font License.
+
 ## Ideas
 
 - Principios de persuasión: Ferreira, A., Coventry, L. y Lenzini, G. (2015). *Principles of Persuasion in Social Engineering and Their Use in Phishing*.
@@ -39,4 +41,5 @@ Este proyecto se hizo en un día, con ayuda de IA, y lo decimos con claridad:
 - **Código:** escrito con Claude Code (modelos Claude Fable 5.2 y Claude Opus 5.5), dirigido y revisado por el equipo. Cada PR lo dice en su descripción.
 - **Datos:** las traducciones de los ataques, los mensajes portadores y los mensajes de leads fueron generados con Claude. Cada fila lo indica en los campos `traduccion` o `generado_con_ia`. La revisión humana está en curso; hasta entonces deben tratarse como datos sintéticos.
 - **Documentación y ficha técnica:** redactadas con ayuda de IA y revisadas por el equipo.
+- **Sitio web (`web/`):** el diseño, el sistema de diseño Vigía y el código inicial los generó Lovable a partir de un prompt del equipo; Claude Code los pasó a Astro y preparó la publicación.
 - **Evaluación:** el revisor y el bot de las pruebas son modelos de Anthropic. Las respuestas guardadas están en `resultados/`.
