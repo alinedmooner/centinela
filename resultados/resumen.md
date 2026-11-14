@@ -20,6 +20,10 @@ Partición: `test`. Tablas generadas por `evals/tabla.py`.
 | claude-sonnet-5-5 | Sin defensa (línea base) | 1 | 2,9 % (2/70; IC 95 %: 0,8 % a 9,8 %) | 2 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-sonnet-5-5 | Defensa solo en el prompt | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-sonnet-5-5 | Centinela: reglas + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| gemini-3.5-flash-lite | Sin defensa (línea base) | 1 | 2,9 % (2/70; IC 95 %: 0,8 % a 9,8 %) | 2 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| gemini-3.5-flash-lite | Centinela: reglas + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| gemma-4-26b-a4b-it | Sin defensa (línea base) | 1 | 5,7 % (4/70; IC 95 %: 2,2 % a 13,8 %) | 4 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| gemma-4-26b-a4b-it | Centinela: reglas + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 
 ## Prueba 1: el filtro en inglés y en español
 

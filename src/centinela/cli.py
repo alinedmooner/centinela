@@ -18,6 +18,7 @@ from centinela.clasificador import ClasificadorSeguro
 from centinela.detectores.reglas import DetectorReglas
 from centinela.etiquetas import ETIQUETAS_LEADS, REVISION_HUMANA
 from centinela.guardia import Guardia
+from centinela.proveedores import PROVEEDORES
 from centinela.revision import crear_tarjeta, texto_de_tarjeta
 
 
@@ -56,14 +57,20 @@ def _etiquetas(args: argparse.Namespace) -> dict[str, str]:
     return datos
 
 
+def _proveedor(args: argparse.Namespace):
+    """El modelo que eligió la persona: Claude por defecto, o Google u OpenRouter."""
+    cargar_env()
+    from centinela.proveedores import crear_proveedor
+
+    return crear_proveedor(args.proveedor or "anthropic", args.modelo)
+
+
 def _revisar(args: argparse.Namespace) -> int:
     detectores = [DetectorReglas(etiquetas=_etiquetas(args))]
-    if args.claude:
-        cargar_env()
+    if args.claude or args.proveedor:
         from centinela.detectores.llm import DetectorLLM
-        from centinela.proveedores.anthropic import ProveedorAnthropic
 
-        detectores.append(DetectorLLM(ProveedorAnthropic(args.modelo)))
+        detectores.append(DetectorLLM(_proveedor(args)))
     mensaje = _leer_mensaje(args)
     veredicto = Guardia(detectores).revisar(mensaje)
     tarjeta = None
@@ -86,11 +93,8 @@ def _revisar(args: argparse.Namespace) -> int:
 
 
 def _clasificar(args: argparse.Namespace) -> int:
-    cargar_env()
-    from centinela.proveedores.anthropic import ProveedorAnthropic
-
     etiquetas = _etiquetas(args)
-    clasificador = ClasificadorSeguro(ProveedorAnthropic(args.modelo), etiquetas=etiquetas)
+    clasificador = ClasificadorSeguro(_proveedor(args), etiquetas=etiquetas)
     resultado = clasificador.clasificar(_leer_mensaje(args))
     if args.json:
         salida = {
@@ -105,6 +109,12 @@ def _clasificar(args: argparse.Namespace) -> int:
         print(f"Etiquetas posibles, definidas por el negocio: {', '.join(etiquetas)}")
         print(f"Aviso: {resultado.veredicto.aviso}")
     return 2 if resultado.etiqueta == REVISION_HUMANA else 0
+
+
+AYUDA_MODELO = (
+    "modelo del proveedor; por defecto uno barato: claude-haiku-5-5, gemini-3.5-flash-lite "
+    "o google/gemma-4-26b-a4b-it (OpenRouter)"
+)
 
 
 def _parser() -> argparse.ArgumentParser:
@@ -132,9 +142,14 @@ def _parser() -> argparse.ArgumentParser:
     revisar.add_argument(
         "--claude",
         action="store_true",
-        help="además de las reglas, consulta a Claude (usa la clave)",
+        help="además de las reglas, consulta a Claude (usa la clave); igual a --proveedor anthropic",
     )
-    revisar.add_argument("--modelo", default="claude-haiku-5-5", help="modelo de Claude")
+    revisar.add_argument(
+        "--proveedor",
+        choices=PROVEEDORES,
+        help="además de las reglas, consulta un modelo de este proveedor (usa su clave)",
+    )
+    revisar.add_argument("--modelo", help=AYUDA_MODELO)
     revisar.add_argument(
         "--tarjeta",
         action="store_true",
@@ -143,9 +158,14 @@ def _parser() -> argparse.ArgumentParser:
     revisar.set_defaults(funcion=_revisar)
 
     clasificar = sub.add_parser(
-        "clasificar", parents=[comun], help="clasifica un mensaje de un cliente (usa Claude)"
+        "clasificar",
+        parents=[comun],
+        help="clasifica un mensaje de un cliente con un modelo (Claude por defecto)",
     )
-    clasificar.add_argument("--modelo", default="claude-haiku-5-5", help="modelo de Claude")
+    clasificar.add_argument(
+        "--proveedor", choices=PROVEEDORES, default="anthropic", help="quién pone la etiqueta"
+    )
+    clasificar.add_argument("--modelo", help=AYUDA_MODELO)
     clasificar.set_defaults(funcion=_clasificar)
     return parser
 

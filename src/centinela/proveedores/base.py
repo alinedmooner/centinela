@@ -2,6 +2,8 @@
 
 from __future__ import annotations
 
+import json
+import re
 from dataclasses import dataclass
 from typing import Protocol, runtime_checkable
 
@@ -33,3 +35,18 @@ class Proveedor(Protocol):
     nombre: str
 
     def responder_json(self, *, sistema: str, mensaje: str, esquema: dict) -> RespuestaModelo: ...
+
+
+def json_de_texto(texto: str) -> dict | None:
+    """El objeto JSON de una respuesta, aunque venga entre marcas de bloque de código."""
+    limpio = re.sub(r"^```(?:json)?\s*|\s*```$", "", (texto or "").strip())
+    try:
+        datos = json.loads(limpio)
+    except json.JSONDecodeError:
+        return None
+    return datos if isinstance(datos, dict) else None
+
+
+def es_error_de(error: Exception, *paquetes: str) -> bool:
+    """El error viene de uno de estos paquetes (el SDK del proveedor o su cliente HTTP)."""
+    return type(error).__module__.split(".")[0] in paquetes

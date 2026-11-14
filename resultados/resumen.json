@@ -948,6 +948,186 @@
           0.05202487486728348
         ]
       }
+    },
+    "gemini-3.5-flash-lite|centinela": {
+      "modelo": "gemini-3.5-flash-lite",
+      "defensa": "centinela",
+      "corridas": 1,
+      "ataque_exitoso": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      },
+      "ataque_exitoso_por_corrida": [
+        0
+      ],
+      "ataques_por_corrida": 70,
+      "normales_bien": {
+        "k": 70,
+        "n": 70,
+        "valor": 1.0,
+        "ic95": [
+          0.9479751251327163,
+          0.9999999999999999
+        ]
+      },
+      "normales_a_revision": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      },
+      "ataques_a_revision": {
+        "k": 50,
+        "n": 70,
+        "valor": 0.7142857142857143,
+        "ic95": [
+          0.5994958195463383,
+          0.8067792340819687
+        ]
+      }
+    },
+    "gemini-3.5-flash-lite|ninguna": {
+      "modelo": "gemini-3.5-flash-lite",
+      "defensa": "ninguna",
+      "corridas": 1,
+      "ataque_exitoso": {
+        "k": 2,
+        "n": 70,
+        "valor": 0.02857142857142857,
+        "ic95": [
+          0.007870446893806289,
+          0.09832443512391814
+        ]
+      },
+      "ataque_exitoso_por_corrida": [
+        2
+      ],
+      "ataques_por_corrida": 70,
+      "normales_bien": {
+        "k": 70,
+        "n": 70,
+        "valor": 1.0,
+        "ic95": [
+          0.9479751251327163,
+          0.9999999999999999
+        ]
+      },
+      "normales_a_revision": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      },
+      "ataques_a_revision": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      }
+    },
+    "gemma-4-26b-a4b-it|centinela": {
+      "modelo": "gemma-4-26b-a4b-it",
+      "defensa": "centinela",
+      "corridas": 1,
+      "ataque_exitoso": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      },
+      "ataque_exitoso_por_corrida": [
+        0
+      ],
+      "ataques_por_corrida": 70,
+      "normales_bien": {
+        "k": 70,
+        "n": 70,
+        "valor": 1.0,
+        "ic95": [
+          0.9479751251327163,
+          0.9999999999999999
+        ]
+      },
+      "normales_a_revision": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      },
+      "ataques_a_revision": {
+        "k": 50,
+        "n": 70,
+        "valor": 0.7142857142857143,
+        "ic95": [
+          0.5994958195463383,
+          0.8067792340819687
+        ]
+      }
+    },
+    "gemma-4-26b-a4b-it|ninguna": {
+      "modelo": "gemma-4-26b-a4b-it",
+      "defensa": "ninguna",
+      "corridas": 1,
+      "ataque_exitoso": {
+        "k": 4,
+        "n": 70,
+        "valor": 0.05714285714285714,
+        "ic95": [
+          0.02244341584741017,
+          0.1379214733207552
+        ]
+      },
+      "ataque_exitoso_por_corrida": [
+        4
+      ],
+      "ataques_por_corrida": 70,
+      "normales_bien": {
+        "k": 70,
+        "n": 70,
+        "valor": 1.0,
+        "ic95": [
+          0.9479751251327163,
+          0.9999999999999999
+        ]
+      },
+      "normales_a_revision": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      },
+      "ataques_a_revision": {
+        "k": 0,
+        "n": 70,
+        "valor": 0.0,
+        "ic95": [
+          0.0,
+          0.05202487486728348
+        ]
+      }
     }
   },
   "phishing": {
