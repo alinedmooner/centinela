@@ -25,6 +25,11 @@ centinela = "centinela.cli:main"
 llm = [
     "anthropic>=2.6.0",
 ]
+local = [
+    "sentencepiece>=0.2.3",
+    "torch>=2.15.0",
+    "transformers>=5.22.2",
+]
 
 [dependency-groups]
 dev = ["pytest", "ruff"]
@@ -45,3 +50,16 @@ testpaths = ["tests"]
 
 [tool.ruff]
 line-length = 100
+
+# El extra «local» usa PyTorch para CPU: los detectores son pequeños y no necesitan GPU.
+[tool.uv.sources]
+torch = { index = "pytorch-cpu" }
+
+[[tool.uv.index]]
+name = "pytorch-cpu"
+url = "https://download.pytorch.org/whl/cpu"
+explicit = true
+
+# El índice de PyTorch no publica fechas de subida, así que no pasa por el periodo de espera.
+[tool.uv.exclude-newer-package]
+torch = false
