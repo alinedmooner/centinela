@@ -1,0 +1,26 @@
+# Secretos: nunca se suben
+.env
+.env.*
+!.env.example
+
+# Entornos y cachés
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+*.egg-info/
+dist/
+build/
+
+# Datos de terceros que no se redistribuyen (por ejemplo, SpaPhish)
+datos/externos/
+
+# Registros de Inspect y salidas crudas que pueden contener texto de terceros
+logs/
+resultados/crudo/
+
+# Editor y sistema
+.idea/
+.vscode/
+.DS_Store
