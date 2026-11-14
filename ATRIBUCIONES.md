@@ -2,6 +2,21 @@
 
 Centinela se apoya en trabajo de otras personas. Aquí está lo que usamos, de dónde viene y qué parte hizo una IA.
 
+## Recursos del hackathon que usamos
+
+La organización del Hackathon DefAcc 2026 entregó recursos en seis carpetas temáticas. Estos son los que usa Centinela, para qué y en qué archivos:
+
+| Recurso entregado (carpeta) | Para qué lo usamos | Dónde |
+|---|---|---|
+| AgentDojo (Seguridad de agentes) | Cuatro plantillas públicas de ataque y 27 objetivos de inyección, traducidos al español. Su implementación del detector de ProtectAI, como referencia para el detector local. Sus registros públicos, para medir el éxito de los ataques en 22 modelos | `datos/ataques.jsonl`, `src/centinela/detectores/local.py`, `evals/externos.py` |
+| AgentDyn (Seguridad de agentes) | 28 objetivos de inyección. Sus registros públicos, para medir el éxito de los ataques en 10 modelos | `datos/ataques.jsonl`, `evals/externos.py` |
+| Inspect AI, del UK AI Security Institute (Control de IA) | La prueba del bot de leads con cuatro modelos de Claude | `evals/bot.py` |
+| LlamaFirewall, de PurpleLlama, de Meta (Ciberdefensa automatizada) | Su regla por defecto, como línea base del filtro, y la idea de buscar texto oculto con caracteres invisibles | `evals/filtro.py`, `src/centinela/detectores/reglas.py` |
+| SpaPhish (Defensa epistémica) | 1395 correos reales en español para las falsas alarmas, la prueba de phishing y la sala de revisión. Su guía de anotación, para definir los trucos de persuasión | `evals/casos.py`, `evals/phishing.py`, `evals/revision.py`, `src/centinela/detectores/llm.py` |
+| Plantilla de la ficha técnica | La estructura de la ficha | `docs/ficha-tecnica.html` |
+
+También revisamos el resto de los recursos, como ControlArena, MCPTox y CyberSecEval, pero no forman parte de Centinela.
+
 ## Datos
 
 | Fuente | Qué tomamos | Licencia |

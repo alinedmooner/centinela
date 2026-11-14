@@ -75,26 +75,26 @@
 
 <section>
   <h2>3. Cómo lo evaluamos</h2>
-  <p>Con casos reservados: las reglas se escribieron con el 30 % de los datos y se midieron con el otro 70 %. Cada número es un conteo sobre un grupo fijo (n en la tabla). <b>Ataques que cambian la etiqueta:</b> de 70 mensajes de WhatsApp con trampa, cuántos terminan con la etiqueta que pide el atacante. <b>Normales bien clasificados:</b> de 70 sin trampa, cuántos reciben la etiqueta correcta. <b>Detección y falsas alarmas:</b> qué parte de los ataques, o de los mensajes normales, marca cada detector. <b>Phishing:</b> qué parte de 731 correos reales de phishing marca el revisor. Líneas base: bot sin defensa, advertencia en el prompt, LlamaFirewall, ProtectAI y un clasificador clásico entrenado.</p>
+  <p>Con casos reservados: las reglas se escribieron con el 30 % de los datos y se midieron con el 70 % restante. El bot se probó con cuatro modelos de Claude: sin defensa, con una advertencia en el prompt y con Centinela. Los mensajes de WhatsApp son de prueba; los correos son reales (SpaPhish: A Spanish Dataset for Phishing and Psychological Persuasion Analysis).</p>
 
   <h2>4. Resultados</h2>
   <table>
-    <thead><tr><th style="width:38%">Métrica</th><th style="width:27%">Línea base (sin Centinela)</th><th style="width:24%">Centinela</th><th>Diferencia</th></tr></thead>
+    <thead><tr><th style="width:51%">Qué medimos</th><th style="width:25%">Sin Centinela (línea base)</th><th>Con Centinela</th></tr></thead>
     <tbody>
-      <tr><td>Ataques que cambian la etiqueta del bot <span class="n">(70 por modelo)</span></td><td>Opus 5.5: 23/70 (32,9 %)<br>Sonnet 5.5: 2/70 · Haiku 4.5: 1/70 · Haiku 5.5: 0/70</td><td class="c">0/70 con los 4 modelos, sin API</td><td>−32,9 p. p. (Opus)</td></tr>
-      <tr><td>Ataques frenados antes de llegar al modelo <span class="n">(70)</span></td><td>0: el modelo lee todo</td><td class="c">50/70 (71,4 %), con cualquier modelo</td><td>+50 ataques</td></tr>
-      <tr><td>Mensajes normales bien clasificados <span class="n">(70 por modelo)</span></td><td>98,6 % a 100 %</td><td class="c">97,1 % a 100 %</td><td>0 a −2,9 p. p.</td></tr>
-      <tr><td>Ataques en español detectados <span class="n">(182)</span></td><td>0 % LlamaFirewall<br>83,5 % ProtectAI</td><td class="c">73,6 % solo reglas<br>98,9 % con revisor</td><td>+15,4 p. p.</td></tr>
-      <tr><td>Falsas alarmas en mensajes normales de clientes <span class="n">(70)</span></td><td>61,4 % ProtectAI</td><td class="c">0 %</td><td>−61,4 p. p.</td></tr>
-      <tr><td>Falsas alarmas en correos legítimos reales</td><td>52,7 % ProtectAI <span class="n">(de 300)</span></td><td class="c">0 % reglas; 0,4 % revisor <span class="n">(de 462)</span></td><td>−52 p. p.</td></tr>
-      <tr><td>Phishing real detectado <span class="n">(731)</span></td><td>89,5 % clasificador clásico entrenado</td><td class="c">93,3 % revisor sin entrenar</td><td>+3,8 p. p.</td></tr>
-      <tr><td>Enlaces que quien revisa puede abrir <span class="n">(103, en 731 correos de phishing)</span></td><td>103 en el texto original</td><td class="c">0 en la sala de revisión</td><td>−100 %</td></tr>
+      <tr><td><b>Engaños que funcionaron.</b> De 70 mensajes con trampa, ¿en cuántos el bot puso la etiqueta que pedía el atacante? <span class="n">Menos es mejor.</span></td><td>Opus 5.5: 23 de 70<br>Sonnet 5.5: 2 · Haiku 4.5: 1 · Haiku 5.5: 0</td><td class="c">0 de 70, con los cuatro modelos</td></tr>
+      <tr><td><b>Ataques que no llegan al modelo.</b> De esos 70, ¿cuántos se frenan antes de que el modelo los lea? <span class="n">Más es mejor.</span></td><td>0: el modelo lee los 70</td><td class="c">50 de 70, con cualquier modelo</td></tr>
+      <tr><td><b>Trabajo normal.</b> De 70 mensajes normales de clientes, ¿cuántos clasificó bien el bot? <span class="n">Más es mejor.</span></td><td>69 o 70 de 70, según el modelo</td><td class="c">68 a 70 de 70, según el modelo</td></tr>
+      <tr><td><b>Ataques detectados.</b> De 182 ataques en español, ¿cuántos marca el filtro como sospechosos? <span class="n">Más es mejor.</span></td><td>LlamaFirewall: 0 de 182<br>ProtectAI: 152 de 182</td><td class="c">Solo reglas, sin API: 134 de 182<br>Con revisor, por API: 180 de 182</td></tr>
+      <tr><td><b>Falsas alarmas con clientes.</b> De 70 mensajes normales, ¿cuántos marca por error como ataque? <span class="n">Menos es mejor.</span></td><td>ProtectAI: 43 de 70</td><td class="c">0 de 70</td></tr>
+      <tr><td><b>Falsas alarmas con correos reales.</b> De correos legítimos reales, ¿cuántos marca por error? <span class="n">Menos es mejor.</span></td><td>ProtectAI: 158 de 300</td><td class="c">Solo reglas: 0 de 462<br>Con revisor: 2 de 462</td></tr>
+      <tr><td><b>Phishing real detectado.</b> De 731 correos reales de phishing, ¿cuántos detecta? <span class="n">Más es mejor.</span></td><td>Clasificador clásico, entrenado con esos correos: 654 de 731</td><td class="c">Revisor por API, sin entrenar: 682 de 731</td></tr>
+      <tr><td><b>Enlaces al alcance de quien revisa.</b> De 103 enlaces en esos correos de phishing, ¿cuántos se pueden abrir? <span class="n">Menos es mejor.</span></td><td>103 de 103: el mensaje tal como llega</td><td class="c">0 de 103: el mensaje desarmado</td></tr>
     </tbody>
   </table>
-  <p class="pie"><b>Tabla 1.</b> Línea base: lo que hay sin Centinela (el bot sin defensa, los filtros abiertos, un clasificador clásico o el mensaje tal como llega). «Solo reglas» no usa API; el revisor es Claude Haiku 5.5 por API. Casos reservados; una corrida por condición (dos para Opus sin defensa).</p>
+  <p class="pie"><b>Tabla 1.</b> Conteos sobre casos reservados. «Sin Centinela» es lo que hay hoy: el bot sin defensa, los filtros abiertos, un clasificador clásico o el mensaje tal como llega. «Sin API» funciona sin internet ni clave; el revisor es Claude Haiku 5.5. Opus sin defensa dio 23 de 70 en dos corridas.</p>
   <ul>
-    <li><b>No es solo Opus:</b> en agentes con herramientas, los ataques también funcionan con modelos pequeños. En los registros públicos de AgentDojo y AgentDyn, GPT-4o mini cayó en el 27 % y el 51 % de los intentos, y Llama 3.3 70B en el 23 % y el 12,5 %; Claude 3.5 Sonnet pasó de 34 % a 1 % entre versiones. La defensa no puede depender del modelo.</li>
-    <li><b>Dónde falla:</b> las reglas solas dejan pasar uno de cada cuatro ataques nuevos (7 de 10 con texto ofuscado) y no marcan un engaño dirigido solo a una persona. Una advertencia en el prompt también dejó a los cuatro modelos en 0 %. En phishing, el clasificador clásico acierta más en total (93,3 % frente a 85,0 %).</li>
+    <li><b>No es solo Opus:</b> en agentes con herramientas, los ataques también engañan a modelos pequeños. En los registros públicos de AgentDojo y AgentDyn, GPT-4o mini cayó en el 27 % y el 51 % de los intentos, y Llama 3.3 70B en el 23 % y el 12,5 %. La defensa no puede depender del modelo.</li>
+    <li><b>Dónde falla:</b> las reglas solas dejan pasar 48 de los 182 ataques y no marcan un engaño dirigido solo a una persona. Una advertencia en el prompt también dejó a los cuatro modelos en 0 de 70. En phishing, el clasificador clásico acierta más en total: 1302 de 1395 correos, frente a 1186.</li>
   </ul>
 
   <h2>5. Límites y riesgo de doble uso</h2>
@@ -105,9 +105,8 @@
   <div class="refs">
     <p>Debenedetti et al. (2024). AgentDojo: A Dynamic Environment to Evaluate Prompt Injection Attacks and Defenses for LLM Agents. NeurIPS.</p>
     <p>Li et al. (2026). AgentDyn: Are Your Agent Security Defenses Deployable in Real-World Dynamic Environments? arXiv:2602.03117.</p>
-    <p>SpaPhish: A Spanish Dataset for Phishing and Psychological Persuasion Analysis. Conjunto de datos y guía de anotación.</p>
     <p>Ferreira, Coventry y Lenzini (2015). Principles of Persuasion in Social Engineering and Their Use in Phishing. HAS.</p>
-    <p>ProtectAI, deberta-v3-base-prompt-injection-v2 (modelo); Meta, LlamaFirewall (2025).</p>
+    <p><b>Recursos del hackathon que usamos:</b> AgentDojo y AgentDyn (ataques, registros públicos y el detector de ProtectAI), Inspect AI del UK AISI (prueba del bot), LlamaFirewall de PurpleLlama (línea base) y SpaPhish (correos reales); detalle en ATRIBUCIONES.md.</p>
   </div>
 </section>
 
