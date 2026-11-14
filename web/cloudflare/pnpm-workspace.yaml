@@ -1,0 +1,9 @@
+# Mismas reglas que el resto del proyecto: solo versiones con al menos 7 días de publicadas.
+minimumReleaseAge: 10080
+
+# Paquetes revisados que pueden correr scripts de instalación. El resto queda bloqueado.
+allowBuilds:
+  # Runtime oficial de Cloudflare y el empaquetador que usa Wrangler: sus scripts
+  # solo verifican el binario de la plataforma.
+  workerd: true
+  esbuild: true

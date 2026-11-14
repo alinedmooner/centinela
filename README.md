@@ -5,7 +5,7 @@
 
 **Guardia de código abierto para asistentes de IA que leen mensajes en español.** Revisa cada mensaje antes de que lo lea el bot, avisa si trae órdenes escondidas o trucos de engaño, y deja las decisiones delicadas en manos del código.
 
-[English summary](#english-summary)
+Sitio: [centinela.alinedlabs.co](https://centinela.alinedlabs.co) · [English summary](#english-summary)
 
 ## El problema
 

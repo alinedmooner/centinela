@@ -1,0 +1,12 @@
+# Cabeceras de seguridad. La CSP no permite scripts ni estilos en línea:
+# solo los archivos del propio sitio y las fuentes de Google Fonts.
+/*
+  Content-Security-Policy: default-src 'self'; script-src 'self'; style-src 'self' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self' data:; connect-src 'self'; base-uri 'none'; form-action 'none'; frame-ancestors 'none'; object-src 'none'
+  Strict-Transport-Security: max-age=31536000
+  Referrer-Policy: strict-origin-when-cross-origin
+  X-Content-Type-Options: nosniff
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), payment=()
+  Cross-Origin-Opener-Policy: same-origin
+  # no-transform: Cloudflare no modifica las páginas; en particular, no les inyecta su
+  # script de analítica (el sitio promete no tener analítica). Lo demás es la caché por defecto.
+  Cache-Control: public, max-age=0, must-revalidate, no-transform

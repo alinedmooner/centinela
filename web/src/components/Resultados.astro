@@ -1,0 +1,32 @@
+---
+// Portado de la landing generada con Lovable (index.html).
+---
+<section id="resultados" class="cn-seccion" aria-labelledby="res-titulo">
+  <div class="cn-contenedor">
+    <p class="cn-etiqueta cn-seccion__ojo">04 · Resultados</p>
+    <h2 id="res-titulo" class="cn-aparece">Lo medimos.</h2>
+    <p class="cn-seccion__bajada cn-aparece">Con casos reservados, que no se usaron para escribir las reglas. Medido el 14 de noviembre de 2026, con una corrida por condición.</p>
+    <ul class="cn-evidencias">
+      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 01</span><span class="cn-evidencia__cifra">0 %</span><p class="cn-evidencia__texto">de los ataques cambió la etiqueta del bot con Centinela (Claude Opus 5.5; sin defensa, 32,9 %)</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 70</span><span>resultados/resumen.md</span></span></li>
+      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 02</span><span class="cn-evidencia__cifra">100 %</span><p class="cn-evidencia__texto">de los mensajes normales, bien clasificados con Centinela (Claude Opus 5.5)</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 70</span><span>resultados/resumen.md</span></span></li>
+      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 03</span><span class="cn-evidencia__cifra">0 de 462</span><p class="cn-evidencia__texto">falsas alarmas de las reglas en correos legítimos reales</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 462</span><span>resultados/resumen.md</span></span></li>
+      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 04</span><span class="cn-evidencia__cifra">98,9 %</span><p class="cn-evidencia__texto">de los ataques en español, detectados con Claude Haiku 5.5 como revisor (0,4 % de falsas alarmas)</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 182</span><span>resultados/resumen.md</span></span></li>
+      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 05</span><span class="cn-evidencia__cifra">93,3 %</span><p class="cn-evidencia__texto">del phishing real, detectado por el revisor sin entrenamiento</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 731</span><span>resultados/resumen.md</span></span></li>
+    </ul>
+    <div class="cn-tabla-caja cn-aparece" tabindex="0" role="region" aria-label="Tabla de resultados">
+      <table class="cn-tabla">
+        <caption class="cn-oculto">Comparación de Centinela con la línea base</caption>
+        <thead><tr><th scope="col">Métrica</th><th scope="col">Línea base</th><th scope="col">Centinela</th></tr></thead>
+        <tbody>
+          <tr><th scope="row">Ataques que cambian la etiqueta del bot (Opus 5.5, 70)</th><td>32,9 % sin defensa</td><td>0 %</td></tr>
+          <tr><th scope="row">Mensajes normales bien clasificados (70)</th><td>100 %</td><td>100 %</td></tr>
+          <tr><th scope="row">Ataques en español detectados (182)</th><td>0 % LlamaFirewall · 83,5 % ProtectAI</td><td>73,6 % solo reglas · 98,9 % con revisor</td></tr>
+          <tr><th scope="row">Falsas alarmas en mensajes normales de clientes (70)</th><td>61,4 % ProtectAI</td><td>0 %</td></tr>
+          <tr><th scope="row">Falsas alarmas en correos legítimos reales</th><td>52,7 % ProtectAI (300)</td><td>0 % reglas · 0,4 % revisor (462)</td></tr>
+          <tr><th scope="row">Phishing real detectado (731)</th><td>89,5 % clasificador clásico entrenado</td><td>93,3 % revisor sin entrenar</td></tr>
+          <tr><th scope="row">Enlaces que quien revisa puede abrir (731 correos de phishing)</th><td>103 en el texto original</td><td>0 en la sala de revisión</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>

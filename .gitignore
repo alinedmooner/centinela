@@ -24,3 +24,9 @@ resultados/crudo/
 .idea/
 .vscode/
 .DS_Store
+
+# Sitio web (web/)
+node_modules/
+.astro/
+.cloudflare/
+.wrangler/

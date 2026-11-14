@@ -1,0 +1,11 @@
+{
+  "name": "centinela-web-cloudflare",
+  "private": true,
+  "description": "Publica en Cloudflare el sitio estático que genera web/ en ../dist.",
+  "license": "MIT",
+  "type": "module",
+  "devDependencies": {
+    "cf": "1.0.0-beta.28",
+    "wrangler": "4.158.0"
+  }
+}

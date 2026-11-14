@@ -1,0 +1,4 @@
+# Higiene de la cadena de suministro, igual que en el proyecto de Python:
+# solo se instalan versiones publicadas hace al menos 7 días (10080 minutos),
+# incluidas las dependencias indirectas.
+minimumReleaseAge: 10080
