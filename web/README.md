@@ -18,9 +18,26 @@ pnpm build     # genera dist/
 
 ## Publicación en Cloudflare
 
-`cloudflare/` es un proyecto mínimo que publica `dist/` como sitio estático con el CLI `cf`, sin adaptador de Astro ni código de servidor. El nombre del Worker, el dominio y el manejo de rutas están en `cloudflare/cloudflare.config.ts`.
+`cloudflare/` es un proyecto mínimo que publica `dist/` con el CLI `cf`, sin adaptador de Astro. Cloudflare sirve las páginas estáticas directo; solo las rutas `/api/*` pasan por el Worker (`cloudflare/src/worker.js`). El nombre del Worker, el dominio, las rutas y los límites están en `cloudflare/cloudflare.config.ts`.
 
 ```bash
 cd web && pnpm build
 cd cloudflare && pnpm install && pnpm exec cf deploy
 ```
+
+## Revisión en vivo con Claude (`/api/revisar`)
+
+El botón «Revisar con Claude, en vivo» de la sala manda el texto a `POST /api/revisar`. El Worker lo revisa con Claude Haiku 5.5 y el revisor de la librería (`DetectorLLM`): mismas instrucciones, mismo esquema y la misma regla, porque la decisión la toma el código con las dos respuestas del modelo. Si el modelo se niega o responde mal, el mensaje va a revisión humana.
+
+- **Instrucciones:** `cloudflare/src/revisor.js` se genera desde Python con `uv run python web/cloudflare/generar_revisor.py`; `tests/test_web_revisor.py` falla si se desalinea.
+- **Clave:** `ANTHROPIC_API_KEY` es un secreto de Cloudflare (`secret_text`); no está en el código ni llega al navegador. Se sube con la publicación, desde un archivo temporal que se borra al terminar:
+
+  ```bash
+  umask 077; grep -E '^ANTHROPIC_API_KEY=' ../../.env > /tmp/secreto.env
+  pnpm exec cf deploy --secrets-file /tmp/secreto.env; rm -f /tmp/secreto.env
+  ```
+
+- **Límites:** hasta 2000 caracteres por mensaje y 700 tokens de respuesta. Hay 6 revisiones por minuto por visitante y 60 por minuto en total, por ubicación de Cloudflare. Solo acepta peticiones con el origen del sitio. Cada revisión cuesta unos 0,0002 USD (unos 1400 tokens de entrada y 100 de salida).
+- **Privacidad:** el texto no se guarda ni se registra; viaja a la API de Anthropic para revisarlo.
+- **Apagarlo** (después de la presentación): en `cloudflare.config.ts`, `REVISION_EN_VIVO: bindings.text('apagada')`, y `pnpm exec cf deploy`. El botón muestra que está apagado y la demostración en el navegador sigue funcionando. Para borrar también la clave, usen `npx wrangler secret delete ANTHROPIC_API_KEY --name centinela-web`.
+- **SDK:** el Worker usa el SDK oficial `@anthropic-ai/sdk` (licencia Apache 2.0).

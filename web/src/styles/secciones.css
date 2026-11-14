@@ -185,3 +185,30 @@
 .cn-esc--10 { height: var(--e-10); }
 .cn-doc__h2 { font-size: var(--t-h2); text-transform: uppercase; } .cn-doc__h3 { font-family: var(--f-titular); font-size: var(--t-h3); }
 .cn-hero__titulo, .cn-hero__bajada, .cn-insignia { overflow-wrap: anywhere; } .cn-hero__bandeja { min-width: 0; }
+
+/* Sala: revisión en vivo con Claude */
+.cn-sala__botones { display: flex; flex-wrap: wrap; gap: var(--e-3); }
+.cn-sala__claude { justify-self: stretch; }
+.cn-sala__pista { color: var(--texto-suave); margin-top: var(--e-2); }
+.cn-claude { display: grid; gap: var(--e-3); padding: var(--e-4); background: var(--superficie); border: var(--b-2) solid var(--borde); }
+.cn-claude--revisar { border-color: var(--acento); }
+.cn-claude__encabezado { display: flex; justify-content: space-between; gap: var(--e-3); flex-wrap: wrap; color: var(--texto-suave); }
+.cn-claude__decision { color: var(--acento); }
+.cn-claude--permitir .cn-claude__decision { color: var(--texto); }
+.cn-claude__aviso { font-weight: 600; }
+.cn-claude__nota { color: var(--texto-suave); }
+.cn-claude__error { color: var(--alerta); padding: var(--e-3) var(--e-4); border: var(--b-1) solid var(--alerta); }
+
+/* Dónde usarlo */
+.cn-donde__patron { margin-top: var(--e-6); }
+.cn-donde { margin-top: var(--e-6); display: grid; gap: var(--e-3); }
+.cn-donde__caso { border: var(--b-1) solid var(--borde); background: var(--superficie); }
+.cn-donde__caso[open] { border-color: var(--acento); }
+.cn-donde__resumen { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: var(--e-2) var(--e-4); padding: var(--e-4); cursor: pointer; min-height: var(--objetivo); }
+.cn-donde__resumen:focus-visible { outline: var(--b-2) solid var(--acento); outline-offset: -2px; }
+.cn-donde__titulo { font-family: var(--f-titular); font-size: var(--t-h3); }
+.cn-donde__herramienta { color: var(--texto-suave); }
+.cn-donde__caso > :not(summary) { margin: 0 var(--e-4) var(--e-4); }
+.cn-donde__texto { color: var(--texto-suave); max-width: 72ch; }
+.cn-donde__nota { margin-top: var(--e-5); }
+.cn-donde__nota code { overflow-wrap: anywhere; }
