@@ -79,9 +79,9 @@
 
   <h2>4. Resultados</h2>
   <table>
-    <thead><tr><th style="width:38%">Métrica</th><th style="width:27%">Línea base</th><th style="width:24%">Centinela</th><th>Diferencia</th></tr></thead>
+    <thead><tr><th style="width:38%">Métrica</th><th style="width:27%">Línea base (sin Centinela)</th><th style="width:24%">Centinela</th><th>Diferencia</th></tr></thead>
     <tbody>
-      <tr><td>Ataques que cambian la etiqueta del bot <span class="n">(70 por modelo)</span></td><td>Opus 5.5: 23/70 (32,9 %)<br>Sonnet 5.5: 2/70 · Haiku 4.5: 1/70 · Haiku 5.5: 0/70</td><td class="c">0/70 con los 4 modelos</td><td>−32,9 p. p. (Opus)</td></tr>
+      <tr><td>Ataques que cambian la etiqueta del bot <span class="n">(70 por modelo)</span></td><td>Opus 5.5: 23/70 (32,9 %)<br>Sonnet 5.5: 2/70 · Haiku 4.5: 1/70 · Haiku 5.5: 0/70</td><td class="c">0/70 con los 4 modelos, sin API</td><td>−32,9 p. p. (Opus)</td></tr>
       <tr><td>Ataques frenados antes de llegar al modelo <span class="n">(70)</span></td><td>0: el modelo lee todo</td><td class="c">50/70 (71,4 %), con cualquier modelo</td><td>+50 ataques</td></tr>
       <tr><td>Mensajes normales bien clasificados <span class="n">(70 por modelo)</span></td><td>98,6 % a 100 %</td><td class="c">97,1 % a 100 %</td><td>0 a −2,9 p. p.</td></tr>
       <tr><td>Ataques en español detectados <span class="n">(182)</span></td><td>0 % LlamaFirewall<br>83,5 % ProtectAI</td><td class="c">73,6 % solo reglas<br>98,9 % con revisor</td><td>+15,4 p. p.</td></tr>
@@ -91,7 +91,7 @@
       <tr><td>Enlaces que quien revisa puede abrir <span class="n">(103, en 731 correos de phishing)</span></td><td>103 en el texto original</td><td class="c">0 en la sala de revisión</td><td>−100 %</td></tr>
     </tbody>
   </table>
-  <p class="pie"><b>Tabla 1.</b> Casos reservados; revisor: Claude Haiku 5.5; una corrida por condición (dos para Opus sin defensa). En el 91,5 % del phishing, un enlace lleva a un dominio que no está en el texto: la tarjeta lo muestra.</p>
+  <p class="pie"><b>Tabla 1.</b> Línea base: lo que hay sin Centinela (el bot sin defensa, los filtros abiertos, un clasificador clásico o el mensaje tal como llega). «Solo reglas» no usa API; el revisor es Claude Haiku 5.5 por API. Casos reservados; una corrida por condición (dos para Opus sin defensa).</p>
   <ul>
     <li><b>No es solo Opus:</b> en agentes con herramientas, los ataques también funcionan con modelos pequeños. En los registros públicos de AgentDojo y AgentDyn, GPT-4o mini cayó en el 27 % y el 51 % de los intentos, y Llama 3.3 70B en el 23 % y el 12,5 %; Claude 3.5 Sonnet pasó de 34 % a 1 % entre versiones. La defensa no puede depender del modelo.</li>
     <li><b>Dónde falla:</b> las reglas solas dejan pasar uno de cada cuatro ataques nuevos (7 de 10 con texto ofuscado) y no marcan un engaño dirigido solo a una persona. Una advertencia en el prompt también dejó a los cuatro modelos en 0 %. En phishing, el clasificador clásico acierta más en total (93,3 % frente a 85,0 %).</li>
