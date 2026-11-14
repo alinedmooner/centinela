@@ -1,0 +1,7 @@
+{
+  "urgencia": "Dolor, sangrado o un problema que necesita atención hoy.",
+  "cita": "Quiere pedir, cambiar o cancelar una cita.",
+  "consulta": "Pregunta por precios, horarios, ubicación o tratamientos, sin pedir cita.",
+  "reclamo": "Paciente con una queja sobre una atención o un cobro.",
+  "spam": "Publicidad, cadenas o mensajes sin relación con la clínica."
+}

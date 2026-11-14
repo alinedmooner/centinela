@@ -72,6 +72,10 @@ def main() -> int:
         clasificador = ClasificadorSeguro(proveedor, guardia=Guardia(detectores))
     guardia = Guardia(detectores)
 
+    print("Negocio de ejemplo: una empresa de software que vende por WhatsApp.")
+    print(
+        f"Sus etiquetas: {', '.join(ETIQUETAS_LEADS)}. Cada negocio define las suyas (ver ejemplos/)."
+    )
     for numero, mensaje in enumerate(BANDEJA, start=1):
         print(f"\nMensaje {numero}")
         print(textwrap.indent(textwrap.fill(mensaje, 88), "  | "))
