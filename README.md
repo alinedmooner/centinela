@@ -112,6 +112,18 @@ Para una demostración en vivo hay dos scripts sin dependencias:
 
 Las credenciales van en `.env` (ver `.env.example`). Con Gmail hacen falta contraseñas de aplicación.
 
+**Con Composio.** Muchos agentes leen el correo con las herramientas de Gmail de [Composio](https://composio.dev). `centinela.buzon_seguro` trae dos modificadores que ponen al guardia delante de esas herramientas: cada correo se revisa en código antes de que lo vea el agente, y los sospechosos se retienen. El agente recibe solo un aviso, nunca su texto, y la decisión no depende de que el agente se acuerde de consultar a Centinela.
+
+```python
+from composio import Composio
+from centinela.buzon_seguro import modificadores
+
+composio = Composio()
+herramientas = composio.tools.get(user_id, toolkits=["gmail"], modifiers=modificadores())
+```
+
+`ejemplos/composio_buzon.py` lo muestra con una cuenta real: envía los correos de prueba, vigila el buzón y enseña lo que recibe el agente. Se corre con `uv run --group composio` y necesita `COMPOSIO_API_KEY` y `COMPOSIO_USUARIO` en `.env`.
+
 ## Detectores
 
 El guardia combina uno o varios detectores. Todos responden con el mismo formato.
