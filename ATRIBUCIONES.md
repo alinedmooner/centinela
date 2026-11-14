@@ -25,6 +25,8 @@ Los mensajes de `datos/leads.jsonl`, los de `datos/portadores.jsonl` y las tradu
 
 SDK oficial de Anthropic, [Inspect AI](https://inspect.aisi.org.uk/) (UK AI Security Institute), transformers, PyTorch, scikit-learn, pytest, ruff, hatchling y uv. Las versiones exactas están en `uv.lock`.
 
+La demostración con Gmail puede usar el SDK de [Composio](https://composio.dev), en el grupo opcional `composio`.
+
 El sitio web (`web/`) usa [Astro](https://astro.build) y se publica en Cloudflare con `cf` y Wrangler; las versiones exactas están en sus `pnpm-lock.yaml`. Sus fuentes son Big Shoulders, Instrument Sans y Martian Mono, de Google Fonts, con licencia SIL Open Font License.
 
 ## Ideas
