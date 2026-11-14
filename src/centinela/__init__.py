@@ -9,7 +9,7 @@ Uso mínimo, sin clave ni internet::
 """
 
 from centinela.clasificador import Clasificacion, ClasificadorSeguro
-from centinela.detectores import Detector, DetectorReglas
+from centinela.detectores import Detector, DetectorLLM, DetectorLocal, DetectorReglas
 from centinela.etiquetas import ETIQUETAS_LEADS, REVISION_HUMANA
 from centinela.guardia import Guardia, revisar
 from centinela.tipos import TRUCOS, Hallazgo, Veredicto
@@ -23,6 +23,8 @@ __all__ = [
     "Clasificacion",
     "ClasificadorSeguro",
     "Detector",
+    "DetectorLLM",
+    "DetectorLocal",
     "DetectorReglas",
     "Guardia",
     "Hallazgo",
