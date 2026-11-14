@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 900 232" role="img" aria-labelledby="titulo desc" font-family="Helvetica, Arial, sans-serif">
+  <title id="titulo">Arquitectura de Centinela</title>
+  <desc id="desc">Un mensaje entrante pasa por el guardia. Si no hay señales, el clasificador le pone una etiqueta de una lista cerrada. Si hay sospecha, o si el modelo responde algo inválido, el mensaje va a revisión humana con un aviso.</desc>
+  <defs>
+    <marker id="flecha" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M0 0 L10 5 L0 10 z" fill="#1f2d3d"/>
+    </marker>
+  </defs>
+  <rect x="0" y="0" width="900" height="232" fill="#ffffff"/>
+
+  <!-- Mensaje -->
+  <rect x="10" y="78" width="150" height="64" rx="6" fill="#eef2f6" stroke="#1f2d3d" stroke-width="1.5"/>
+  <text x="85" y="104" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f2d3d">Mensaje entrante</text>
+  <text x="85" y="124" text-anchor="middle" font-size="12" fill="#3d4f63">WhatsApp o correo</text>
+
+  <!-- Guardia -->
+  <rect x="215" y="40" width="215" height="140" rx="6" fill="#e6eef9" stroke="#1f56a8" stroke-width="2"/>
+  <text x="322" y="64" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f56a8">1. Guardia</text>
+  <text x="322" y="84" text-anchor="middle" font-size="12" fill="#1f2d3d">¿Órdenes para la IA?</text>
+  <text x="322" y="100" text-anchor="middle" font-size="12" fill="#1f2d3d">¿Engaño a una persona?</text>
+  <rect x="229" y="112" width="58" height="52" rx="4" fill="#ffffff" stroke="#1f56a8"/>
+  <text x="258" y="134" text-anchor="middle" font-size="11" fill="#1f2d3d">Reglas</text>
+  <text x="258" y="150" text-anchor="middle" font-size="10" fill="#3d4f63">sin clave</text>
+  <rect x="293" y="112" width="58" height="52" rx="4" fill="#ffffff" stroke="#1f56a8"/>
+  <text x="322" y="134" text-anchor="middle" font-size="11" fill="#1f2d3d">Modelo</text>
+  <text x="322" y="150" text-anchor="middle" font-size="10" fill="#3d4f63">local</text>
+  <rect x="357" y="112" width="58" height="52" rx="4" fill="#ffffff" stroke="#1f56a8"/>
+  <text x="386" y="134" text-anchor="middle" font-size="11" fill="#1f2d3d">Modelo</text>
+  <text x="386" y="150" text-anchor="middle" font-size="10" fill="#3d4f63">por API</text>
+
+  <!-- Clasificador -->
+  <rect x="505" y="30" width="200" height="74" rx="6" fill="#e6eef9" stroke="#1f56a8" stroke-width="2"/>
+  <text x="605" y="54" text-anchor="middle" font-size="15" font-weight="bold" fill="#1f56a8">2. Clasificador seguro</text>
+  <text x="605" y="74" text-anchor="middle" font-size="12" fill="#1f2d3d">El mensaje viaja como dato.</text>
+  <text x="605" y="90" text-anchor="middle" font-size="12" fill="#1f2d3d">Solo vale una etiqueta de la lista.</text>
+
+  <!-- Etiqueta -->
+  <rect x="770" y="40" width="120" height="54" rx="6" fill="#dff2e8" stroke="#17694a" stroke-width="1.5"/>
+  <text x="830" y="72" text-anchor="middle" font-size="15" font-weight="bold" fill="#17694a">Etiqueta</text>
+
+  <!-- Revisión humana -->
+  <rect x="505" y="150" width="385" height="74" rx="6" fill="#faeed2" stroke="#855600" stroke-width="2"/>
+  <text x="697" y="176" text-anchor="middle" font-size="15" font-weight="bold" fill="#855600">Revisión humana</text>
+  <text x="697" y="196" text-anchor="middle" font-size="12" fill="#1f2d3d">Con un aviso de una línea: qué trae el mensaje</text>
+  <text x="697" y="212" text-anchor="middle" font-size="12" fill="#1f2d3d">y qué truco usa (autoridad, urgencia…).</text>
+
+  <!-- Flechas -->
+  <line x1="160" y1="110" x2="213" y2="110" stroke="#1f2d3d" stroke-width="1.5" marker-end="url(#flecha)"/>
+  <line x1="430" y1="76" x2="503" y2="68" stroke="#1f2d3d" stroke-width="1.5" marker-end="url(#flecha)"/>
+  <text x="466" y="60" text-anchor="middle" font-size="11" fill="#17694a">sin señales</text>
+  <line x1="430" y1="150" x2="503" y2="180" stroke="#1f2d3d" stroke-width="1.5" marker-end="url(#flecha)"/>
+  <text x="462" y="186" text-anchor="middle" font-size="11" fill="#855600">sospecha</text>
+  <line x1="705" y1="67" x2="768" y2="67" stroke="#1f2d3d" stroke-width="1.5" marker-end="url(#flecha)"/>
+  <line x1="605" y1="104" x2="605" y2="148" stroke="#1f2d3d" stroke-width="1.5" stroke-dasharray="5 4" marker-end="url(#flecha)"/>
+  <text x="612" y="130" font-size="11" fill="#855600">respuesta inválida, rechazo o error</text>
+
+</svg>
