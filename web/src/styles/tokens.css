@@ -1,0 +1,49 @@
+/* Vigía · tokens */
+:root {
+  --noche-950: #050505; --noche-900: #0C0C0D; --noche-800: #151517; --noche-700: #1F2023;
+  --noche-600: #2C2D31; --noche-400: #6B6E76; --niebla-200: #B4B7BE; --papel-50: #F6F4EE;
+  --voltaje-300: #FFF36B; --voltaje-500: #FFEA00; --voltaje-600: #E6D200;
+  --voltaje-brillo: rgb(255 234 0 / .45);
+  --senal-roja: #FF3B30;
+
+  --fondo: var(--noche-950); --fondo-alt: var(--noche-900); --superficie: var(--noche-800);
+  --superficie-elevada: var(--noche-700); --borde: var(--noche-600);
+  --texto: var(--papel-50); --texto-suave: var(--niebla-200); --texto-decorativo: var(--noche-400);
+  --acento: var(--voltaje-500); --acento-hover: var(--voltaje-300); --acento-presionado: var(--voltaje-600);
+  --sobre-acento: #050505; --foco: var(--voltaje-500); --alerta: var(--senal-roja);
+  --claro-fondo: var(--papel-50); --claro-texto: var(--noche-950); --claro-suave: #3A3B40; --claro-borde: #D6D3C8;
+
+  --f-titular: "Big Shoulders", "Big Shoulders Display", Impact, sans-serif;
+  --f-stencil: "Big Shoulders Stencil", "Big Shoulders Stencil Display", Impact, sans-serif;
+  --f-texto: "Instrument Sans", system-ui, sans-serif;
+  --f-mono: "Martian Mono", ui-monospace, monospace;
+
+  --t-display: clamp(3.5rem, 1.6rem + 9.5vw, 9rem);
+  --t-h1: clamp(2.75rem, 1.6rem + 5vw, 5.5rem);
+  --t-h2: clamp(2.25rem, 1.5rem + 3.4vw, 4rem);
+  --t-h3: clamp(1.375rem, 1.2rem + .8vw, 1.875rem);
+  --t-cuerpo: 1.0625rem; --t-grande: clamp(1.125rem, 1rem + .5vw, 1.3125rem);
+  --t-peq: .9375rem; --t-etiqueta: .75rem;
+  --interlineado: 1.6; --interlineado-titular: .95; --espaciado-etiqueta: .12em; --medida: 68ch;
+
+  --e-1: 4px; --e-2: 8px; --e-3: 12px; --e-4: 16px; --e-5: 24px; --e-6: 32px;
+  --e-7: 48px; --e-8: 64px; --e-9: 96px; --e-10: 128px;
+  --ancho-max: 1200px; --margen: clamp(16px, 4vw, 32px);
+  --objetivo: 44px;
+
+  --r-0: 0; --r-1: 2px; --r-2: 4px; --r-pildora: 999px;
+  --b-1: 1px; --b-2: 2px;
+
+  --sombra-brillo: 0 0 24px var(--voltaje-brillo);
+  --cinta: repeating-linear-gradient(-45deg, var(--voltaje-500) 0 14px, var(--noche-950) 14px 28px);
+  --trama: repeating-linear-gradient(135deg, rgb(255 255 255 / .035) 0 2px, transparent 2px 8px);
+  --rejilla: linear-gradient(rgb(255 255 255 / .05) 1px, transparent 1px) 0 0 / 48px 48px,
+             linear-gradient(90deg, rgb(255 255 255 / .05) 1px, transparent 1px) 0 0 / 48px 48px;
+  --grano: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --grano-opacidad: .05;
+
+  --d-1: 120ms; --d-2: 200ms; --d-3: 320ms; --d-4: 600ms;
+  --curva: cubic-bezier(.2, .8, .2, 1);
+  --desplazamiento-aparicion: 12px;
+}
+@media (color-gamut: p3) { :root { --voltaje-500: color(display-p3 1 0.92 0); } }
