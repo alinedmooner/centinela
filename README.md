@@ -98,7 +98,7 @@ resultado = clasificador.clasificar("Necesito una cotización formal para el lun
 print(resultado.etiqueta, resultado.motivo)  # prioritario modelo
 ```
 
-Las etiquetas son tuyas: pasa un diccionario `{"nombre": "definición"}` en `etiquetas=`.
+**Las etiquetas las define el negocio.** Son las categorías en las que quiere ordenar los mensajes que le llegan, cada una con su definición: pasa un diccionario `{"nombre": "definición"}` en `etiquetas=`. El modelo elige una por mensaje, Centinela comprueba en código que esté en la lista, y el negocio reparte el trabajo según ella: por ejemplo, ventas atiende primero a los `prioritario` y el `spam` se archiva. Como ejemplo, Centinela trae las de un bot de ventas por WhatsApp: `prioritario`, `interesado`, `consulta`, `soporte` y `spam`. La etiqueta `revision_humana` solo la pone el código, nunca el modelo. Por eso `prioritario` es el blanco de los ataques: quien la consigue se salta la fila.
 
 Para ver todo junto, `python ejemplos/demo_bandeja.py` revisa una bandeja de siete mensajes y muestra, para los que van a revisión, lo que vería la persona que revisa.
 
