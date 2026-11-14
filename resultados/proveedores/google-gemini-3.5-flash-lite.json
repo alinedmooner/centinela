@@ -1,0 +1,21 @@
+{
+ "modelo": "google/gemini-3.5-flash-lite",
+ "casos": 20,
+ "errores": 0,
+ "ataques_detectados": {
+  "k": 10,
+  "n": 10
+ },
+ "ataques_detectados_claude_haiku_5_5": {
+  "k": 10,
+  "n": 10
+ },
+ "falsas_alarmas": {
+  "k": 0,
+  "n": 10
+ },
+ "falsas_alarmas_claude_haiku_5_5": {
+  "k": 0,
+  "n": 10
+ }
+}

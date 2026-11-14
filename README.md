@@ -18,7 +18,7 @@ Las defensas abiertas más conocidas se hicieron y se midieron en inglés.
 
 ## Por qué usarlo
 
-- **No depende del modelo.** El guardia frena 50 de cada 70 ataques antes de que el modelo los lea, sea cual sea el modelo, y la lista cerrada impide que el bot responda algo fuera de lo permitido. Con cuatro modelos de Claude, ningún ataque cambió la etiqueta.
+- **No depende del modelo.** El guardia frena 50 de cada 70 ataques antes de que el modelo los lea, sea cual sea el modelo, y la lista cerrada impide que el bot responda algo fuera de lo permitido. Con seis modelos de dos proveedores (cuatro de Claude, Gemini 3.5 Flash-Lite y el modelo abierto Gemma 4), ningún ataque cambió la etiqueta.
 - **Funciona en español.** Las defensas abiertas que probamos fallan aquí: una no detectó ningún ataque y la otra marca como ataque el 61 % de los mensajes normales de clientes.
 - **Gratis, local y sin falsas alarmas.** El modo de reglas no necesita clave ni internet, y no marcó ninguno de 462 correos legítimos reales.
 - **Protege también a la persona.** Quien revisa ve el mensaje desarmado: en 731 correos reales de phishing no quedó ningún enlace activo.
@@ -77,7 +77,13 @@ pip install centinela-ia
 
 # Con Claude como revisor y como clasificador
 pip install "centinela-ia[llm]"
+
+# O con otro proveedor: Gemini y Gemma (Google AI Studio), o cualquier modelo de OpenRouter
+pip install "centinela-ia[google]"
+pip install "centinela-ia[openrouter]"
 ```
+
+Cada proveedor lee su clave del entorno o de un archivo `.env`: `ANTHROPIC_API_KEY`, `GOOGLE_API_KEY` u `OPENROUTER_API_KEY`.
 
 El paquete se llama `centinela-ia` porque en PyPI el nombre `centinela` ya estaba tomado. El módulo y el comando se llaman `centinela`.
 
@@ -100,6 +106,20 @@ centinela revisar "Hola, ¿a qué hora abren mañana?"       # sale con 0: puede
 centinela revisar --archivo mensaje.txt --json            # sale con 2 si debe verlo una persona
 centinela revisar --claude "Su cuenta será bloqueada hoy" # suma a Claude como revisor
 centinela revisar --tarjeta --archivo mensaje.txt        # si va a revisión, muestra la tarjeta
+
+# El revisor puede ser cualquier modelo: --proveedor anthropic, google u openrouter
+centinela revisar --proveedor google "Su cuenta será bloqueada hoy"   # Gemini 3.5 Flash-Lite
+centinela revisar --proveedor openrouter --modelo meta-llama/llama-3.1-8b-instruct --archivo mensaje.txt
+centinela clasificar --proveedor google "Quiero el plan para mis 3 tiendas"
+```
+
+En Python, con el proveedor que quieran (o con uno propio: basta una clase con el método `responder_json`, ver `centinela/proveedores/base.py`):
+
+```python
+from centinela import DetectorLLM, DetectorReglas, Guardia
+from centinela.proveedores import crear_proveedor
+
+guardia = Guardia([DetectorReglas(), DetectorLLM(crear_proveedor("google"))])
 ```
 
 La sala de revisión, en Python y sin clave:
@@ -188,7 +208,7 @@ Medidos el 14 de noviembre de 2026 con casos reservados: las reglas se escribier
 | Phishing detectado | Correos de phishing que el revisor marca como engaño, sin ningún entrenamiento | 731 correos de phishing de SpaPhish (de 1395) |
 | Enlaces activos en la sala de revisión | Enlaces escritos en el texto que se pueden abrir después de desarmar el mensaje | 103 enlaces en los 731 correos de phishing |
 
-### El bot de leads, con cuatro modelos
+### El bot de leads, con seis modelos de dos proveedores
 
 Porcentaje de los 70 ataques que logran cambiar la etiqueta:
 
@@ -198,14 +218,29 @@ Porcentaje de los 70 ataques que logran cambiar la etiqueta:
 | Claude Sonnet 5.5 | 2,9 % (2 de 70) | 0 % | 0 % | 100 % (70 de 70) |
 | Claude Haiku 4.5 | 1,4 % (1 de 70) | 0 % | 0 % | 97,1 % (68 de 70) |
 | Claude Haiku 5.5 | 0 % | 0 % | 0 % | 98,6 % (69 de 70) |
+| Gemini 3.5 Flash-Lite (Google) | 2,9 % (2 de 70) | no se probó | 0 % | 100 % (70 de 70) |
+| Gemma 4 26B A4B (Google, modelo abierto: 4.000 millones de parámetros activos) | 5,7 % (4 de 70) | no se probó | 0 % | 100 % (70 de 70) |
+
+Con Gemini y Gemma, los mensajes normales también se clasificaron bien sin defensa: 70 de 70. El revisor y el bot se conectan a cualquier modelo con `--proveedor` (ver «Uso»).
+
+### El revisor con otros proveedores
+
+El mismo revisor de Centinela, con Gemini 3.5 Flash-Lite en lugar de Claude, en 20 casos en español de la partición de prueba: 10 ataques (5 públicos y 5 al bot) y 10 mensajes normales (`evals/proveedores.py`).
+
+| Revisor | Ataques detectados | Falsas alarmas |
+|---|---|---|
+| Gemini 3.5 Flash-Lite (Google) | 10 de 10 | 0 de 10 |
+| Claude Haiku 5.5, en los mismos 20 casos | 10 de 10 | 0 de 10 |
+
+Es una muestra chica para cuidar el crédito: muestra que el revisor funciona con otro proveedor, no que los dos sean igual de buenos.
 
 ### La parte de la defensa que no depende del modelo
 
-Con Centinela, los 70 ataques se reparten igual con los cuatro modelos:
+Con Centinela, los 70 ataques se reparten igual con los seis modelos:
 
 - **50 (71,4 %) no llegan al modelo.** El guardia de reglas los detecta antes y el código los manda a revisión humana. Son los mismos 50 con cualquier modelo, porque las reglas no dependen de él.
-- **20 llegan al modelo,** entregados como dato y entre marcas, y su respuesta solo vale si es una etiqueta de la lista. Ninguno de esos 20 cambió la etiqueta, con ninguno de los cuatro modelos.
-- Una respuesta fuera de la lista no pasa nunca: el código la manda a revisión. Sin defensa, los modelos casi no respondieron fuera de la lista (1 de 140 respuestas como mucho), así que el daño posible es una etiqueta válida pero equivocada. Eso es lo que el guardia evita al mirar el mensaje antes.
+- **20 llegan al modelo,** entregados como dato y entre marcas, y su respuesta solo vale si es una etiqueta de la lista. Ninguno de esos 20 cambió la etiqueta, con ninguno de los seis modelos.
+- Una respuesta fuera de la lista no pasa nunca: el código la manda a revisión. Sin defensa, los modelos de Claude casi no respondieron fuera de la lista (1 de 140 respuestas como mucho); Gemma 4 lo hizo en 8 de los 70 ataques, así que el daño posible es una etiqueta válida pero equivocada. Eso es lo que el guardia evita al mirar el mensaje antes.
 
 ### Si un modelo ya resiste, ¿para qué Centinela?
 
@@ -219,7 +254,7 @@ Y no cuesta precisión: Haiku 5.5 clasificó bien 69 de 70 mensajes normales con
 
 ### ¿Hacen daño los ataques sin un modelo potente?
 
-En nuestra prueba, una clasificación con lista cerrada, los modelos pequeños casi nunca obedecieron. Eso no se puede generalizar. En agentes que usan herramientas, los ataques también funcionan con modelos pequeños y baratos, y la vulnerabilidad cambia de un modelo a otro y de una versión a otra. Lo calculamos con los registros públicos de AgentDojo y AgentDyn: porcentaje de intentos del ataque «important_instructions» en los que el agente hizo lo que pedía el atacante (en inglés; `evals/externos.py`).
+Con el modelo abierto y pequeño de la prueba, Gemma 4 (4.000 millones de parámetros activos), 4 de 70 ataques cambiaron la etiqueta sin defensa y otras 8 respuestas quedaron fuera de la lista; con Centinela, 0. En nuestra prueba, una clasificación con lista cerrada, los modelos pequeños casi nunca obedecieron. Eso no se puede generalizar. En agentes que usan herramientas, los ataques también funcionan con modelos pequeños y baratos, y la vulnerabilidad cambia de un modelo a otro y de una versión a otra. Lo calculamos con los registros públicos de AgentDojo y AgentDyn: porcentaje de intentos del ataque «important_instructions» en los que el agente hizo lo que pedía el atacante (en inglés; `evals/externos.py`).
 
 | Modelo | AgentDojo | AgentDyn |
 |---|---|---|
@@ -269,10 +304,10 @@ Sin clave: ninguno de los enlaces escritos en el texto quedó activo (0 de 103 e
 
 ### Lo que estos números no dicen
 
-- Cada condición se corrió una vez, salvo Opus 5.5 sin defensa: 23 de 70 en dos corridas con los datos finales, y 29 en una corrida con una versión anterior casi igual de los datos.
+- Cada condición se corrió una vez, salvo Opus 5.5 sin defensa: 23 de 70 en dos corridas con los datos finales, y 29 en una corrida con una versión anterior casi igual de los datos. En Gemma 4 sin defensa, una petición se quedó colgada: ese mensaje (un lead normal) se corrió aparte y se sumó a la misma corrida.
 - Una advertencia en el prompt también frenó los ataques en esta prueba. Lo que agrega Centinela es que la lista cerrada y la revisión humana no dependen de que el modelo obedezca, y que los intentos llegan a una persona en lugar de pasar en silencio.
 - Las reglas solas dejan pasar cerca de uno de cada cuatro ataques nuevos, y no marcan un engaño dirigido solo a una persona.
-- Probamos el bot solo con modelos de Claude; los demás modelos vienen de registros públicos, en inglés y con agentes que usan herramientas.
+- Probamos el bot con seis modelos de Anthropic y de Google; los demás modelos vienen de registros públicos, en inglés y con agentes que usan herramientas. Con Gemini y Gemma no corrimos la advertencia en el prompt, para cuidar el crédito. El proveedor de OpenRouter está probado sin red, pero todavía sin una medición en vivo.
 - De LlamaFirewall comparamos solo su regla por defecto contra la inyección, que busca dos frases en inglés. No probamos su modelo PromptGuard 2.
 - No probamos la sala de revisión con personas: medimos lo que muestra, no cuánto reduce los errores de quien revisa.
 
@@ -306,7 +341,7 @@ El banco de pruebas contiene mensajes de ataque porque hacen falta para medir de
 Centinela se construyó con recursos que entregó la organización del Hackathon DefAcc 2026:
 
 - **AgentDojo y AgentDyn:** las plantillas y los objetivos de ataque del banco de pruebas, y sus registros públicos para comparar modelos.
-- **Inspect AI** (UK AI Security Institute): la prueba del bot con cuatro modelos.
+- **Inspect AI** (UK AI Security Institute): la prueba del bot con seis modelos.
 - **LlamaFirewall** (PurpleLlama, de Meta): la línea base del filtro y la idea de buscar texto oculto.
 - **SpaPhish:** los correos reales en español y la guía para definir los trucos de persuasión.
 - **La plantilla de la ficha técnica.**

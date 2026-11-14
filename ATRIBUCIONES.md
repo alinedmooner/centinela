@@ -10,7 +10,7 @@ La organización del Hackathon DefAcc 2026 entregó recursos en seis carpetas te
 |---|---|---|
 | AgentDojo (Seguridad de agentes) | Cuatro plantillas públicas de ataque y 27 objetivos de inyección, traducidos al español. Su implementación del detector de ProtectAI, como referencia para el detector local. Sus registros públicos, para medir el éxito de los ataques en 22 modelos | `datos/ataques.jsonl`, `src/centinela/detectores/local.py`, `evals/externos.py` |
 | AgentDyn (Seguridad de agentes) | 28 objetivos de inyección. Sus registros públicos, para medir el éxito de los ataques en 10 modelos | `datos/ataques.jsonl`, `evals/externos.py` |
-| Inspect AI, del UK AI Security Institute (Control de IA) | La prueba del bot de leads con cuatro modelos de Claude | `evals/bot.py` |
+| Inspect AI, del UK AI Security Institute (Control de IA) | La prueba del bot de leads con cuatro modelos de Claude y dos de Google (Gemini y el modelo abierto Gemma) | `evals/bot.py` |
 | LlamaFirewall, de PurpleLlama, de Meta (Ciberdefensa automatizada) | Su regla por defecto, como línea base del filtro, y la idea de buscar texto oculto con caracteres invisibles | `evals/filtro.py`, `src/centinela/detectores/reglas.py` |
 | SpaPhish (Defensa epistémica) | 1395 correos reales en español para las falsas alarmas, la prueba de phishing y la sala de revisión. Su guía de anotación, para definir los trucos de persuasión | `evals/casos.py`, `evals/phishing.py`, `evals/revision.py`, `src/centinela/detectores/llm.py` |
 | Plantilla de la ficha técnica | La estructura de la ficha | `docs/ficha-tecnica.html` |
@@ -34,11 +34,13 @@ Los mensajes de `datos/leads.jsonl`, los de `datos/portadores.jsonl` y las tradu
 |---|---|---|
 | `protectai/deberta-v3-base-prompt-injection-v2` | Línea base de detección y detector local opcional | Apache-2.0 |
 | `Helsinki-NLP/opus-mt-es-en` | Traducción al inglés antes del detector local | Apache-2.0 |
-| Claude Haiku 5.5, Claude Opus 5.5 y Claude Haiku 4.5 | Revisor y bot en las pruebas | API de Anthropic |
+| Claude Haiku 5.5, Claude Opus 5.5, Claude Sonnet 5.5 y Claude Haiku 4.5 | Revisor y bot en las pruebas | API de Anthropic |
+| Gemini 3.5 Flash-Lite (Google) | Bot de la prueba 2 y revisor en la revisión con otros proveedores | API de Gemini (Google AI Studio) |
+| Gemma 4 26B A4B (Google, modelo abierto) | Bot de la prueba 2 | API de Gemini (Google AI Studio); licencia de Gemma |
 
 ## Librerías
 
-SDK oficial de Anthropic, [Inspect AI](https://inspect.aisi.org.uk/) (UK AI Security Institute), transformers, PyTorch, scikit-learn, pytest, ruff, hatchling y uv. Las versiones exactas están en `uv.lock`.
+SDK oficial de Anthropic, SDK oficial de Google (`google-genai`), SDK oficial de OpenAI (`openai`, para la API de [OpenRouter](https://openrouter.ai), compatible con la de OpenAI), [Inspect AI](https://inspect.aisi.org.uk/) (UK AI Security Institute), transformers, PyTorch, scikit-learn, pytest, ruff, hatchling y uv. Las versiones exactas están en `uv.lock`.
 
 La demostración con Gmail puede usar el SDK de [Composio](https://composio.dev), en el grupo opcional `composio`.
 
@@ -59,4 +61,4 @@ Este proyecto se hizo en un día, con ayuda de IA, y lo decimos con claridad:
 - **Datos:** las traducciones de los ataques, los mensajes portadores y los mensajes de leads fueron generados con Claude. Cada fila lo indica en los campos `traduccion` o `generado_con_ia`. La revisión humana está en curso; hasta entonces deben tratarse como datos sintéticos.
 - **Documentación y ficha técnica:** redactadas con ayuda de IA y revisadas por el equipo.
 - **Sitio web (`web/`):** el diseño, el sistema de diseño Vigía y el código inicial los generó Lovable a partir de un prompt del equipo; Claude Code los pasó a Astro y preparó la publicación.
-- **Evaluación:** el revisor y el bot de las pruebas son modelos de Anthropic. Las respuestas guardadas están en `resultados/`.
+- **Evaluación:** el revisor y el bot de las pruebas son modelos de Anthropic y, en la prueba del bot y en la revisión con otros proveedores, también de Google. Las respuestas guardadas están en `resultados/`.

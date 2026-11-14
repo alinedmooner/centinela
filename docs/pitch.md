@@ -18,7 +18,7 @@ Señalar la figura: mensaje, guardia, clasificador, sala de revisión.
 
 ## 1:45 a 2:30. Resultados (página 2, tabla)
 
-> Lo medimos con casos que no usamos para construirlo, y con cuatro modelos de Claude. Con Centinela, ningún ataque cambió la etiqueta con ninguno, y 50 de los 70 ni siquiera llegaron al modelo: los frenó el guardia, igual con cualquier modelo. Las reglas, que son gratis, detectan tres de cada cuatro ataques en español sin una sola falsa alarma en más de 500 mensajes reales y de prueba. Con un modelo como revisor, se llega al 99 %.
+> Lo medimos con casos que no usamos para construirlo, y con seis modelos: cuatro de Claude, Gemini y el modelo abierto Gemma. Con Centinela, ningún ataque cambió la etiqueta con ninguno, y 50 de los 70 ni siquiera llegaron al modelo: los frenó el guardia, igual con cualquier modelo. Las reglas, que son gratis, detectan tres de cada cuatro ataques en español sin una sola falsa alarma en más de 500 mensajes reales y de prueba. Con un modelo como revisor, se llega al 99 %.
 
 ## 2:30 a 2:50. Dónde falla y uso responsable (secciones 4 y 5)
 
@@ -30,7 +30,7 @@ Señalar la figura: mensaje, guardia, clasificador, sala de revisión.
 
 ## Preguntas probables
 
-- **¿Funciona con distintos modelos?** Lo probamos con cuatro. Sin defensa, Opus 5.5 obedeció 23 de 70 ataques en dos corridas; Sonnet 5.5, 2; Haiku 4.5, 1, y Haiku 5.5, ninguno. Con Centinela, 0 con los cuatro, y los mensajes normales se clasificaron bien entre el 97 % y el 100 %.
+- **¿Funciona con distintos modelos?** Lo probamos con seis, de Anthropic y de Google. Sin defensa, Opus 5.5 obedeció 23 de 70 ataques en dos corridas; el modelo abierto Gemma 4, 4; Gemini 3.5 Flash-Lite y Sonnet 5.5, 2; Haiku 4.5, 1, y Haiku 5.5, ninguno. Con Centinela, 0 con los seis, y los mensajes normales se clasificaron bien entre el 97 % y el 100 %.
 - **Si Haiku no cae ni sin defensa, ¿para qué Centinela?** Porque no se sabe de antemano qué modelo resistirá: en esta prueba el más capaz, Opus, obedeció 23 de 70, y cada versión cambia. Con Centinela es 0 con cualquiera, 50 de los 70 ataques ni siquiera llegan al modelo, y esos intentos llegan a una persona con un aviso en vez de pasar en silencio. Además, no cuesta precisión: Haiku clasificó bien 69 de 70 normales con y sin Centinela.
 - **¿Cuál es la defensa real frente a cualquier modelo?** La que no depende de él. El guardia frena 50 de cada 70 ataques antes de que el modelo los lea, y son los mismos 50 con cualquier modelo. Los otros 20 le llegan como dato, y su respuesta solo vale si es una etiqueta de la lista; si no, el código la manda a revisión.
 - **¿Hacen daño los ataques sin un modelo potente?** En nuestra prueba, los modelos pequeños casi no obedecieron. Pero en agentes con herramientas sí hacen daño: en los registros públicos de AgentDojo y AgentDyn, GPT-4o mini cayó en el 27 % y el 51 % de los intentos, y Llama 3.3 70B en el 23 % y el 12,5 %. Además cambia entre versiones: Claude 3.5 Sonnet pasó de 34 % a 1 %. No se puede apostar la seguridad a que el modelo de turno resista.
