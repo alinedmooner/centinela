@@ -204,6 +204,6 @@ print(resultado.etiqueta)  # «cita», o «revision_humana» si el guardia sospe
         </details>
       ))}
     </div>
-    <p class="cn-sala__nota cn-donde__nota">En los ejemplos, <code>tu_bot()</code>, <code>responder()</code> y <code>enviar_a_revision()</code> son tu código. <code>revisar()</code> usa las reglas, sin clave ni internet. Para sumar a Claude como segundo revisor: <code>Guardia([DetectorReglas(), DetectorLLM(ProveedorAnthropic())])</code>. Instalación: <code>pip install centinela-ia</code>.</p>
+    <p class="cn-sala__nota cn-donde__nota">En los ejemplos, <code>tu_bot()</code>, <code>responder()</code> y <code>enviar_a_revision()</code> son tu código. <code>revisar()</code> usa las reglas, sin clave ni internet. Para sumar un modelo como segundo revisor: <code>Guardia([DetectorReglas(), DetectorLLM(crear_proveedor("google"))])</code>, también con <code>"anthropic"</code> u <code>"openrouter"</code>, o con una clase propia para otro proveedor. Instalación: <code>pip install centinela-ia</code>.</p>
   </div>
 </section>
