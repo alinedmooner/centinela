@@ -41,9 +41,14 @@ GRUPOS = [
 
 
 def exportar_bot(carpeta_registros: Path) -> None:
-    """Pasa los registros de Inspect a archivos compactos, uno por modelo y defensa."""
+    """Pasa los registros de Inspect a archivos compactos, uno por modelo y defensa.
+
+    Si una condición se corrió varias veces, todas las corridas quedan en el mismo archivo,
+    numeradas en el campo ``corrida`` por orden de ejecución.
+    """
     from inspect_ai.log import list_eval_logs, read_eval_log
 
+    grupos: dict[tuple[str, str, str], list] = defaultdict(list)
     for info in list_eval_logs(str(carpeta_registros)):
         registro = read_eval_log(info)
         if registro.status != "success" or not registro.samples:
@@ -51,20 +56,25 @@ def exportar_bot(carpeta_registros: Path) -> None:
         modelo = registro.eval.model.split("/")[-1]
         defensa = registro.eval.task_args.get("defensa", "ninguna")
         particion = registro.eval.task_args.get("particion", "test")
+        grupos[(particion, modelo, defensa)].append(registro)
+
+    for (particion, modelo, defensa), registros in grupos.items():
         filas = []
-        for muestra in registro.samples:
-            puntaje = muestra.scores["resultado"]
-            filas.append(
-                {
-                    "id": muestra.id,
-                    "tipo": puntaje.metadata["tipo"],
-                    "tecnica": puntaje.metadata.get("tecnica"),
-                    "esperada": muestra.target,
-                    "salida": puntaje.answer,
-                    "motivo": puntaje.metadata.get("motivo"),
-                    "ataque_exitoso": bool(puntaje.metadata.get("ataque_exitoso")),
-                }
-            )
+        for corrida, registro in enumerate(sorted(registros, key=lambda r: r.eval.created), 1):
+            for muestra in registro.samples:
+                puntaje = muestra.scores["resultado"]
+                filas.append(
+                    {
+                        "corrida": corrida,
+                        "id": muestra.id,
+                        "tipo": puntaje.metadata["tipo"],
+                        "tecnica": puntaje.metadata.get("tecnica"),
+                        "esperada": muestra.target,
+                        "salida": puntaje.answer,
+                        "motivo": puntaje.metadata.get("motivo"),
+                        "ataque_exitoso": bool(puntaje.metadata.get("ataque_exitoso")),
+                    }
+                )
         escribir_jsonl(RESULTADOS / "bot" / particion / f"{modelo}__{defensa}.jsonl", filas)
 
 
@@ -110,10 +120,17 @@ def tabla_bot(particion: str = "test") -> tuple[list[str], dict]:
         filas = leer_jsonl(archivo)
         ataques = [f for f in filas if f["tipo"] == "ataque"]
         normales = [f for f in filas if f["tipo"] == "normal"]
+        corridas = sorted({f.get("corrida", 1) for f in filas})
         datos[f"{modelo}|{defensa}"] = {
             "modelo": modelo,
             "defensa": defensa,
+            "corridas": len(corridas),
             "ataque_exitoso": proporcion(sum(f["ataque_exitoso"] for f in ataques), len(ataques)),
+            "ataque_exitoso_por_corrida": [
+                sum(f["ataque_exitoso"] for f in ataques if f.get("corrida", 1) == c)
+                for c in corridas
+            ],
+            "ataques_por_corrida": len(ataques) // len(corridas) if corridas else 0,
             "normales_bien": proporcion(
                 sum(f["salida"] == f["esperada"] for f in normales), len(normales)
             ),
@@ -127,15 +144,16 @@ def tabla_bot(particion: str = "test") -> tuple[list[str], dict]:
     if not datos:
         return [], {}
     lineas = [
-        "| Modelo | Condición | Ataques que cambian la etiqueta | Mensajes normales bien clasificados | Mensajes normales enviados a revisión |",
-        "|---|---|---|---|---|",
+        "| Modelo | Condición | Corridas | Ataques que cambian la etiqueta | Por corrida | Mensajes normales bien clasificados | Mensajes normales enviados a revisión |",
+        "|---|---|---|---|---|---|---|",
     ]
     orden = {d: i for i, d in enumerate(NOMBRES_DEFENSA)}
     for d in sorted(datos.values(), key=lambda d: (d["modelo"], orden.get(d["defensa"], 9))):
+        por_corrida = ", ".join(str(k) for k in d["ataque_exitoso_por_corrida"])
         lineas.append(
-            f"| {d['modelo']} | {NOMBRES_DEFENSA.get(d['defensa'], d['defensa'])} | "
-            f"{pct_ic(d['ataque_exitoso'])} | {pct_ic(d['normales_bien'])} | "
-            f"{pct_ic(d['normales_a_revision'])} |"
+            f"| {d['modelo']} | {NOMBRES_DEFENSA.get(d['defensa'], d['defensa'])} | {d['corridas']} | "
+            f"{pct_ic(d['ataque_exitoso'])} | {por_corrida} de {d['ataques_por_corrida']} | "
+            f"{pct_ic(d['normales_bien'])} | {pct_ic(d['normales_a_revision'])} |"
         )
     return lineas, datos
 

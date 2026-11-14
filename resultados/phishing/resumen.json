@@ -1,0 +1,98 @@
+{
+  "correos": 1395,
+  "phishing": 731,
+  "modelo": "claude-haiku-5-5",
+  "respuestas_con_error": 2,
+  "deteccion": {
+    "modelo": {
+      "aciertos": {
+        "k": 1186,
+        "n": 1395,
+        "valor": 0.850179211469534,
+        "ic95": [
+          0.8304897381033606,
+          0.8679453098677604
+        ]
+      },
+      "precision": 0.8099762470308789,
+      "cobertura": 0.93296853625171,
+      "f1": 0.8671328671328672,
+      "matriz": {
+        "vp": 682,
+        "fp": 160,
+        "fn": 49,
+        "vn": 504
+      }
+    },
+    "base_tfidf": {
+      "aciertos": {
+        "k": 1302,
+        "n": 1395,
+        "valor": 0.9333333333333333,
+        "ic95": [
+          0.9190171481170671,
+          0.9452694158512905
+        ]
+      },
+      "precision": 0.9761194029850746,
+      "cobertura": 0.8946648426812586,
+      "f1": 0.9336188436830836,
+      "matriz": {
+        "vp": 654,
+        "fp": 16,
+        "fn": 77,
+        "vn": 648
+      }
+    }
+  },
+  "ordenes_para_ia_en_correos_legitimos": {
+    "k": 5,
+    "n": 664,
+    "valor": 0.007530120481927711,
+    "ic95": [
+      0.0032205344938860576,
+      0.017505338228028838
+    ]
+  },
+  "trucos": {
+    "autoridad": {
+      "frecuencia": 0.9197132616487456,
+      "f1_modelo": 0.793103448275862,
+      "aciertos_modelo": 0.6817204301075269,
+      "f1_mayoria": 0.9581777445855116,
+      "aciertos_mayoria": 0.9197132616487456
+    },
+    "prueba_social": {
+      "frecuencia": 0.1017921146953405,
+      "f1_modelo": 0.35175879396984927,
+      "aciertos_modelo": 0.9075268817204301,
+      "f1_mayoria": 0.0,
+      "aciertos_mayoria": 0.8982078853046594
+    },
+    "simpatia_engano": {
+      "frecuencia": 0.9118279569892473,
+      "f1_modelo": 0.527042577675489,
+      "aciertos_modelo": 0.410752688172043,
+      "f1_mayoria": 0.953880764904387,
+      "aciertos_mayoria": 0.9118279569892473
+    },
+    "compromiso_reciprocidad": {
+      "frecuencia": 0.3627240143369176,
+      "f1_modelo": 0.2150170648464164,
+      "aciertos_modelo": 0.6702508960573477,
+      "f1_mayoria": 0.0,
+      "aciertos_mayoria": 0.6372759856630824
+    },
+    "distraccion_urgencia": {
+      "frecuencia": 0.7505376344086021,
+      "f1_modelo": 0.8722280887011615,
+      "aciertos_modelo": 0.8265232974910395,
+      "f1_mayoria": 0.8574938574938574,
+      "aciertos_mayoria": 0.7505376344086021
+    }
+  },
+  "trucos_f1_promedio": {
+    "modelo": 0.5518299946937557,
+    "mayoria": 0.5539104733967513
+  }
+}
