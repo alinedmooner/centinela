@@ -1,7 +1,7 @@
 # Centinela
 
 [![Pruebas](https://github.com/alinedmooner/centinela/actions/workflows/pruebas.yml/badge.svg)](https://github.com/alinedmooner/centinela/actions/workflows/pruebas.yml)
-[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](LICENSE)
+[![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](https://github.com/alinedmooner/centinela/blob/main/LICENSE)
 
 **Guardia de código abierto para asistentes de IA que leen mensajes en español.** Revisa cada mensaje antes de que lo lea el bot, avisa si trae órdenes escondidas o trucos de engaño, y deja las decisiones delicadas en manos del código.
 
@@ -34,15 +34,15 @@ flowchart LR
 
 ## Instalación
 
-Centinela todavía no está en PyPI. Se instala desde GitHub:
-
 ```bash
 # Modo de reglas: sin clave, sin internet y sin dependencias
-pip install "git+https://github.com/alinedmooner/centinela"
+pip install centinela-ia
 
 # Con Claude como revisor y como clasificador
-pip install "centinela-ia[llm] @ git+https://github.com/alinedmooner/centinela"
+pip install "centinela-ia[llm]"
 ```
+
+El paquete se llama `centinela-ia` porque en PyPI el nombre `centinela` ya estaba tomado. El módulo y el comando se llaman `centinela`.
 
 ## Uso
 
@@ -103,11 +103,11 @@ El guardia combina uno o varios detectores. Todos responden con el mismo formato
 | `DetectorLocal` | Extra `local` (cerca de 1 GB de modelos) | No | Modelo abierto de clasificación. Fue entrenado para inglés; puede traducir antes |
 | `DetectorLLM` | Extra `llm` y una clave | Sí, va al proveedor del modelo | Entiende ataques sin palabras clave y nombra el truco de persuasión |
 
-Agregar un detector o conectar otro proveedor de modelos es escribir una clase pequeña. Ver [CONTRIBUTING.md](CONTRIBUTING.md).
+Agregar un detector o conectar otro proveedor de modelos es escribir una clase pequeña. Ver [CONTRIBUTING.md](https://github.com/alinedmooner/centinela/blob/main/CONTRIBUTING.md).
 
 ## Resultados
 
-Medidos el 14 de noviembre de 2026 con casos reservados, que no se usaron para escribir las reglas. Las tablas completas, con sus intervalos de confianza, están en [resultados/resumen.md](resultados/resumen.md), y se rehacen sin clave con `uv run --extra evals python evals/tabla.py`.
+Medidos el 14 de noviembre de 2026 con casos reservados, que no se usaron para escribir las reglas. Las tablas completas, con sus intervalos de confianza, están en [resultados/resumen.md](https://github.com/alinedmooner/centinela/blob/main/resultados/resumen.md), y se rehacen sin clave con `uv run --extra evals python evals/tabla.py`.
 
 **El bot de leads frente a 70 mensajes con trampa.** Porcentaje de ataques que logran cambiar la etiqueta:
 
@@ -143,7 +143,7 @@ Con los mismos 41 mensajes normales en los dos idiomas, el modelo de ProtectAI m
 
 ## Banco de pruebas
 
-Los casos están en `datos/` y su formato en [datos/README.md](datos/README.md). Agregar un caso es agregar una línea. Las reglas se escriben mirando solo la partición `dev`; la partición `test` solo se usa para medir.
+Los casos están en `datos/` y su formato en [datos/README.md](https://github.com/alinedmooner/centinela/blob/main/datos/README.md). Agregar un caso es agregar una línea. Las reglas se escriben mirando solo la partición `dev`; la partición `test` solo se usa para medir.
 
 ## Límites
 
@@ -156,11 +156,10 @@ Los casos están en `datos/` y su formato en [datos/README.md](datos/README.md).
 
 ## Uso responsable
 
-El banco de pruebas contiene mensajes de ataque porque hacen falta para medir defensas. Son traducciones de ataques ya públicos y ejemplos genéricos. No uses Centinela ni sus datos contra sistemas de terceros sin permiso. Si encuentras cómo saltarte el guardia, sigue [SECURITY.md](SECURITY.md).
+El banco de pruebas contiene mensajes de ataque porque hacen falta para medir defensas. Son traducciones de ataques ya públicos y ejemplos genéricos. No uses Centinela ni sus datos contra sistemas de terceros sin permiso. Si encuentras cómo saltarte el guardia, sigue [SECURITY.md](https://github.com/alinedmooner/centinela/blob/main/SECURITY.md).
 
 ## Hoja de ruta
 
-- Publicar en PyPI como `centinela-ia`.
 - Más detectores y más proveedores de modelos.
 - Ejemplo de integración con WhatsApp Business.
 - Casos reales, con permiso y anonimizados, y casos de otros países.
@@ -168,10 +167,10 @@ El banco de pruebas contiene mensajes de ataque porque hacen falta para medir de
 
 ## Contribuir, licencia y atribuciones
 
-- Cómo aportar: [CONTRIBUTING.md](CONTRIBUTING.md).
-- Licencia: [MIT](LICENSE).
-- Datos, modelos, librerías y uso de IA: [ATRIBUCIONES.md](ATRIBUCIONES.md).
+- Cómo aportar: [CONTRIBUTING.md](https://github.com/alinedmooner/centinela/blob/main/CONTRIBUTING.md).
+- Licencia: [MIT](https://github.com/alinedmooner/centinela/blob/main/LICENSE).
+- Datos, modelos, librerías y uso de IA: [ATRIBUCIONES.md](https://github.com/alinedmooner/centinela/blob/main/ATRIBUCIONES.md).
 
 ## English summary
 
-Centinela is an open-source guard for AI assistants that read messages written in Spanish, such as a small business's WhatsApp or email inbox. It checks each incoming message for instructions aimed at the AI (prompt injection) and for social-engineering tricks aimed at people (phishing), then decides in code whether the message may continue or must go to a human. It ships a rule-based detector that needs no API key, optional detectors backed by a local open model or by an LLM, a safe classifier that only accepts labels from a closed list, a hardened review room that shows flagged messages to people with links, emails and numbers disabled, a card stating what the message asks for and only three bounded decisions, and a Spanish benchmark with a command that rebuilds the result tables. MIT licensed.
+Centinela is an open-source guard for AI assistants that read messages written in Spanish, such as a small business's WhatsApp or email inbox. It checks each incoming message for instructions aimed at the AI (prompt injection) and for social-engineering tricks aimed at people (phishing), then decides in code whether the message may continue or must go to a human. It ships a rule-based detector that needs no API key, optional detectors backed by a local open model or by an LLM, a safe classifier that only accepts labels from a closed list, a hardened review room that shows flagged messages to people with links, emails and numbers disabled, a card stating what the message asks for and only three bounded decisions, and a Spanish benchmark with a command that rebuilds the result tables. Install it with `pip install centinela-ia`. MIT licensed.

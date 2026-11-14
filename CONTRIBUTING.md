@@ -43,6 +43,14 @@ Las reglas se escriben mirando solo la partición `dev` de los datos. La partici
 - Un PR por tema, con qué cambia, por qué y cómo probarlo.
 - Si una parte la escribió una IA, dilo en el PR.
 
+## Publicar una versión
+
+Solo para quienes mantienen el proyecto.
+
+1. Sube la versión en `pyproject.toml` y en `src/centinela/__init__.py`, corre `uv lock` y fusiona el PR.
+2. Crea una versión (release) en GitHub con la etiqueta `vX.Y.Z`, igual a la versión del paquete.
+3. El flujo `publicar.yml` construye el paquete, lo prueba y espera la aprobación en el entorno `pypi`. Al aprobarla, se publica en PyPI sin claves guardadas (trusted publishing) y con atestaciones de origen.
+
 ## Seguridad
 
 Si encuentras una forma de saltarte el guardia, no abras un issue público. Sigue [SECURITY.md](SECURITY.md).
