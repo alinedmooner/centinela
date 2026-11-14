@@ -262,6 +262,18 @@ El banco de pruebas contiene mensajes de ataque porque hacen falta para medir de
 - Casos reales, con permiso y anonimizados, y casos de otros países.
 - Portugués.
 
+## Recursos del hackathon que usamos
+
+Centinela se construyó con recursos que entregó la organización del Hackathon DefAcc 2026:
+
+- **AgentDojo y AgentDyn:** las plantillas y los objetivos de ataque del banco de pruebas, y sus registros públicos para comparar modelos.
+- **Inspect AI** (UK AI Security Institute): la prueba del bot con cuatro modelos.
+- **LlamaFirewall** (PurpleLlama, de Meta): la línea base del filtro y la idea de buscar texto oculto.
+- **SpaPhish:** los correos reales en español y la guía para definir los trucos de persuasión.
+- **La plantilla de la ficha técnica.**
+
+Qué archivo usa cada uno está en [ATRIBUCIONES.md](https://github.com/alinedmooner/centinela/blob/main/ATRIBUCIONES.md).
+
 ## Contribuir, licencia y atribuciones
 
 - Cómo aportar: [CONTRIBUTING.md](https://github.com/alinedmooner/centinela/blob/main/CONTRIBUTING.md).
