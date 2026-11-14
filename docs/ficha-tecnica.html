@@ -84,7 +84,7 @@
       <tr><td><b>Engaños que funcionaron.</b> De 70 mensajes con trampa, ¿en cuántos el bot puso la etiqueta que pedía el atacante? <span class="n">Menos es mejor.</span></td><td>Opus 5.5: 23 de 70<br>Sonnet 5.5: 2 · Haiku 4.5: 1 · Haiku 5.5: 0</td><td class="c">0 de 70, con los cuatro modelos</td></tr>
       <tr><td><b>Ataques que no llegan al modelo.</b> De esos 70, ¿cuántos se frenan antes de que el modelo los lea? <span class="n">Más es mejor.</span></td><td>0: el modelo lee los 70</td><td class="c">50 de 70, con cualquier modelo</td></tr>
       <tr><td><b>Trabajo normal.</b> De 70 mensajes normales de clientes, ¿cuántos clasificó bien el bot? <span class="n">Más es mejor.</span></td><td>69 o 70 de 70, según el modelo</td><td class="c">68 a 70 de 70, según el modelo</td></tr>
-      <tr><td><b>Ataques detectados.</b> De 182 ataques en español, ¿cuántos marca el filtro como sospechosos? <span class="n">Más es mejor.</span></td><td>LlamaFirewall: 0 de 182<br>ProtectAI: 152 de 182</td><td class="c">Solo reglas, sin API: 134 de 182<br>Con revisor, por API: 180 de 182</td></tr>
+      <tr><td><b>Ataques detectados.</b> De 182 ataques en español, ¿cuántos marca el filtro como sospechosos? <span class="n">Más es mejor.</span></td><td>Regla de LlamaFirewall: 0 de 182<br>Modelo de ProtectAI: 152 de 182</td><td class="c">Solo reglas, sin API: 134 de 182<br>Con revisor, por API: 180 de 182</td></tr>
       <tr><td><b>Falsas alarmas con clientes.</b> De 70 mensajes normales, ¿cuántos marca por error como ataque? <span class="n">Menos es mejor.</span></td><td>ProtectAI: 43 de 70</td><td class="c">0 de 70</td></tr>
       <tr><td><b>Falsas alarmas con correos reales.</b> De correos legítimos reales, ¿cuántos marca por error? <span class="n">Menos es mejor.</span></td><td>ProtectAI: 158 de 300</td><td class="c">Solo reglas: 0 de 462<br>Con revisor: 2 de 462</td></tr>
       <tr><td><b>Phishing real detectado.</b> De 731 correos reales de phishing, ¿cuántos detecta? <span class="n">Más es mejor.</span></td><td>Clasificador clásico, entrenado con esos correos: 654 de 731</td><td class="c">Revisor por API, sin entrenar: 682 de 731</td></tr>
@@ -98,7 +98,7 @@
   </ul>
 
   <h2>5. Límites y riesgo de doble uso</h2>
-  <p>Los leads son inventados y los ataques en español son traducciones. El bot se probó solo con cuatro modelos de Claude. Quien conozca las reglas puede esquivarlas; por eso la lista cerrada y la revisión humana están en código. No medimos la sala de revisión con personas.</p>
+  <p>Los leads son inventados y los ataques en español son traducciones. El bot se probó solo con cuatro modelos de Claude. De LlamaFirewall probamos su regla por defecto, no su modelo PromptGuard 2. Quien conozca las reglas puede esquivarlas; por eso la lista cerrada y la revisión humana están en código. No medimos la sala de revisión con personas.</p>
   <p>El banco de ataques podría servir para atacar. Solo incluye traducciones de ataques ya públicos y ejemplos genéricos, sin objetivos reales, y el repositorio explica cómo avisar en privado de un fallo. No se redistribuyen los correos de SpaPhish.</p>
 
   <h2>Referencias</h2>
