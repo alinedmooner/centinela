@@ -194,6 +194,55 @@ def tabla_phishing() -> tuple[list[str], dict]:
     return lineas, r
 
 
+def tabla_revision() -> tuple[list[str], dict]:
+    archivo = RESULTADOS / "revision" / "resumen.json"
+    if not archivo.exists():
+        return [], {}
+    r = json.loads(archivo.read_text(encoding="utf-8"))
+    fraude, legitimo = r["phishing"], r["legitimos"]
+
+    def celda(d: dict, clave: str) -> str:
+        m = d[clave]
+        return f"{pct(m['valor'])} ({m['k']}/{m['n']})"
+
+    def fila(nombre: str, clave: str) -> str:
+        return f"| {nombre} | {celda(fraude, clave)} | {celda(legitimo, clave)} |"
+
+    def activos(d: dict) -> str:
+        return f"{d['enlaces_activos']['despues']} de {d['enlaces_activos']['antes']}"
+
+    lineas = [
+        (
+            f"{r['correos']} correos reales en español: {fraude['correos']} de phishing y "
+            f"{legitimo['correos']} legítimos. A cada uno se le arma la tarjeta que vería quien "
+            "lo revisa, como si fuera a revisión. No usa clave."
+        ),
+        "",
+        "| Medida | Phishing | Legítimos |",
+        "|---|---|---|",
+        f"| Enlaces del texto que quedan activos | {activos(fraude)} | {activos(legitimo)} |",
+        fila("Correos con un enlace a un dominio que no aparece en el texto", "con_destino_oculto"),
+        fila("La tarjeta nombra qué pide el correo", "con_pedido"),
+        fila("La tarjeta nombra con qué presiona", "con_presion"),
+        fila("Liberarlo exigiría una segunda persona", "exige_segunda_persona"),
+        (
+            f"| Palabras que quedan iguales | {pct(fraude['palabras_iguales']['valor'])} | "
+            f"{pct(legitimo['palabras_iguales']['valor'])} |"
+        ),
+        "",
+        "| Pista de la tarjeta | Phishing | Legítimos |",
+        "|---|---|---|",
+    ]
+    for grupo, prefijo in (("por_pedido", "Pide"), ("por_presion", "Presiona con")):
+        for nombre in sorted(set(fraude[grupo]) | set(legitimo[grupo])):
+            celdas = [
+                celda(d[grupo], nombre) if nombre in d[grupo] else "0,0 %"
+                for d in (fraude, legitimo)
+            ]
+            lineas.append(f"| {prefijo}: {nombre} | " + " | ".join(celdas) + " |")
+    return lineas, r
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument("--exportar-bot", type=Path, help="carpeta con registros de Inspect")
@@ -205,6 +254,7 @@ def main(argv: list[str] | None = None) -> int:
     filtro, datos_filtro = tabla_filtro(args.particion)
     bot, datos_bot = tabla_bot(args.particion)
     phishing, datos_phishing = tabla_phishing()
+    revision, datos_revision = tabla_revision()
     partes = [
         "# Resultados",
         "",
@@ -221,13 +271,20 @@ def main(argv: list[str] | None = None) -> int:
         partes += filtro
     if phishing:
         partes += ["", "## Prueba 3: phishing en español y sus trucos", "", *phishing]
+    if revision:
+        partes += ["", "## Prueba 4: la sala de revisión sobre correos reales", "", *revision]
     salida = RESULTADOS / (
         "resumen.md" if args.particion == "test" else f"resumen-{args.particion}.md"
     )
     salida.write_text("\n".join(partes) + "\n", encoding="utf-8")
     (salida.with_suffix(".json")).write_text(
         json.dumps(
-            {"filtro": datos_filtro, "bot": datos_bot, "phishing": datos_phishing},
+            {
+                "filtro": datos_filtro,
+                "bot": datos_bot,
+                "phishing": datos_phishing,
+                "revision": datos_revision,
+            },
             ensure_ascii=False,
             indent=2,
         )

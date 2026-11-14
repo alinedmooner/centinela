@@ -12,9 +12,9 @@ Se proyecta la ficha técnica. La primera página sostiene los dos primeros minu
 
 ## 1:00 a 1:45. Lo que construimos (sección 2 y figura)
 
-> Centinela es un guardia de código abierto. Tiene tres piezas. El guardia revisa cada mensaje antes que el bot. El clasificador solo acepta una etiqueta de una lista cerrada. Y si hay sospecha, es el código, no el modelo, el que manda el mensaje a una persona, con un aviso de una línea que dice qué truco usa. Funciona sin clave y sin internet en su modo básico, y se instala con pip.
+> Centinela es un guardia de código abierto. El guardia revisa cada mensaje antes que el bot. El clasificador solo acepta una etiqueta de una lista cerrada. Si hay sospecha, es el código, no el modelo, el que manda el mensaje a una persona. Y como esa persona también puede caer, lo ve desarmado: los enlaces y teléfonos no se pueden abrir, una tarjeta le dice qué pide el mensaje y solo tiene tres botones; ninguno hace lo que pide el mensaje. Funciona sin clave y sin internet, y se instala con pip.
 
-Señalar la figura: mensaje, guardia, clasificador, revisión humana.
+Señalar la figura: mensaje, guardia, clasificador, sala de revisión.
 
 ## 1:45 a 2:30. Resultados (página 2, tabla)
 
@@ -32,6 +32,7 @@ Señalar la figura: mensaje, guardia, clasificador, revisión humana.
 
 - **¿Por qué Opus cae más que Haiku?** No lo sabemos con certeza y no lo afirmamos. Lo que medimos es que, con el mensaje del cliente pegado a las instrucciones, Opus 5.5 obedeció 23 de 70 ataques, Haiku 5.5 ninguno y Haiku 4.5 uno. En una corrida previa Opus obedeció 29, así que el número varía. Por eso la defensa no debe depender del modelo.
 - **Si una advertencia en el prompt también deja el éxito en 0 %, ¿qué agrega Centinela?** Tres cosas: la lista cerrada y la revisión humana no dependen de que el modelo obedezca la advertencia; el 71 % de los intentos llega a una persona con un aviso, en lugar de pasar en silencio; y funciona igual con cualquier modelo.
+- **¿Y si el mensaje engaña a quien lo revisa?** Para eso está la sala de revisión. En los 731 correos de phishing de SpaPhish no quedó ningún enlace activo, y en 9 de cada 10 el enlace llevaba a un dominio que no aparece escrito en el texto; la tarjeta lo muestra. Lo que no medimos es su efecto en personas.
 - **¿Los datos son reales?** Los 462 correos legítimos y los 1395 de la prueba de phishing sí (SpaPhish). Los mensajes de WhatsApp son inventados y los ataques son traducciones de bancos públicos. Está dicho en la ficha.
 - **¿Puede servir para atacar?** El banco solo incluye ataques ya públicos y ejemplos genéricos. El repositorio explica cómo reportar un fallo en privado.
 - **¿Qué sigue?** Mensajes reales con permiso, más modelos y proveedores, y un ejemplo de integración con WhatsApp Business.

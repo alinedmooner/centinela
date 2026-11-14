@@ -9,6 +9,7 @@ from __future__ import annotations
 import argparse
 import json
 import sys
+from dataclasses import asdict
 from pathlib import Path
 
 from centinela import __version__
@@ -17,6 +18,7 @@ from centinela.clasificador import ClasificadorSeguro
 from centinela.detectores.reglas import DetectorReglas
 from centinela.etiquetas import ETIQUETAS_LEADS, REVISION_HUMANA
 from centinela.guardia import Guardia
+from centinela.revision import crear_tarjeta, texto_de_tarjeta
 
 
 def _leer_mensaje(args: argparse.Namespace) -> str:
@@ -35,14 +37,24 @@ def _revisar(args: argparse.Namespace) -> int:
         from centinela.proveedores.anthropic import ProveedorAnthropic
 
         detectores.append(DetectorLLM(ProveedorAnthropic(args.modelo)))
-    veredicto = Guardia(detectores).revisar(_leer_mensaje(args))
+    mensaje = _leer_mensaje(args)
+    veredicto = Guardia(detectores).revisar(mensaje)
+    tarjeta = None
+    if args.tarjeta and veredicto.decision == "revisar":
+        tarjeta = crear_tarjeta(mensaje, veredicto)
     if args.json:
-        print(json.dumps(veredicto.a_dict(), ensure_ascii=False, indent=2))
+        salida = veredicto.a_dict()
+        if tarjeta:
+            salida["tarjeta"] = asdict(tarjeta)
+        print(json.dumps(salida, ensure_ascii=False, indent=2))
     else:
         print(f"Decisión: {veredicto.decision}")
         print(f"Aviso: {veredicto.aviso}")
         for evidencia in veredicto.evidencias:
             print(f"  - {evidencia}")
+        if tarjeta:
+            print()
+            print(texto_de_tarjeta(tarjeta))
     return 2 if veredicto.decision == "revisar" else 0
 
 
@@ -90,6 +102,11 @@ def _parser() -> argparse.ArgumentParser:
         help="además de las reglas, consulta a Claude (usa la clave)",
     )
     revisar.add_argument("--modelo", default="claude-haiku-5-5", help="modelo de Claude")
+    revisar.add_argument(
+        "--tarjeta",
+        action="store_true",
+        help="si el mensaje va a revisión humana, muestra la tarjeta de la sala de revisión",
+    )
     revisar.set_defaults(funcion=_revisar)
 
     clasificar = sub.add_parser(

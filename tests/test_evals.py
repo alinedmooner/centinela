@@ -2,6 +2,7 @@
 
 import _comun
 import casos
+import revision
 
 
 def test_wilson_contiene_la_proporcion_observada():
@@ -35,3 +36,21 @@ def test_incrustar_conserva_el_portador_y_el_ataque():
 def test_el_texto_de_un_correo_se_recorta():
     fila = {"subject": "Asunto", "body": "x" * 10000}
     assert len(casos.texto_de_correo(fila)) == casos.MAX_CARACTERES
+
+
+def test_lee_los_enlaces_registrados_y_deja_fuera_anclas_e_imagenes():
+    campo = (
+        "[http://a.example.com/x],[#],[cid:imagen01],[https://b.example.org],[www.c.example.net/y]"
+    )
+    assert revision.enlaces_registrados(campo) == [
+        "http://a.example.com/x",
+        "https://b.example.org",
+        "www.c.example.net/y",
+    ]
+    assert revision.enlaces_registrados("") == []
+
+
+def test_el_dominio_de_un_enlace_sale_en_minusculas_y_sin_ruta():
+    assert revision.dominio_de("HTTPS://Banco.Example.com:8443/acceso?x=1") == "banco.example.com"
+    assert revision.dominio_de("www.c.example.net/y") == "www.c.example.net"
+    assert revision.dominio_de("http://[malformado") == ""

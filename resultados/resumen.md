@@ -45,3 +45,27 @@ En las columnas de ataques, más alto es mejor; en las de falsas alarmas, más b
 | simpatia_engano | 91,2 % | 0,527 | 0,954 |
 | compromiso_reciprocidad | 36,3 % | 0,215 | 0,000 |
 | distraccion_urgencia | 75,1 % | 0,872 | 0,857 |
+
+## Prueba 4: la sala de revisión sobre correos reales
+
+1395 correos reales en español: 731 de phishing y 664 legítimos. A cada uno se le arma la tarjeta que vería quien lo revisa, como si fuera a revisión. No usa clave.
+
+| Medida | Phishing | Legítimos |
+|---|---|---|
+| Enlaces del texto que quedan activos | 0 de 103 | 0 de 1256 |
+| Correos con un enlace a un dominio que no aparece en el texto | 91,5 % (669/731) | 61,9 % (411/664) |
+| La tarjeta nombra qué pide el correo | 48,8 % (357/731) | 41,3 % (274/664) |
+| La tarjeta nombra con qué presiona | 51,0 % (373/731) | 22,1 % (147/664) |
+| Liberarlo exigiría una segunda persona | 93,7 % (685/731) | 31,3 % (208/664) |
+| Palabras que quedan iguales | 99,1 % | 96,8 % |
+
+| Pista de la tarjeta | Phishing | Legítimos |
+|---|---|---|
+| Pide: dar una clave o datos personales | 11,9 % (87/731) | 9,0 % (60/664) |
+| Pide: descargar o abrir un archivo | 2,5 % (18/731) | 8,6 % (57/664) |
+| Pide: entrar a un enlace | 36,8 % (269/731) | 22,9 % (152/664) |
+| Pide: llamar o escribir a un contacto | 1,4 % (10/731) | 7,1 % (47/664) |
+| Pide: pagar o transferir dinero | 3,1 % (23/731) | 4,2 % (28/664) |
+| Presiona con: amenaza | 26,8 % (196/731) | 10,8 % (72/664) |
+| Presiona con: premio u oferta | 17,6 % (129/731) | 6,5 % (43/664) |
+| Presiona con: urgencia | 12,4 % (91/731) | 6,6 % (44/664) |
