@@ -245,6 +245,7 @@ Sin clave: ninguno de los enlaces escritos en el texto quedó activo (0 de 103 e
 - Una advertencia en el prompt también frenó los ataques en esta prueba. Lo que agrega Centinela es que la lista cerrada y la revisión humana no dependen de que el modelo obedezca, y que los intentos llegan a una persona en lugar de pasar en silencio.
 - Las reglas solas dejan pasar cerca de uno de cada cuatro ataques nuevos, y no marcan un engaño dirigido solo a una persona.
 - Probamos el bot solo con modelos de Claude; los demás modelos vienen de registros públicos, en inglés y con agentes que usan herramientas.
+- De LlamaFirewall comparamos solo su regla por defecto contra la inyección, que busca dos frases en inglés. No probamos su modelo PromptGuard 2.
 - No probamos la sala de revisión con personas: medimos lo que muestra, no cuánto reduce los errores de quien revisa.
 
 ## Banco de pruebas
