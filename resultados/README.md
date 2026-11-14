@@ -12,6 +12,7 @@ Aquí están las respuestas de cada detector y de cada modelo, para que cualquie
 | `phishing/resumen.json` | Métricas de la prueba 3 |
 | `revision/spaphish.jsonl` | Prueba 4. Una línea por correo, con el mismo identificador: enlaces activos antes y después de desarmar, destinos que muestra la tarjeta, qué pide y con qué presiona |
 | `revision/resumen.json` | Métricas de la prueba 4 |
+| `externos/asr_publico.json` | Prueba 5, externa: éxito del ataque «important_instructions» por modelo en los registros públicos de AgentDojo y AgentDyn (`evals/externos.py`) |
 | `reglas_congeladas.txt` | Huella de las reglas en el momento en que se congelaron, antes de medir |
 
 Ningún archivo contiene el texto de los correos de SpaPhish.
@@ -47,7 +48,7 @@ uv run python evals/revision.py --spaphish RUTA.csv
 ## Cómo leer estos números
 
 - Son de la partición `test`, que no se usó para escribir las reglas.
-- Cada prueba se corrió una vez, el 14 de noviembre de 2026. Los modelos no permiten fijar la temperatura, así que otra corrida puede variar un poco.
+- Cada condición se corrió una vez, el 14 de noviembre de 2026, salvo Opus 5.5 sin defensa, que se corrió dos veces. Sonnet 5.5 y Haiku 4.5 con Centinela se sumaron por la tarde, con los mismos datos. Los modelos no permiten fijar la temperatura, así que otra corrida puede variar un poco.
 - En la prueba 1, un detector que no pudo responder cuenta como «marcado», porque en ese caso el guardia manda el mensaje a una persona.
 - Con el modelo abierto local se usaron 300 correos legítimos de SpaPhish, por tiempo; con los demás detectores, 462.
 - La variante con traducción se midió sin los correos de SpaPhish.

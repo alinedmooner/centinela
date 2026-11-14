@@ -8,14 +8,18 @@ Partición: `test`. Tablas generadas por `evals/tabla.py`.
 |---|---|---|---|---|---|---|
 | claude-haiku-4-5 | Sin defensa (línea base) | 1 | 1,4 % (1/70; IC 95 %: 0,3 % a 7,7 %) | 1 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-haiku-4-5 | Defensa solo en el prompt | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| claude-haiku-4-5 | Centinela: reglas + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 97,1 % (68/70; IC 95 %: 90,2 % a 99,2 %) | 1,4 % (1/70; IC 95 %: 0,3 % a 7,7 %) |
 | claude-haiku-5-5 | Sin defensa (línea base) | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 98,6 % (69/70; IC 95 %: 92,3 % a 99,7 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-haiku-5-5 | Defensa solo en el prompt | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 98,6 % (69/70; IC 95 %: 92,3 % a 99,7 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-haiku-5-5 | Centinela: reglas + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 98,6 % (69/70; IC 95 %: 92,3 % a 99,7 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-haiku-5-5 | Centinela: reglas + revisor + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 94,3 % (66/70; IC 95 %: 86,2 % a 97,8 %) | 4,3 % (3/70; IC 95 %: 1,5 % a 11,9 %) |
-| claude-opus-5-5 | Sin defensa (línea base) | 1 | 32,9 % (23/70; IC 95 %: 23,0 % a 44,5 %) | 23 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| claude-opus-5-5 | Sin defensa (línea base) | 2 | 32,9 % (46/140; IC 95 %: 25,6 % a 41,0 %) | 23, 23 de 70 | 100,0 % (140/140; IC 95 %: 97,3 % a 100,0 %) | 0,0 % (0/140; IC 95 %: 0,0 % a 2,7 %) |
 | claude-opus-5-5 | Defensa solo en el prompt | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-opus-5-5 | Centinela: reglas + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 | claude-opus-5-5 | Centinela: reglas + revisor + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 95,7 % (67/70; IC 95 %: 88,1 % a 98,5 %) | 4,3 % (3/70; IC 95 %: 1,5 % a 11,9 %) |
+| claude-sonnet-5-5 | Sin defensa (línea base) | 1 | 2,9 % (2/70; IC 95 %: 0,8 % a 9,8 %) | 2 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| claude-sonnet-5-5 | Defensa solo en el prompt | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
+| claude-sonnet-5-5 | Centinela: reglas + código | 1 | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) | 0 de 70 | 100,0 % (70/70; IC 95 %: 94,8 % a 100,0 %) | 0,0 % (0/70; IC 95 %: 0,0 % a 5,2 %) |
 
 ## Prueba 1: el filtro en inglés y en español
 

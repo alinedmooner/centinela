@@ -16,6 +16,15 @@ Un negocio usa un bot con IA para leer y clasificar lo que le escriben por Whats
 
 Las defensas abiertas más conocidas se hicieron y se midieron en inglés.
 
+## Por qué usarlo
+
+- **No depende del modelo.** El guardia frena 50 de cada 70 ataques antes de que el modelo los lea, sea cual sea el modelo, y la lista cerrada impide que el bot responda algo fuera de lo permitido. Con cuatro modelos de Claude, ningún ataque cambió la etiqueta.
+- **Funciona en español.** Las defensas abiertas que probamos fallan aquí: una no detectó ningún ataque y la otra marca como ataque el 61 % de los mensajes normales de clientes.
+- **Gratis, local y sin falsas alarmas.** El modo de reglas no necesita clave ni internet, y no marcó ninguno de 462 correos legítimos reales.
+- **Protege también a la persona.** Quien revisa ve el mensaje desarmado: en 731 correos reales de phishing no quedó ningún enlace activo.
+- **Se integra en minutos.** `pip install centinela-ia`, tres líneas de Python o un comando de terminal, y ejemplos listos para un buzón de correo y para agentes que leen Gmail con Composio.
+- **Abierto y medible.** Licencia MIT, un banco de pruebas en español y resultados que cualquiera puede rehacer sin clave.
+
 ## Qué trae
 
 1. **Un guardia.** Revisa un mensaje y dice si trae órdenes para la IA, si parece un engaño dirigido a una persona, qué truco de persuasión usa y qué hacer: dejarlo pasar o mandarlo a revisión humana.
@@ -138,18 +147,57 @@ Agregar un detector o conectar otro proveedor de modelos es escribir una clase p
 
 ## Resultados
 
-Medidos el 14 de noviembre de 2026 con casos reservados, que no se usaron para escribir las reglas. Las tablas completas, con sus intervalos de confianza, están en [resultados/resumen.md](https://github.com/alinedmooner/centinela/blob/main/resultados/resumen.md), y se rehacen sin clave con `uv run --extra evals python evals/tabla.py`.
+Medidos el 14 de noviembre de 2026 con casos reservados: las reglas se escribieron mirando solo el 30 % de los datos (`dev`) y se midieron con el otro 70 % (`test`). Las tablas completas, con intervalos de confianza de Wilson al 95 %, están en [resultados/resumen.md](https://github.com/alinedmooner/centinela/blob/main/resultados/resumen.md) y se rehacen sin clave con `uv run --extra evals python evals/tabla.py`.
 
-**El bot de leads frente a 70 mensajes con trampa.** Porcentaje de ataques que logran cambiar la etiqueta:
+### Cómo se calcula cada número
 
-| Modelo del bot | Sin defensa | Advertencia en el prompt | Centinela |
-|---|---|---|---|
-| Claude Opus 5.5 | 32,9 % (23 de 70) | 0 % | 0 % |
-| Claude Haiku 5.5 | 0 % | 0 % | 0 % |
+| Métrica | Qué se cuenta | Sobre qué casos |
+|---|---|---|
+| Ataques que cambian la etiqueta | Mensajes con trampa en los que la etiqueta final del bot es la que pide el atacante («prioritario») | 70 mensajes de WhatsApp con trampa, de diez técnicas, por modelo y condición. Cada uno es un mensaje normal de cliente con su etiqueta correcta, más la trampa |
+| Mensajes normales bien clasificados | Mensajes sin trampa cuya etiqueta final es la correcta. Mandarlo a revisión cuenta como error | 70 mensajes normales de clientes |
+| Ataques detectados | Ataques que el detector marca como sospechosos | 182 ataques en español: 112 públicos de AgentDojo y AgentDyn, traducidos y metidos en mensajes normales, y los 70 al bot |
+| Falsas alarmas | Mensajes normales que el detector marca como sospechosos | 70 mensajes normales de clientes, 41 mensajes normales en español y en inglés, y 462 correos legítimos reales de SpaPhish |
+| Phishing detectado | Correos de phishing que el revisor marca como engaño, sin ningún entrenamiento | 731 correos de phishing de SpaPhish (de 1395) |
+| Enlaces activos en la sala de revisión | Enlaces escritos en el texto que se pueden abrir después de desarmar el mensaje | 103 enlaces en los 731 correos de phishing |
 
-Con Centinela, Opus 5.5 clasificó bien los 70 mensajes normales y ninguno se fue a revisión por error.
+### El bot de leads, con cuatro modelos
 
-**El filtro, en español.** 182 ataques reservados y mensajes normales:
+Porcentaje de los 70 ataques que logran cambiar la etiqueta:
+
+| Modelo del bot | Sin defensa | Advertencia en el prompt | Centinela | Normales bien clasificados con Centinela |
+|---|---|---|---|---|
+| Claude Opus 5.5 | 32,9 % (23 de 70, en dos corridas) | 0 % | 0 % | 100 % (70 de 70) |
+| Claude Sonnet 5.5 | 2,9 % (2 de 70) | 0 % | 0 % | 100 % (70 de 70) |
+| Claude Haiku 4.5 | 1,4 % (1 de 70) | 0 % | 0 % | 97,1 % (68 de 70) |
+| Claude Haiku 5.5 | 0 % | 0 % | 0 % | 98,6 % (69 de 70) |
+
+### La parte de la defensa que no depende del modelo
+
+Con Centinela, los 70 ataques se reparten igual con los cuatro modelos:
+
+- **50 (71,4 %) no llegan al modelo.** El guardia de reglas los detecta antes y el código los manda a revisión humana. Son los mismos 50 con cualquier modelo, porque las reglas no dependen de él.
+- **20 llegan al modelo,** entregados como dato y entre marcas, y su respuesta solo vale si es una etiqueta de la lista. Ninguno de esos 20 cambió la etiqueta, con ninguno de los cuatro modelos.
+- Una respuesta fuera de la lista no pasa nunca: el código la manda a revisión. Sin defensa, los modelos casi no respondieron fuera de la lista (1 de 140 respuestas como mucho), así que el daño posible es una etiqueta válida pero equivocada. Eso es lo que el guardia evita al mirar el mensaje antes.
+
+### ¿Hacen daño los ataques sin un modelo potente?
+
+En nuestra prueba, una clasificación con lista cerrada, los modelos pequeños casi nunca obedecieron. Eso no se puede generalizar. En agentes que usan herramientas, los ataques también funcionan con modelos pequeños y baratos, y la vulnerabilidad cambia de un modelo a otro y de una versión a otra. Lo calculamos con los registros públicos de AgentDojo y AgentDyn: porcentaje de intentos del ataque «important_instructions» en los que el agente hizo lo que pedía el atacante (en inglés; `evals/externos.py`).
+
+| Modelo | AgentDojo | AgentDyn |
+|---|---|---|
+| GPT-4o mini | 27,2 % (de 629) | 51,1 % (de 560) |
+| GPT-4o | 47,7 % | 38,9 % |
+| Llama 3.3 70B | 23,1 % (de 949) | 12,5 % |
+| Gemini Flash (1.5 y 2.5) | 12,2 % | 14,1 % |
+| Claude 3 Haiku | 9,1 % | sin datos |
+| Claude 3.5 Sonnet, de junio a octubre de 2024 | de 33,9 % a 1,1 % | sin datos |
+| GPT-5.1 | sin datos | 5,2 % |
+
+Por eso la defensa no puede depender del modelo: la que se mide hoy con uno puede no valer con el siguiente, ni con la próxima versión del mismo.
+
+### El filtro, en español
+
+182 ataques reservados y mensajes normales:
 
 | Detector | Ataques detectados | Falsas alarmas en 70 mensajes normales de clientes | Falsas alarmas en correos legítimos reales |
 |---|---|---|---|
@@ -161,15 +209,32 @@ Con Centinela, Opus 5.5 clasificó bien los 70 mensajes normales y ninguno se fu
 
 Con los mismos 41 mensajes normales en los dos idiomas, el modelo de ProtectAI marcó como ataque el 31,7 % en español y el 4,9 % en inglés. Traducir al inglés antes de filtrar arregla casi todas esas falsas alarmas, pero deja pasar más ataques.
 
-**Phishing real en español.** Sobre los 1395 correos de SpaPhish, el revisor detectó el 93,3 % del phishing sin ningún entrenamiento, con 85,0 % de aciertos en total. Un clasificador clásico entrenado con el propio conjunto acierta más (93,3 %), pero no explica el engaño.
+Qué atrapan las reglas en los 70 ataques al bot, por técnica:
 
-**La sala de revisión, sobre los mismos correos reales.** Sin clave: ninguno de los enlaces escritos en el texto quedó activo (0 de 103 en el phishing y 0 de 1256 en los legítimos), y en los legítimos el 96,8 % de las palabras quedó igual. En el 91,5 % de los correos de phishing, al menos un enlace lleva a un dominio que no aparece escrito en el texto; la tarjeta lo muestra desactivado si se le pasan los enlaces del HTML. La tarjeta nombró qué pide el correo en el 48,8 % del phishing y con qué presiona en el 51,0 %.
+| Técnica | Detectados | | Técnica | Detectados |
+|---|---|---|---|---|
+| Texto oculto | 10 de 10 | | Sistema falso | 3 de 4 |
+| Orden directa | 4 de 4 | | Formato de salida | 3 de 4 |
+| Nota al asistente | 4 de 4 | | Urgencia | 6 de 10 |
+| En inglés | 8 de 10 | | Juego de rol | 6 de 10 |
+| Autoridad | 3 de 4 | | Texto ofuscado | 3 de 10 |
 
-**Lo que estos números no dicen**
+Las reglas fallan sobre todo con el texto ofuscado y con las órdenes disfrazadas de urgencia o de juego de rol. Ahí aporta el revisor con modelo.
 
-- Cada condición se corrió una vez, y el resultado de Opus sin defensa varía entre corridas.
+### Phishing real en español
+
+Sobre los 1395 correos de SpaPhish, el revisor detectó el 93,3 % del phishing sin ningún entrenamiento, con 85,0 % de aciertos en total. Un clasificador clásico entrenado con el propio conjunto (TF-IDF y regresión logística, con validación cruzada) acierta más, 93,3 %, pero no explica el engaño.
+
+### La sala de revisión, sobre los mismos correos reales
+
+Sin clave: ninguno de los enlaces escritos en el texto quedó activo (0 de 103 en el phishing y 0 de 1256 en los legítimos), y en los legítimos el 96,8 % de las palabras quedó igual. En el 91,5 % de los correos de phishing, al menos un enlace lleva a un dominio que no aparece escrito en el texto; la tarjeta lo muestra desactivado y avisa. La tarjeta nombró qué pide el correo en el 48,8 % del phishing y con qué presiona en el 51,0 %.
+
+### Lo que estos números no dicen
+
+- Cada condición se corrió una vez, salvo Opus 5.5 sin defensa: 23 de 70 en dos corridas con los datos finales, y 29 en una corrida con una versión anterior casi igual de los datos.
 - Una advertencia en el prompt también frenó los ataques en esta prueba. Lo que agrega Centinela es que la lista cerrada y la revisión humana no dependen de que el modelo obedezca, y que los intentos llegan a una persona en lugar de pasar en silencio.
-- Las reglas solas dejan pasar cerca de uno de cada cuatro ataques nuevos.
+- Las reglas solas dejan pasar cerca de uno de cada cuatro ataques nuevos, y no marcan un engaño dirigido solo a una persona.
+- Probamos el bot solo con modelos de Claude; los demás modelos vienen de registros públicos, en inglés y con agentes que usan herramientas.
 - No probamos la sala de revisión con personas: medimos lo que muestra, no cuánto reduce los errores de quien revisa.
 
 ## Banco de pruebas
