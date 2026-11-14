@@ -28,7 +28,14 @@ def _leer_mensaje(args: argparse.Namespace) -> str:
 
 
 def _revisar(args: argparse.Namespace) -> int:
-    veredicto = Guardia([DetectorReglas(etiquetas=ETIQUETAS_LEADS)]).revisar(_leer_mensaje(args))
+    detectores = [DetectorReglas(etiquetas=ETIQUETAS_LEADS)]
+    if args.claude:
+        cargar_env()
+        from centinela.detectores.llm import DetectorLLM
+        from centinela.proveedores.anthropic import ProveedorAnthropic
+
+        detectores.append(DetectorLLM(ProveedorAnthropic(args.modelo)))
+    veredicto = Guardia(detectores).revisar(_leer_mensaje(args))
     if args.json:
         print(json.dumps(veredicto.a_dict(), ensure_ascii=False, indent=2))
     else:
@@ -77,6 +84,12 @@ def _parser() -> argparse.ArgumentParser:
     revisar = sub.add_parser(
         "revisar", parents=[comun], help="revisa un mensaje con reglas, sin clave ni internet"
     )
+    revisar.add_argument(
+        "--claude",
+        action="store_true",
+        help="además de las reglas, consulta a Claude (usa la clave)",
+    )
+    revisar.add_argument("--modelo", default="claude-haiku-5-5", help="modelo de Claude")
     revisar.set_defaults(funcion=_revisar)
 
     clasificar = sub.add_parser(
