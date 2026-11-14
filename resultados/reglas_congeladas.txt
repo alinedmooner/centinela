@@ -1,0 +1,3 @@
+Reglas congeladas antes de medir en la partición test.
+sha256 de src/centinela/detectores/reglas.py: 6091fa188b4aa7a1251013d099bcd62abf5177c5ace3f5334091c734d720765d
+hora: 2026-11-14 11:54 -0500

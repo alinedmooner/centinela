@@ -30,6 +30,11 @@ local = [
     "torch>=2.15.0",
     "transformers>=5.22.2",
 ]
+evals = [
+    "anthropic>=2.6.0",
+    "inspect-ai>=0.3.288",
+    "scikit-learn>=1.9.1",
+]
 
 [dependency-groups]
 dev = ["pytest", "ruff"]
@@ -47,6 +52,7 @@ exclude-newer = "7 days"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
+pythonpath = ["evals"]
 
 [tool.ruff]
 line-length = 100
