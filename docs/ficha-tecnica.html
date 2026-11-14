@@ -93,12 +93,12 @@
   </table>
   <p class="pie"><b>Tabla 1.</b> Conteos sobre casos reservados. «Sin Centinela» es lo que hay hoy: el bot sin defensa, los filtros abiertos, un clasificador clásico o el mensaje tal como llega. «Sin API» funciona sin internet ni clave; el revisor es Claude Haiku 5.5. Opus sin defensa dio 23 de 70 en dos corridas.</p>
   <ul>
-    <li><b>No es solo Opus:</b> en agentes con herramientas, los ataques también engañan a modelos pequeños. En los registros públicos de AgentDojo y AgentDyn, GPT-4o mini cayó en el 27 % y el 51 % de los intentos, y Llama 3.3 70B en el 23 % y el 12,5 %. La defensa no puede depender del modelo.</li>
+    <li><b>¿Y si el modelo ya resiste?</b> Sin defensa, Haiku 5.5 no cayó en ningún engaño y Opus 5.5 cayó en 23: aquí, el modelo más capaz obedeció más al atacante. No se sabe de antemano cuál resistirá, y cambia con cada versión. Centinela da 0 con cualquiera, y los 50 intentos que frena llegan a una persona con un aviso, en vez de pasar en silencio.</li>
     <li><b>Dónde falla:</b> las reglas solas dejan pasar 48 de los 182 ataques y no marcan un engaño dirigido solo a una persona. Una advertencia en el prompt también dejó a los cuatro modelos en 0 de 70. En phishing, el clasificador clásico acierta más en total: 1302 de 1395 correos, frente a 1186.</li>
   </ul>
 
   <h2>5. Límites y riesgo de doble uso</h2>
-  <p>Los leads son inventados y los ataques en español son traducciones. El bot se probó con cuatro modelos de un solo proveedor; los demás datos vienen de registros públicos en inglés. Quien conozca las reglas puede esquivarlas; por eso la lista cerrada y la revisión humana están en código. No medimos la sala de revisión con personas.</p>
+  <p>Los leads son inventados y los ataques en español son traducciones. El bot se probó solo con cuatro modelos de Claude. Quien conozca las reglas puede esquivarlas; por eso la lista cerrada y la revisión humana están en código. No medimos la sala de revisión con personas.</p>
   <p>El banco de ataques podría servir para atacar. Solo incluye traducciones de ataques ya públicos y ejemplos genéricos, sin objetivos reales, y el repositorio explica cómo avisar en privado de un fallo. No se redistribuyen los correos de SpaPhish.</p>
 
   <h2>Referencias</h2>

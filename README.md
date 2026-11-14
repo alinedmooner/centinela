@@ -179,6 +179,16 @@ Con Centinela, los 70 ataques se reparten igual con los cuatro modelos:
 - **20 llegan al modelo,** entregados como dato y entre marcas, y su respuesta solo vale si es una etiqueta de la lista. Ninguno de esos 20 cambió la etiqueta, con ninguno de los cuatro modelos.
 - Una respuesta fuera de la lista no pasa nunca: el código la manda a revisión. Sin defensa, los modelos casi no respondieron fuera de la lista (1 de 140 respuestas como mucho), así que el daño posible es una etiqueta válida pero equivocada. Eso es lo que el guardia evita al mirar el mensaje antes.
 
+### Si un modelo ya resiste, ¿para qué Centinela?
+
+Sin defensa, Haiku 5.5 no cayó en ningún engaño y Opus 5.5 cayó en 23 de 70: en esta prueba, cuanto más capaz el modelo, más obedeció las órdenes escondidas en el mensaje. Centinela sirve igual por tres razones:
+
+- **No se sabe de antemano cuál modelo resistirá.** Cambia con cada versión, y los negocios cambian de modelo, casi siempre hacia uno más capaz. Con Centinela el resultado es 0 con cualquiera.
+- **La protección es de diseño.** Sin Centinela, los 70 ataques le llegan al modelo y todo depende de que los ignore. Con Centinela, 50 de los 70 no llegan a ningún modelo.
+- **Los intentos se ven.** Sin defensa, un modelo que ignora el ataque lo hace en silencio. Con Centinela, los 50 intentos que frena llegan a una persona con un aviso: el negocio sabe que lo están atacando.
+
+Y no cuesta precisión: Haiku 5.5 clasificó bien 69 de 70 mensajes normales con y sin Centinela.
+
 ### ¿Hacen daño los ataques sin un modelo potente?
 
 En nuestra prueba, una clasificación con lista cerrada, los modelos pequeños casi nunca obedecieron. Eso no se puede generalizar. En agentes que usan herramientas, los ataques también funcionan con modelos pequeños y baratos, y la vulnerabilidad cambia de un modelo a otro y de una versión a otra. Lo calculamos con los registros públicos de AgentDojo y AgentDyn: porcentaje de intentos del ataque «important_instructions» en los que el agente hizo lo que pedía el atacante (en inglés; `evals/externos.py`).
