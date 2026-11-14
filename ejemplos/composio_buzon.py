@@ -7,11 +7,14 @@ Necesita en .env:
 
 Comandos::
 
+    uv run --group composio python ejemplos/composio_buzon.py conectar
     uv run --group composio python ejemplos/composio_buzon.py cuentas
     uv run --group composio python ejemplos/composio_buzon.py enviar [--para correo] [--solo 2 4]
     uv run --group composio python ejemplos/composio_buzon.py vigilar [--desde correo] [--etiquetar]
     uv run --group composio python ejemplos/composio_buzon.py agente [--desde correo]
 
+- conectar: da el enlace para conectar la cuenta de Gmail al proyecto, con la autenticación
+  que administra Composio, y espera a que la autoricen.
 - cuentas: las cuentas de Gmail conectadas en Composio, con su User ID.
 - enviar: manda los cinco correos ficticios de la demostración, por defecto al mismo buzón.
 - vigilar: revisa cada correo nuevo. Con --etiquetar, saca los sospechosos de la bandeja de
@@ -96,6 +99,20 @@ class Gmail:
 
 def consulta(desde: str | None) -> str:
     return "newer_than:1d" + (f" from:{desde}" if desde else "")
+
+
+def conectar(usuario: str) -> int:
+    from composio import Composio
+
+    composio = Composio(api_key=os.environ["COMPOSIO_API_KEY"])
+    solicitud = composio.toolkits.authorize(user_id=usuario, toolkit="gmail")
+    print("Abran este enlace, entren con la cuenta de Gmail de pruebas y autoricen el acceso:\n")
+    print(solicitud.redirect_url)
+    print("\nEsperando la autorización (hasta 5 minutos)…")
+    sys.stdout.flush()
+    cuenta = solicitud.wait_for_connection(300)
+    print(f"Conectada: {getattr(cuenta, 'id', '?')} · User ID: {usuario}")
+    return 0
 
 
 def cuentas() -> int:
@@ -198,6 +215,7 @@ def agente(gmail: Gmail, guardia: Guardia, desde: str | None) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = parser.add_subparsers(dest="comando", required=True)
+    sub.add_parser("conectar", help="conecta la cuenta de Gmail al proyecto de Composio")
     sub.add_parser("cuentas", help="cuentas de Gmail conectadas en Composio")
     p_enviar = sub.add_parser("enviar", help="envía los correos ficticios de la demostración")
     p_enviar.add_argument("--para", help="destinatario (por defecto, el mismo buzón)")
@@ -216,12 +234,22 @@ def main(argv: list[str] | None = None) -> int:
     if not os.environ.get("COMPOSIO_API_KEY"):
         print("Falta COMPOSIO_API_KEY en .env.", file=sys.stderr)
         return 1
+    if os.environ["COMPOSIO_API_KEY"].startswith("ck_"):
+        print(
+            "COMPOSIO_API_KEY es una clave de Composio Connect (ck_), que sirve para su MCP. "
+            "Este script usa la plataforma de desarrolladores: pongan la clave de un proyecto "
+            "(empieza por ak_, en platform.composio.dev → Settings → API Keys).",
+            file=sys.stderr,
+        )
+        return 1
     if args.comando == "cuentas":
         return cuentas()
     usuario = os.environ.get("COMPOSIO_USUARIO")
     if not usuario:
         print("Falta COMPOSIO_USUARIO en .env (el comando «cuentas» lo muestra).", file=sys.stderr)
         return 1
+    if args.comando == "conectar":
+        return conectar(usuario)
     gmail = Gmail(usuario)
     if args.comando == "enviar":
         return enviar(gmail, args.para, args.solo)
