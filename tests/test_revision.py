@@ -184,3 +184,17 @@ def test_la_segunda_persona_no_puede_ser_la_misma_escrita_distinto():
     assert resolucion.estado == "espera_segunda_persona"
     with pytest.raises(ValueError):
         resolver(tarjeta, "es_fraude", "  ")
+
+
+def test_la_tarjeta_avisa_cuando_un_enlace_lleva_a_otro_dominio():
+    tarjeta = crear_tarjeta(
+        "Ingrese a www.banco.example.com y confirme.",
+        veredicto(),
+        enlaces_ocultos=["http://otro.example.net/x", "https://www.banco.example.com/inicio"],
+    )
+    assert tarjeta.destinos_ocultos == ("otro[.]example[.]net",)
+    assert "¡Ojo! Enlaces que llevan a otro dominio: otro[.]example[.]net" in texto_de_tarjeta(
+        tarjeta
+    )
+    sin_trampa = crear_tarjeta("Hola", veredicto())
+    assert "¡Ojo!" not in texto_de_tarjeta(sin_trampa)

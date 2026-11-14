@@ -116,6 +116,9 @@ class TarjetaRevision:
     acciones: tuple[Accion, ...] = ACCIONES
     #: Liberar este mensaje exige dos personas distintas.
     requiere_segunda_persona: bool = False
+    #: Dominios a los que llevan los enlaces pero que no aparecen escritos en el texto
+    #: (por ejemplo, el destino real de un botón en un correo HTML).
+    destinos_ocultos: tuple[str, ...] = ()
 
 
 @dataclass(frozen=True)
@@ -212,6 +215,7 @@ def crear_tarjeta(
     """
     desarmado, enlaces = desarmar(texto)
     ocultos = [_desactivar(e.strip())[1].lower() for e in enlaces_ocultos if e.strip()]
+    destinos_ocultos = tuple(d for d in dict.fromkeys(ocultos) if d not in enlaces)
     enlaces = tuple(dict.fromkeys((*enlaces, *ocultos)))
     plano = _sin_tildes(texto.lower())
 
@@ -234,6 +238,7 @@ def crear_tarjeta(
         texto_desarmado=desarmado,
         requiere_segunda_persona=veredicto.engano_a_personas
         or any(p in PEDIDOS_DELICADOS for p in pide),
+        destinos_ocultos=destinos_ocultos,
     )
 
 
@@ -254,6 +259,11 @@ def texto_de_tarjeta(tarjeta: TarjetaRevision) -> str:
             f"Pide:         {lista(tarjeta.pide, 'nada que las reglas reconozcan')}",
             f"Presiona con: {lista(tarjeta.presiona_con, 'nada que las reglas reconozcan')}",
             f"Enlaces y correos (desactivados): {lista(tarjeta.enlaces, 'ninguno')}",
+            *(
+                [f"¡Ojo! Enlaces que llevan a otro dominio: {lista(tarjeta.destinos_ocultos, '')}"]
+                if tarjeta.destinos_ocultos
+                else []
+            ),
             "",
             "--- Texto del remitente (no confiable) ---",
             tarjeta.texto_desarmado.strip(),

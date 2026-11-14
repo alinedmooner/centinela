@@ -93,6 +93,25 @@ Las etiquetas son tuyas: pasa un diccionario `{"nombre": "definición"}` en `eti
 
 Para ver todo junto, `python ejemplos/demo_bandeja.py` revisa una bandeja de siete mensajes y muestra, para los que van a revisión, lo que vería la persona que revisa.
 
+### Con un buzón de correo
+
+`centinela.correo` lee un correo con lo que no se ve: el texto escondido en el HTML (marcado como tal) y el destino real de cada enlace, que la tarjeta muestra cuando no coincide con el texto.
+
+```python
+from centinela import revisar
+from centinela.correo import leer_correo, texto_a_revisar
+
+correo = leer_correo(open("mensaje.eml", "rb").read())
+print(revisar(texto_a_revisar(correo)).decision)
+```
+
+Para una demostración en vivo hay dos scripts sin dependencias:
+
+- `ejemplos/vigilar_buzon.py` es un bot que vigila un buzón por IMAP. Revisa cada correo nuevo, muestra la tarjeta de los sospechosos y, con `--mover`, los pasa a la carpeta `Centinela-Cuarentena`. Con `--solo-de` el servidor le entrega solo los correos de esa dirección: el bot no abre los demás.
+- `ejemplos/enviar_pruebas.py` envía al buzón del bot cinco correos ficticios desde otra cuenta.
+
+Las credenciales van en `.env` (ver `.env.example`). Con Gmail hacen falta contraseñas de aplicación.
+
 ## Detectores
 
 El guardia combina uno o varios detectores. Todos responden con el mismo formato.
@@ -161,6 +180,7 @@ El banco de pruebas contiene mensajes de ataque porque hacen falta para medir de
 ## Hoja de ruta
 
 - Más detectores y más proveedores de modelos.
+- Un servidor MCP de «buzón seguro»: el agente pide sus correos y el guardia los revisa antes de entregárselos, en vez de que el agente decida si consultar a Centinela.
 - Ejemplo de integración con WhatsApp Business.
 - Casos reales, con permiso y anonimizados, y casos de otros países.
 - Portugués.
