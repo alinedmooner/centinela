@@ -18,7 +18,7 @@ Señalar la figura: mensaje, guardia, clasificador, sala de revisión.
 
 ## 1:45 a 2:30. Resultados (página 2, tabla)
 
-> Lo medimos con casos que no usamos para construirlo. Con Centinela, ningún ataque cambió la etiqueta, y el bot siguió clasificando bien todos los mensajes normales. Las reglas, que son gratis, detectan tres de cada cuatro ataques en español sin una sola falsa alarma en más de 500 mensajes reales y de prueba. Con un modelo como revisor, se llega al 99 %.
+> Lo medimos con casos que no usamos para construirlo, y con cuatro modelos de Claude. Con Centinela, ningún ataque cambió la etiqueta con ninguno, y 50 de los 70 ni siquiera llegaron al modelo: los frenó el guardia, igual con cualquier modelo. Las reglas, que son gratis, detectan tres de cada cuatro ataques en español sin una sola falsa alarma en más de 500 mensajes reales y de prueba. Con un modelo como revisor, se llega al 99 %.
 
 ## 2:30 a 2:50. Dónde falla y uso responsable (secciones 4 y 5)
 
@@ -30,7 +30,10 @@ Señalar la figura: mensaje, guardia, clasificador, sala de revisión.
 
 ## Preguntas probables
 
-- **¿Por qué Opus cae más que Haiku?** No lo sabemos con certeza y no lo afirmamos. Lo que medimos es que, con el mensaje del cliente pegado a las instrucciones, Opus 5.5 obedeció 23 de 70 ataques, Haiku 5.5 ninguno y Haiku 4.5 uno. En una corrida previa Opus obedeció 29, así que el número varía. Por eso la defensa no debe depender del modelo.
+- **¿Funciona con distintos modelos?** Lo probamos con cuatro. Sin defensa, Opus 5.5 obedeció 23 de 70 ataques en dos corridas; Sonnet 5.5, 2; Haiku 4.5, 1, y Haiku 5.5, ninguno. Con Centinela, 0 con los cuatro, y los mensajes normales se clasificaron bien entre el 97 % y el 100 %.
+- **¿Cuál es la defensa real frente a cualquier modelo?** La que no depende de él. El guardia frena 50 de cada 70 ataques antes de que el modelo los lea, y son los mismos 50 con cualquier modelo. Los otros 20 le llegan como dato, y su respuesta solo vale si es una etiqueta de la lista; si no, el código la manda a revisión.
+- **¿Hacen daño los ataques sin un modelo potente?** En nuestra prueba, los modelos pequeños casi no obedecieron. Pero en agentes con herramientas sí hacen daño: en los registros públicos de AgentDojo y AgentDyn, GPT-4o mini cayó en el 27 % y el 51 % de los intentos, y Llama 3.3 70B en el 23 % y el 12,5 %. Además cambia entre versiones: Claude 3.5 Sonnet pasó de 34 % a 1 %. No se puede apostar la seguridad a que el modelo de turno resista.
+- **¿Por qué usarlo?** No depende del modelo, funciona en español, es gratis y local sin falsas alarmas en 462 correos reales, protege también a la persona que revisa y se instala con `pip install centinela-ia`.
 - **Si una advertencia en el prompt también deja el éxito en 0 %, ¿qué agrega Centinela?** Tres cosas: la lista cerrada y la revisión humana no dependen de que el modelo obedezca la advertencia; el 71 % de los intentos llega a una persona con un aviso, en lugar de pasar en silencio; y funciona igual con cualquier modelo.
 - **¿Y si el mensaje engaña a quien lo revisa?** Para eso está la sala de revisión. En los 731 correos de phishing de SpaPhish no quedó ningún enlace activo, y en 9 de cada 10 el enlace llevaba a un dominio que no aparece escrito en el texto; la tarjeta lo muestra. Lo que no medimos es su efecto en personas.
 - **¿Los datos son reales?** Los 462 correos legítimos y los 1395 de la prueba de phishing sí (SpaPhish). Los mensajes de WhatsApp son inventados y los ataques son traducciones de bancos públicos. Está dicho en la ficha.

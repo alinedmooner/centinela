@@ -1,0 +1,720 @@
+{
+ "AgentDojo": {
+  "Meta-SecAlign-70B": {
+   "ataques": 949,
+   "exitos": 21,
+   "utiles_ataque": 740,
+   "tareas": 132,
+   "utiles": 100
+  },
+  "Meta-SecAlign-70B-repeat_user_prompt": {
+   "ataques": 949,
+   "exitos": 20,
+   "utiles_ataque": 760,
+   "tareas": 132,
+   "utiles": 109
+  },
+  "claude-3-5-sonnet-20240620": {
+   "ataques": 629,
+   "exitos": 213,
+   "utiles_ataque": 322,
+   "tareas": 124,
+   "utiles": 94
+  },
+  "claude-3-5-sonnet-20241022": {
+   "ataques": 629,
+   "exitos": 7,
+   "utiles_ataque": 456,
+   "tareas": 124,
+   "utiles": 94
+  },
+  "claude-3-7-sonnet-20250219": {
+   "ataques": 949,
+   "exitos": 47,
+   "utiles_ataque": 779,
+   "tareas": 132,
+   "utiles": 116
+  },
+  "claude-3-haiku-20240307": {
+   "ataques": 629,
+   "exitos": 57,
+   "utiles_ataque": 210,
+   "tareas": 124,
+   "utiles": 53
+  },
+  "claude-3-opus-20240229": {
+   "ataques": 629,
+   "exitos": 71,
+   "utiles_ataque": 330,
+   "tareas": 124,
+   "utiles": 85
+  },
+  "claude-3-sonnet-20240229": {
+   "ataques": 629,
+   "exitos": 168,
+   "utiles_ataque": 209,
+   "tareas": 124,
+   "utiles": 65
+  },
+  "command-r": {
+   "ataques": 629,
+   "exitos": 21,
+   "utiles_ataque": 194,
+   "tareas": 124,
+   "utiles": 44
+  },
+  "command-r-plus": {
+   "ataques": 629,
+   "exitos": 28,
+   "utiles_ataque": 158,
+   "tareas": 124,
+   "utiles": 35
+  },
+  "gemini-1.5-flash-001": {
+   "ataques": 629,
+   "exitos": 77,
+   "utiles_ataque": 215,
+   "tareas": 124,
+   "utiles": 58
+  },
+  "gemini-1.5-flash-002": {
+   "ataques": 629,
+   "exitos": 22,
+   "utiles_ataque": 204,
+   "tareas": 124,
+   "utiles": 52
+  },
+  "gemini-1.5-pro-001": {
+   "ataques": 629,
+   "exitos": 180,
+   "utiles_ataque": 182,
+   "tareas": 124,
+   "utiles": 59
+  },
+  "gemini-1.5-pro-002": {
+   "ataques": 629,
+   "exitos": 107,
+   "utiles_ataque": 296,
+   "tareas": 124,
+   "utiles": 77
+  },
+  "gemini-2.0-flash-001": {
+   "ataques": 949,
+   "exitos": 134,
+   "utiles_ataque": 373,
+   "tareas": 132,
+   "utiles": 56
+  },
+  "gemini-2.0-flash-exp": {
+   "ataques": 629,
+   "exitos": 107,
+   "utiles_ataque": 251,
+   "tareas": 124,
+   "utiles": 60
+  },
+  "gpt-3.5-turbo-0125": {
+   "ataques": 629,
+   "exitos": 65,
+   "utiles_ataque": 218,
+   "tareas": 124,
+   "utiles": 57
+  },
+  "gpt-4-0125-preview": {
+   "ataques": 629,
+   "exitos": 354,
+   "utiles_ataque": 256,
+   "tareas": 124,
+   "utiles": 88
+  },
+  "gpt-4-turbo-2024-04-09": {
+   "ataques": 629,
+   "exitos": 180,
+   "utiles_ataque": 340,
+   "tareas": 124,
+   "utiles": 83
+  },
+  "gpt-4o-2024-05-13": {
+   "ataques": 629,
+   "exitos": 300,
+   "utiles_ataque": 315,
+   "tareas": 124,
+   "utiles": 90
+  },
+  "gpt-4o-2024-05-13-repeat_user_prompt": {
+   "ataques": 629,
+   "exitos": 175,
+   "utiles_ataque": 423,
+   "tareas": 124,
+   "utiles": 106
+  },
+  "gpt-4o-2024-05-13-spotlighting_with_delimiting": {
+   "ataques": 629,
+   "exitos": 262,
+   "utiles_ataque": 350,
+   "tareas": 124,
+   "utiles": 93
+  },
+  "gpt-4o-2024-05-13-tool_filter": {
+   "ataques": 629,
+   "exitos": 43,
+   "utiles_ataque": 354,
+   "tareas": 124,
+   "utiles": 89
+  },
+  "gpt-4o-2024-05-13-transformers_pi_detector": {
+   "ataques": 629,
+   "exitos": 50,
+   "utiles_ataque": 133,
+   "tareas": 124,
+   "utiles": 52
+  },
+  "gpt-4o-mini-2024-07-18": {
+   "ataques": 629,
+   "exitos": 171,
+   "utiles_ataque": 314,
+   "tareas": 124,
+   "utiles": 90
+  },
+  "meta-llama_Llama-3-70b-chat-hf": {
+   "ataques": 629,
+   "exitos": 161,
+   "utiles_ataque": 115,
+   "tareas": 124,
+   "utiles": 49
+  },
+  "meta-llama_Llama-3.3-70B-Instruct": {
+   "ataques": 949,
+   "exitos": 219,
+   "utiles_ataque": 393,
+   "tareas": 132,
+   "utiles": 78
+  },
+  "meta-llama_Llama-3.3-70B-Instruct-repeat_user_prompt": {
+   "ataques": 797,
+   "exitos": 72,
+   "utiles_ataque": 315,
+   "tareas": 132,
+   "utiles": 77
+  }
+ },
+ "AgentDyn": {
+  "google_gemini-2.5-flash": {
+   "ataques": 560,
+   "exitos": 79,
+   "utiles_ataque": 43,
+   "tareas": 88,
+   "utiles": 15
+  },
+  "google_gemini-2.5-flash-drift": {
+   "ataques": 560,
+   "exitos": 16,
+   "utiles_ataque": 69,
+   "tareas": 60,
+   "utiles": 11
+  },
+  "google_gemini-2.5-flash-piguard_detector": {
+   "ataques": 560,
+   "exitos": 12,
+   "utiles_ataque": 10,
+   "tareas": 88,
+   "utiles": 16
+  },
+  "google_gemini-2.5-flash-progent": {
+   "ataques": 560,
+   "exitos": 13,
+   "utiles_ataque": 11,
+   "tareas": 88,
+   "utiles": 8
+  },
+  "google_gemini-2.5-flash-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 141,
+   "utiles_ataque": 66,
+   "tareas": 88,
+   "utiles": 31
+  },
+  "google_gemini-2.5-flash-repeat_user_prompt": {
+   "ataques": 560,
+   "exitos": 105,
+   "utiles_ataque": 81,
+   "tareas": 88,
+   "utiles": 21
+  },
+  "google_gemini-2.5-flash-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 103,
+   "utiles_ataque": 72,
+   "tareas": 88,
+   "utiles": 20
+  },
+  "google_gemini-2.5-flash-tool_filter": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 0,
+   "tareas": 88,
+   "utiles": 0
+  },
+  "google_gemini-2.5-flash-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 6,
+   "utiles_ataque": 1,
+   "tareas": 88,
+   "utiles": 9
+  },
+  "google_gemini-2.5-pro": {
+   "ataques": 560,
+   "exitos": 122,
+   "utiles_ataque": 266,
+   "tareas": 88,
+   "utiles": 50
+  },
+  "google_gemini-2.5-pro-drift": {
+   "ataques": 560,
+   "exitos": 6,
+   "utiles_ataque": 186,
+   "tareas": 60,
+   "utiles": 22
+  },
+  "google_gemini-2.5-pro-piguard_detector": {
+   "ataques": 560,
+   "exitos": 11,
+   "utiles_ataque": 12,
+   "tareas": 88,
+   "utiles": 19
+  },
+  "google_gemini-2.5-pro-progent": {
+   "ataques": 560,
+   "exitos": 9,
+   "utiles_ataque": 89,
+   "tareas": 88,
+   "utiles": 24
+  },
+  "google_gemini-2.5-pro-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 85,
+   "utiles_ataque": 101,
+   "tareas": 88,
+   "utiles": 52
+  },
+  "google_gemini-2.5-pro-repeat_user_prompt": {
+   "ataques": 560,
+   "exitos": 136,
+   "utiles_ataque": 275,
+   "tareas": 88,
+   "utiles": 49
+  },
+  "google_gemini-2.5-pro-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 96,
+   "utiles_ataque": 295,
+   "tareas": 88,
+   "utiles": 52
+  },
+  "google_gemini-2.5-pro-tool_filter": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 5,
+   "tareas": 88,
+   "utiles": 2
+  },
+  "google_gemini-2.5-pro-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 4,
+   "utiles_ataque": 4,
+   "tareas": 88,
+   "utiles": 6
+  },
+  "gpt-4o-2024-08-06": {
+   "ataques": 560,
+   "exitos": 218,
+   "utiles_ataque": 310,
+   "tareas": 88,
+   "utiles": 56
+  },
+  "gpt-4o-2024-08-06-drift": {
+   "ataques": 560,
+   "exitos": 5,
+   "utiles_ataque": 152,
+   "tareas": 60,
+   "utiles": 18
+  },
+  "gpt-4o-2024-08-06-piguard_detector": {
+   "ataques": 560,
+   "exitos": 10,
+   "utiles_ataque": 8,
+   "tareas": 88,
+   "utiles": 21
+  },
+  "gpt-4o-2024-08-06-progent": {
+   "ataques": 560,
+   "exitos": 10,
+   "utiles_ataque": 32,
+   "tareas": 88,
+   "utiles": 18
+  },
+  "gpt-4o-2024-08-06-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 159,
+   "utiles_ataque": 120,
+   "tareas": 88,
+   "utiles": 58
+  },
+  "gpt-4o-2024-08-06-repeat_user_prompt": {
+   "ataques": 559,
+   "exitos": 180,
+   "utiles_ataque": 314,
+   "tareas": 88,
+   "utiles": 57
+  },
+  "gpt-4o-2024-08-06-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 157,
+   "utiles_ataque": 292,
+   "tareas": 88,
+   "utiles": 55
+  },
+  "gpt-4o-2024-08-06-tool_filter": {
+   "ataques": 560,
+   "exitos": 25,
+   "utiles_ataque": 28,
+   "tareas": 88,
+   "utiles": 19
+  },
+  "gpt-4o-2024-08-06-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 5,
+   "utiles_ataque": 3,
+   "tareas": 88,
+   "utiles": 12
+  },
+  "gpt-4o-mini-2024-07-18": {
+   "ataques": 560,
+   "exitos": 286,
+   "utiles_ataque": 198,
+   "tareas": 88,
+   "utiles": 56
+  },
+  "gpt-4o-mini-2024-07-18-camel": {
+   "ataques": 319,
+   "exitos": 0,
+   "utiles_ataque": 0,
+   "tareas": 64,
+   "utiles": 6
+  },
+  "gpt-4o-mini-2024-07-18-drift": {
+   "ataques": 560,
+   "exitos": 20,
+   "utiles_ataque": 107,
+   "tareas": 88,
+   "utiles": 28
+  },
+  "gpt-4o-mini-2024-07-18-piguard_detector": {
+   "ataques": 560,
+   "exitos": 8,
+   "utiles_ataque": 18,
+   "tareas": 88,
+   "utiles": 28
+  },
+  "gpt-4o-mini-2024-07-18-progent": {
+   "ataques": 560,
+   "exitos": 60,
+   "utiles_ataque": 21,
+   "tareas": 88,
+   "utiles": 19
+  },
+  "gpt-4o-mini-2024-07-18-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 199,
+   "utiles_ataque": 110,
+   "tareas": 88,
+   "utiles": 55
+  },
+  "gpt-4o-mini-2024-07-18-repeat_user_prompt": {
+   "ataques": 560,
+   "exitos": 195,
+   "utiles_ataque": 215,
+   "tareas": 88,
+   "utiles": 57
+  },
+  "gpt-4o-mini-2024-07-18-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 270,
+   "utiles_ataque": 197,
+   "tareas": 88,
+   "utiles": 48
+  },
+  "gpt-4o-mini-2024-07-18-tool_filter": {
+   "ataques": 560,
+   "exitos": 33,
+   "utiles_ataque": 30,
+   "tareas": 88,
+   "utiles": 19
+  },
+  "gpt-4o-mini-2024-07-18-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 8,
+   "utiles_ataque": 5,
+   "tareas": 88,
+   "utiles": 12
+  },
+  "gpt-5-mini-2025-08-07": {
+   "ataques": 560,
+   "exitos": 2,
+   "utiles_ataque": 364,
+   "tareas": 88,
+   "utiles": 57
+  },
+  "gpt-5-mini-2025-08-07-drift": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 95,
+   "tareas": 60,
+   "utiles": 6
+  },
+  "gpt-5-mini-2025-08-07-piguard_detector": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 40,
+   "tareas": 88,
+   "utiles": 25
+  },
+  "gpt-5-mini-2025-08-07-progent": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 98,
+   "tareas": 99,
+   "utiles": 30
+  },
+  "gpt-5-mini-2025-08-07-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 196,
+   "tareas": 88,
+   "utiles": 60
+  },
+  "gpt-5-mini-2025-08-07-repeat_user_prompt": {
+   "ataques": 560,
+   "exitos": 2,
+   "utiles_ataque": 367,
+   "tareas": 88,
+   "utiles": 64
+  },
+  "gpt-5-mini-2025-08-07-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 3,
+   "utiles_ataque": 344,
+   "tareas": 88,
+   "utiles": 62
+  },
+  "gpt-5-mini-2025-08-07-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 5,
+   "tareas": 88,
+   "utiles": 11
+  },
+  "gpt-5.1-2025-11-13": {
+   "ataques": 560,
+   "exitos": 29,
+   "utiles_ataque": 280,
+   "tareas": 88,
+   "utiles": 57
+  },
+  "gpt-5.1-2025-11-13-drift": {
+   "ataques": 478,
+   "exitos": 0,
+   "utiles_ataque": 24,
+   "tareas": 60,
+   "utiles": 1
+  },
+  "gpt-5.1-2025-11-13-piguard_detector": {
+   "ataques": 560,
+   "exitos": 7,
+   "utiles_ataque": 15,
+   "tareas": 88,
+   "utiles": 21
+  },
+  "gpt-5.1-2025-11-13-progent": {
+   "ataques": 560,
+   "exitos": 7,
+   "utiles_ataque": 83,
+   "tareas": 88,
+   "utiles": 22
+  },
+  "gpt-5.1-2025-11-13-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 22,
+   "utiles_ataque": 129,
+   "tareas": 88,
+   "utiles": 50
+  },
+  "gpt-5.1-2025-11-13-repeat_user_prompt": {
+   "ataques": 560,
+   "exitos": 7,
+   "utiles_ataque": 302,
+   "tareas": 88,
+   "utiles": 54
+  },
+  "gpt-5.1-2025-11-13-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 20,
+   "utiles_ataque": 281,
+   "tareas": 88,
+   "utiles": 55
+  },
+  "gpt-5.1-2025-11-13-tool_filter": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 20,
+   "tareas": 88,
+   "utiles": 12
+  },
+  "gpt-5.1-2025-11-13-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 0,
+   "utiles_ataque": 3,
+   "tareas": 88,
+   "utiles": 14
+  },
+  "meta-llama_llama-3.3-70b-instruct": {
+   "ataques": 560,
+   "exitos": 70,
+   "utiles_ataque": 36,
+   "tareas": 88,
+   "utiles": 14
+  },
+  "meta-llama_llama-3.3-70b-instruct-drift": {
+   "ataques": 560,
+   "exitos": 34,
+   "utiles_ataque": 49,
+   "tareas": 60,
+   "utiles": 7
+  },
+  "meta-llama_llama-3.3-70b-instruct-piguard_detector": {
+   "ataques": 560,
+   "exitos": 4,
+   "utiles_ataque": 0,
+   "tareas": 88,
+   "utiles": 13
+  },
+  "meta-llama_llama-3.3-70b-instruct-progent": {
+   "ataques": 560,
+   "exitos": 3,
+   "utiles_ataque": 13,
+   "tareas": 88,
+   "utiles": 11
+  },
+  "meta-llama_llama-3.3-70b-instruct-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 65,
+   "utiles_ataque": 38,
+   "tareas": 88,
+   "utiles": 16
+  },
+  "meta-llama_llama-3.3-70b-instruct-repeat_user_prompt": {
+   "ataques": 560,
+   "exitos": 59,
+   "utiles_ataque": 43,
+   "tareas": 88,
+   "utiles": 16
+  },
+  "meta-llama_llama-3.3-70b-instruct-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 87,
+   "utiles_ataque": 40,
+   "tareas": 88,
+   "utiles": 19
+  },
+  "meta-llama_llama-3.3-70b-instruct-tool_filter": {
+   "ataques": 560,
+   "exitos": 15,
+   "utiles_ataque": 27,
+   "tareas": 88,
+   "utiles": 12
+  },
+  "meta-llama_llama-3.3-70b-instruct-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 3,
+   "utiles_ataque": 6,
+   "tareas": 88,
+   "utiles": 12
+  },
+  "meta_secalign-70B": {
+   "ataques": 560,
+   "exitos": 51,
+   "utiles_ataque": 302,
+   "tareas": 88,
+   "utiles": 58
+  },
+  "meta_secalign-8B": {
+   "ataques": 560,
+   "exitos": 31,
+   "utiles_ataque": 41,
+   "tareas": 88,
+   "utiles": 14
+  },
+  "qwen_qwen3-235b-a22b-2507": {
+   "ataques": 560,
+   "exitos": 82,
+   "utiles_ataque": 32,
+   "tareas": 88,
+   "utiles": 12
+  },
+  "qwen_qwen3-235b-a22b-2507-drift": {
+   "ataques": 560,
+   "exitos": 52,
+   "utiles_ataque": 185,
+   "tareas": 60,
+   "utiles": 22
+  },
+  "qwen_qwen3-235b-a22b-2507-piguard_detector": {
+   "ataques": 560,
+   "exitos": 11,
+   "utiles_ataque": 4,
+   "tareas": 88,
+   "utiles": 12
+  },
+  "qwen_qwen3-235b-a22b-2507-progent": {
+   "ataques": 560,
+   "exitos": 79,
+   "utiles_ataque": 13,
+   "tareas": 88,
+   "utiles": 13
+  },
+  "qwen_qwen3-235b-a22b-2507-prompt_guard_2_detector": {
+   "ataques": 560,
+   "exitos": 127,
+   "utiles_ataque": 61,
+   "tareas": 88,
+   "utiles": 21
+  },
+  "qwen_qwen3-235b-a22b-2507-repeat_user_prompt": {
+   "ataques": 560,
+   "exitos": 148,
+   "utiles_ataque": 85,
+   "tareas": 88,
+   "utiles": 22
+  },
+  "qwen_qwen3-235b-a22b-2507-spotlighting_with_delimiting": {
+   "ataques": 560,
+   "exitos": 159,
+   "utiles_ataque": 75,
+   "tareas": 88,
+   "utiles": 25
+  },
+  "qwen_qwen3-235b-a22b-2507-tool_filter": {
+   "ataques": 560,
+   "exitos": 2,
+   "utiles_ataque": 2,
+   "tareas": 88,
+   "utiles": 2
+  },
+  "qwen_qwen3-235b-a22b-2507-transformers_pi_detector": {
+   "ataques": 560,
+   "exitos": 6,
+   "utiles_ataque": 4,
+   "tareas": 88,
+   "utiles": 6
+  }
+ }
+}
