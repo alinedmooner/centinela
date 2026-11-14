@@ -21,7 +21,7 @@ _LEET = str.maketrans(
 )
 
 _IA = r"(asistente( virtual| de ia)?|bot|chatbot|ia|inteligencia artificial|modelo de lenguaje|clasificador|agente de ia|llm|ai|assistant|classifier|language model)"
-_INSTR = r"(instruccion\w*|regla\w*|indicacion\w*|directri\w*|instruction\w*|rule\w*|guideline\w*|directive\w*)"
+_INSTR = r"(instruccion\w*|reglas?|indicacion\w*|directri\w*|instruction\w*|rules?|guideline\w*|directive\w*)"
 
 #: nombre de la regla -> patrones. Se aplican sobre texto en minúsculas y sin tildes.
 _REGLAS: dict[str, tuple[str, ...]] = {
@@ -29,6 +29,7 @@ _REGLAS: dict[str, tuple[str, ...]] = {
         rf"\b(ignora|ignore|ignoren|ignorar|olvida|olvidate|olvidar|omite|omitir|descarta|descartar|desestima|desestimar|anula|anular|pasa por alto|haz caso omiso de?|no (sigas|hagas caso|tengas en cuenta))\b[^.\n]{{0,40}}\b(tus|sus|todas|las|cualquier|toda)\b[^.\n]{{0,20}}\b{_INSTR}\b",
         rf"\b{_INSTR}\b[^.\n]{{0,10}}\b(anteriores|previas|iniciales|originales|del sistema|de arriba|que te dieron)\b",
         r"\b(ignora|olvida|descarta|omite)\b[^.\n]{0,15}\b(todo )?lo (anterior|de arriba|previo)\b",
+        r"\b(anula|anular|cancela|desactiva|sobrescribe|override)\b[^.\n]{0,30}\b(clasificacion|etiquetado|filtro|revision automatica|classification)\b",
         rf"\b(ignore|disregard|forget|override|bypass)\b[^.\n]{{0,40}}\b(your|all|any|the|previous|prior|above)\b[^.\n]{{0,25}}\b({_INSTR}|prompt)\b",
     ),
     "dirigido_a_la_ia": (
@@ -47,7 +48,7 @@ _REGLAS: dict[str, tuple[str, ...]] = {
         r"</?\s*(system|sistema|instrucciones|instructions?|information|informacion|admin|developer|desarrollador|assistant|asistente|mensaje\w*|message|user|usuario|prompt)\b[^>]{0,30}>",
         r"\[\s*/?\s*(system|sistema|admin|inst|developer|desarrollador|instruccion(es)?|nueva regla|override)\b[^\]]{0,40}\]",
         r"<\|[a-z_]{2,20}\|>",
-        r"#{2,}\s*\(?\s*(system|sistema|nueva instruccion|new instruction)",
+        r"#{2,}\s*\(?\s*(system|sistema|desarrollador|developer|admin\w*|nueva instruccion|new instruction|instruccion\w*|instruction\w*)",
         r"\b(begin|end|inicio|fin) (of |de |del )?(system|sistema|instructions?|instrucciones|prompt)\b",
     ),
     "cambio_de_rol": (
@@ -58,6 +59,7 @@ _REGLAS: dict[str, tuple[str, ...]] = {
         r"\b(antes de (continuar|seguir|responder|resolver|clasificar)|before you (can )?(solve|continue|answer|respond|proceed))\b[^.\n]{0,60}\b(haz|realiza|ejecuta|debes|tienes que|do|you must)\b",
     ),
     "respuesta_prefabricada": (
+        r"[\"'“”](etiqueta|label|categoria|category|clasificacion|classification|prioridad|priority)[\"'“”]\s*:\s*[\"'“”]",
         r"\{\s*[\"'“”]?(etiqueta|label|categoria|category|clasificacion|classification|prioridad|priority)[\"'“”]?\s*:",
         r"\b(respuesta|salida|resultado|output|answer|response)\b[^.\n]{0,15}\b(esperad\w+|correct\w+|expected|required)\b[^.\n]{0,5}:",
     ),
@@ -80,13 +82,51 @@ _TRUCOS = {
     ),
 }
 
+# Órdenes de anular instrucciones escritas con erratas («ignore your previous iunstructions»).
+_ANULAR_CON_ERRATA = re.compile(
+    r"\b(ignore|disregard|forget|override|bypass|ignora|ignoren|olvida|descarta|omite|desestima)\b\s+"
+    r"(?:(?:your|all|any|the|my|previous|prior|above|earlier|tus|sus|las|todas|toda|cualquier|mis)\s+){1,3}"
+    r"(\w{7,})"
+)
+_PALABRAS_DE_INSTRUCCION = (
+    "instructions",
+    "instruction",
+    "guidelines",
+    "directives",
+    "instrucciones",
+    "indicaciones",
+    "directrices",
+)
+
+_CERO_ANCHO_ENTRE_LETRAS = re.compile(
+    "[^\\W\\d_][" + "".join(sorted(_CERO_ANCHO)) + "]+(?=[^\\W\\d_])"
+)
 _LETRAS_ESPACIADAS = re.compile(r"\b(?:\w[ .\-_*]{1,2}){5,}\w\b")
-_MUCHOS_SALTOS = re.compile(r"\n\s*(?:\n\s*){7,}")
 
 
 def _sin_tildes(texto: str) -> str:
     descompuesto = unicodedata.normalize("NFD", texto)
     return "".join(c for c in descompuesto if unicodedata.category(c) != "Mn")
+
+
+def _distancia(a: str, b: str) -> int:
+    """Distancia de edición entre dos palabras."""
+    anterior = list(range(len(b) + 1))
+    for i, ca in enumerate(a, start=1):
+        actual = [i]
+        for j, cb in enumerate(b, start=1):
+            actual.append(min(anterior[j] + 1, actual[j - 1] + 1, anterior[j - 1] + (ca != cb)))
+        anterior = actual
+    return anterior[-1]
+
+
+def _anular_con_errata(texto: str) -> str | None:
+    """Encuentra «ignora tus <instrucciones>» aunque la última palabra tenga una errata."""
+    for coincidencia in _ANULAR_CON_ERRATA.finditer(texto):
+        palabra = coincidencia.group(2)
+        if any(_distancia(palabra, objetivo) <= 2 for objetivo in _PALABRAS_DE_INSTRUCCION):
+            return coincidencia.group(0)
+    return None
 
 
 def _juntar_letras(texto: str) -> str:
@@ -103,12 +143,10 @@ def _variantes(texto: str) -> tuple[list[str], list[str]]:
     oculto = "".join(chr(ord(c) - 0xE0000) for c in etiquetas if 0xE0020 <= ord(c) <= 0xE007E)
     if etiquetas:
         senales.append("texto_oculto: caracteres invisibles que esconden un mensaje")
-    if sum(c in _CERO_ANCHO for c in texto) >= 3:
-        senales.append("texto_oculto: caracteres de ancho cero entre las letras")
-    if any(c in _BIDI for c in texto):
-        senales.append("texto_oculto: controles de dirección del texto")
-    if _MUCHOS_SALTOS.search(texto):
-        senales.append("texto_oculto: contenido después de muchos saltos de línea")
+    # Los correos de publicidad usan caracteres de ancho cero como relleno entre palabras.
+    # Solo son sospechosos cuando van dentro de las palabras, para partirlas.
+    if len(_CERO_ANCHO_ENTRE_LETRAS.findall(texto)) >= 3:
+        senales.append("texto_oculto: caracteres de ancho cero que parten palabras")
 
     visible = "".join(
         c
@@ -147,11 +185,21 @@ class DetectorReglas:
             lista = "|".join(nombres)
             self._reglas["nombra_una_etiqueta"] = (
                 re.compile(
-                    r"\b(como|etiqueta|categoria|clasificacion|label|category|as|respuesta|answer|output)\b"
-                    rf"[^.\n]{{0,25}}[\"'“”«]?\b({lista})\b"
+                    r"\b(etiqueta\w*|categoria\w*|clasificacion\w*|label\w*|category\w*|respuesta\w*"
+                    r"|salida\w*|answer\w*|output\w*)\b[^.\n:=]{0,25}"
+                    rf"(:|=>?|->|→|\bes\b|\bsea\b|\bdebe ser\b|\bis\b|\bmust be\b)\s*[\"'“”«]?\s*({lista})\b"
+                ),
+                re.compile(
+                    r"\b(clasific\w+|clasifiqu\w+|marc\w+|marqu\w+|etiquet\w+|categori[zc]\w+|registr\w+"
+                    r"|trat\w+|consider\w+|pon\w*|asign\w+|classif\w+|label\w*|mark\w*|tag\w*|flag\w*)\b"
+                    rf"[^.\n]{{0,40}}\b(como|as)\s+[\"'“”«]?({lista})\b"
                 ),
                 re.compile(
                     rf"\b({lista})\b[^.\n]{{0,30}}\b(es la (etiqueta|respuesta|categoria)|is the (label|answer|category))\b"
+                ),
+                re.compile(
+                    r"\b(etiqueta\w*|categoria\w*|clasificacion\w*|label\w*|category\w*)\s+(de\s+)?"
+                    rf"[\"'“”«]?({lista})\b"
                 ),
             )
 
@@ -164,6 +212,10 @@ class DetectorReglas:
                     fragmento = " ".join(coincidencia.group(0).split())[:80]
                     evidencias.append(f"{nombre}: «{fragmento}»")
                     break
+        if not any(e.startswith("anular_instrucciones") for e in evidencias):
+            errata = next((e for v in variantes if (e := _anular_con_errata(v))), None)
+            if errata:
+                evidencias.append(f"anular_instrucciones: «{errata[:80]}»")
         base = variantes[0]
         trucos = tuple(nombre for nombre, patron in _TRUCOS.items() if patron.search(base))
         return Hallazgo(
