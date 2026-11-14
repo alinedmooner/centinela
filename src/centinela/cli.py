@@ -29,8 +29,35 @@ def _leer_mensaje(args: argparse.Namespace) -> str:
     return args.texto
 
 
+def _etiquetas(args: argparse.Namespace) -> dict[str, str]:
+    """Las etiquetas del negocio: las del archivo de --etiquetas o las de ejemplo de un bot de ventas."""
+    if not args.etiquetas:
+        return dict(ETIQUETAS_LEADS)
+    datos = json.loads(Path(args.etiquetas).read_text(encoding="utf-8"))
+    validas = (
+        isinstance(datos, dict)
+        and datos
+        and all(
+            isinstance(k, str) and isinstance(v, str) and k.strip() and v.strip()
+            for k, v in datos.items()
+        )
+    )
+    if not validas:
+        raise ValueError(
+            'el archivo de etiquetas debe ser un objeto JSON {"nombre": "definición"} con al menos una etiqueta'
+        )
+    raras = [k for k in datos if not k.isalpha()]
+    if raras:
+        print(
+            "Aviso: usa nombres de una sola palabra, sin espacios ni guiones, para que el guardia "
+            f"reconozca un mensaje que intenta imponerlos: {', '.join(raras)}",
+            file=sys.stderr,
+        )
+    return datos
+
+
 def _revisar(args: argparse.Namespace) -> int:
-    detectores = [DetectorReglas(etiquetas=ETIQUETAS_LEADS)]
+    detectores = [DetectorReglas(etiquetas=_etiquetas(args))]
     if args.claude:
         cargar_env()
         from centinela.detectores.llm import DetectorLLM
@@ -62,7 +89,8 @@ def _clasificar(args: argparse.Namespace) -> int:
     cargar_env()
     from centinela.proveedores.anthropic import ProveedorAnthropic
 
-    clasificador = ClasificadorSeguro(ProveedorAnthropic(args.modelo))
+    etiquetas = _etiquetas(args)
+    clasificador = ClasificadorSeguro(ProveedorAnthropic(args.modelo), etiquetas=etiquetas)
     resultado = clasificador.clasificar(_leer_mensaje(args))
     if args.json:
         salida = {
@@ -74,6 +102,7 @@ def _clasificar(args: argparse.Namespace) -> int:
         print(json.dumps(salida, ensure_ascii=False, indent=2))
     else:
         print(f"Etiqueta: {resultado.etiqueta} (decidió: {resultado.motivo})")
+        print(f"Etiquetas posibles, definidas por el negocio: {', '.join(etiquetas)}")
         print(f"Aviso: {resultado.veredicto.aviso}")
     return 2 if resultado.etiqueta == REVISION_HUMANA else 0
 
@@ -92,6 +121,10 @@ def _parser() -> argparse.ArgumentParser:
     )
     comun.add_argument("--archivo", help="lee el mensaje de un archivo")
     comun.add_argument("--json", action="store_true", help="imprime el resultado en JSON")
+    comun.add_argument(
+        "--etiquetas",
+        help='archivo JSON con las etiquetas de tu negocio, {"nombre": "definición"}; sin él se usan las de ejemplo de un bot de ventas (ver ejemplos/)',
+    )
 
     revisar = sub.add_parser(
         "revisar", parents=[comun], help="revisa un mensaje con reglas, sin clave ni internet"

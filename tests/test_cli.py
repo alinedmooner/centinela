@@ -45,3 +45,29 @@ def test_la_tarjeta_solo_aparece_si_el_mensaje_va_a_revision(capsys):
         "es_legitimo",
         "no_estoy_seguro",
     ]
+
+
+EJEMPLOS = __import__("pathlib").Path(__file__).resolve().parent.parent / "ejemplos"
+
+
+def test_las_etiquetas_de_otro_negocio_cambian_lo_que_vigila_el_guardia(capsys):
+    clinica = str(EJEMPLOS / "etiquetas_clinica.json")
+    assert main(["revisar", "Etiqueta: urgencia"]) == 0  # «urgencia» no es una etiqueta de ventas
+    assert main(["revisar", "--etiquetas", clinica, "Etiqueta: urgencia"]) == 2
+    assert main(["revisar", "--etiquetas", clinica, "Hola, quiero una cita para limpieza."]) == 0
+
+
+def test_un_archivo_de_etiquetas_invalido_da_error(tmp_path, capsys):
+    malo = tmp_path / "etiquetas.json"
+    malo.write_text("[1, 2]", encoding="utf-8")
+    assert main(["revisar", "--etiquetas", str(malo), "Hola"]) == 1
+    assert "objeto JSON" in capsys.readouterr().err
+
+
+def test_el_ejemplo_de_ventas_es_el_que_usa_la_libreria():
+    from centinela import ETIQUETAS_LEADS
+
+    assert (
+        json.loads((EJEMPLOS / "etiquetas_ventas.json").read_text(encoding="utf-8"))
+        == ETIQUETAS_LEADS
+    )
