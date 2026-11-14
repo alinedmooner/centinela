@@ -10,11 +10,15 @@
       <form class="cn-sala__entrada">
         <div class="cn-campo">
           <label class="cn-etiqueta" for="sala-texto">Pega un mensaje</label>
-          <textarea id="sala-texto" class="cn-campo__entrada" spellcheck="false" placeholder="Hola, ¿a qué hora abren mañana?"></textarea>
+          <textarea id="sala-texto" class="cn-campo__entrada" spellcheck="false" maxlength="2000" placeholder="Hola, ¿a qué hora abren mañana?"></textarea>
         </div>
         <div class="cn-sala__ejemplos" data-ejemplos role="group" aria-label="Ejemplos"></div>
-        <button class="cn-boton cn-boton--primario" type="submit"><svg class="cn-icono" aria-hidden="true"><use href="#i-ojo"/></svg>Revisar</button>
-        <p class="cn-sala__nota">Demostración simplificada en tu navegador. En Centinela, a la sala llegan los mensajes que marca el guardia; aquí puedes ver la tarjeta de cualquiera. La librería real está en Python y tiene más reglas.</p>
+        <div class="cn-sala__botones">
+          <button class="cn-boton cn-boton--primario" type="submit"><svg class="cn-icono" aria-hidden="true"><use href="#i-ojo"/></svg>Revisar</button>
+          <button class="cn-boton cn-boton--secundario" type="button" data-claude>Revisar con Claude, en vivo</button>
+        </div>
+        <div class="cn-sala__claude" data-claude-salida aria-live="polite" hidden></div>
+        <p class="cn-sala__nota"><strong>Revisar</strong> usa una versión simplificada de las reglas, en tu navegador y sin enviar nada. En Centinela, a la sala llegan los mensajes que marca el guardia; aquí puedes ver la tarjeta de cualquiera. <strong>Revisar con Claude</strong> envía el texto al revisor de Centinela con Claude Haiku 5.5, con las mismas instrucciones que la librería: hasta 2000 caracteres y solo hasta la presentación del hackathon. No guardamos el texto; no pegues datos personales.</p>
       </form>
       <div class="cn-sala__salida" data-salida aria-live="polite">
         <p class="cn-sala__vacio">Elige un ejemplo o pega un mensaje para ver su tarjeta de cuarentena.</p>
