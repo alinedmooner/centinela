@@ -1,0 +1,31 @@
+name: Pruebas
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  pruebas:
+    name: pruebas
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+
+      - name: Instalar uv
+        uses: astral-sh/setup-uv@c771a70e6277c0a99b617c7a806ffedaca235ff9 # v9.0.0
+        with:
+          version: "0.13.4"
+
+      - name: Instalar el proyecto
+        run: uv sync --locked --dev
+
+      - name: Revisar el estilo
+        run: uv run ruff check .
+
+      - name: Correr las pruebas
+        run: uv run pytest
