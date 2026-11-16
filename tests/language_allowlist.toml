@@ -1,0 +1,22 @@
+# Exceptions to the language rules (tests/test_language.py). Every entry says why. An entry that
+# matches nothing fails the test, so this list cannot collect dead exceptions.
+#
+# [[names]]  a name of the old Spanish API that is still in a Python file: file, token, reason
+# [[prose]]  a comment, docstring or document line that looks Spanish: file, contains, reason
+#            (`contains = "*"` covers the whole file: only for a file waiting for its translation)
+# [[paths]]  a path that still has an old Spanish name: file, reason
+
+[[prose]]
+file = "README.md"
+contains = "Español: [README.es.md]"
+reason = "The link to the Spanish copy of the README is labelled in Spanish so that a Spanish reader finds it."
+
+[[prose]]
+file = "ATTRIBUTIONS.md"
+contains = "Vigía design system"
+reason = "Vigía is the proper name of the website's design system."
+
+[[prose]]
+file = "web/README.md"
+contains = "*"
+reason = "Still the Spanish original: the website pull request (step 8) translates it and removes this entry."

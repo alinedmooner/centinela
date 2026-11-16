@@ -1,9 +1,9 @@
-# Secretos: nunca se suben
+# Secrets: never committed
 .env
 .env.*
 !.env.example
 
-# Entornos y cachés
+# Environments and caches
 .venv/
 __pycache__/
 *.pyc
@@ -13,19 +13,19 @@ __pycache__/
 dist/
 build/
 
-# Datos de terceros que no se redistribuyen (por ejemplo, SpaPhish)
+# Third-party data that is not redistributed (for example, SpaPhish)
 data/external/
 
-# Registros de Inspect y salidas crudas que pueden contener texto de terceros
+# Inspect logs and raw outputs that may contain third-party text
 logs/
 results/raw/
 
-# Editor y sistema
+# Editor and system
 .idea/
 .vscode/
 .DS_Store
 
-# Sitio web (web/)
+# Website (web/)
 node_modules/
 .astro/
 .cloudflare/

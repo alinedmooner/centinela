@@ -14,18 +14,20 @@ class FakeProvider:
         return self.response
 
 
-def response(**data):
+def response(data: dict | None = None):
     """The model's JSON. Its keys are the frozen Spanish schema keys."""
     base = {"ordenes_para_ia": False, "engano_a_personas": False, "trucos": [], "motivo": ""}
-    return ModelResponse({**base, **data})
+    return ModelResponse({**base, **(data or {})})
 
 
 def test_the_model_response_is_turned_into_a_finding():
     provider = FakeProvider(
         response(
-            engano_a_personas=True,
-            trucos=["autoridad", "distraccion_urgencia", "inventado", "autoridad"],
-            motivo="Suplanta a un banco y mete prisa.",
+            {
+                "engano_a_personas": True,
+                "trucos": ["autoridad", "distraccion_urgencia", "inventado", "autoridad"],
+                "motivo": "Suplanta a un banco y mete prisa.",
+            }
         )
     )
     finding = LLMDetector(provider).check("Su cuenta será bloqueada hoy.")
@@ -54,7 +56,7 @@ def test_if_the_model_does_not_answer_properly_the_guard_sends_it_to_review():
 
 
 def test_very_long_messages_are_trimmed_and_the_finding_says_so():
-    provider = FakeProvider(response(motivo="Nada raro."))
+    provider = FakeProvider(response({"motivo": "Nada raro."}))
     finding = LLMDetector(provider, max_chars=50).check("a" * 500)
     assert len(provider.calls[0]["message"]) < 200
     assert any("first 50 characters" in e for e in finding.evidence)
