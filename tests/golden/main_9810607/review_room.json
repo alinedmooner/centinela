@@ -1,0 +1,1234 @@
+{
+ "d3": [
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "liberado",
+    "etiqueta": "consulta",
+    "nota": "Liberado por una persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "liberado",
+    "etiqueta": "consulta",
+    "nota": "Liberado por una persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "liberado",
+    "etiqueta": "consulta",
+    "nota": "Liberado por una persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "luis"
+  }
+ ],
+ "d5": [
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "espera_segunda_persona",
+    "etiqueta": null,
+    "nota": "Falta que una segunda persona, distinta, confirme que es legítimo.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "espera_segunda_persona",
+    "etiqueta": null,
+    "nota": "Falta que una segunda persona, distinta, confirme que es legítimo.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "liberado",
+    "etiqueta": "consulta",
+    "nota": "Liberado por dos personas.",
+    "revisores": [
+     "ana",
+     "luis"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "luis"
+  }
+ ],
+ "d7": [
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": null,
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_fraude",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "bloqueado",
+    "etiqueta": null,
+    "nota": "El mensaje no sigue y queda registrado.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": null,
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "espera_segunda_persona",
+    "etiqueta": null,
+    "nota": "Falta que una segunda persona, distinta, confirme que es legítimo.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "espera_segunda_persona",
+    "etiqueta": null,
+    "nota": "Falta que una segunda persona, distinta, confirme que es legítimo.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "liberado",
+    "etiqueta": "consulta",
+    "nota": "Liberado por dos personas.",
+    "revisores": [
+     "ana",
+     "luis"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": null
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "ana"
+  },
+  {
+   "accion": "es_legitimo",
+   "error": [
+    "ValueError",
+    "Para liberar un mensaje hay que elegir una etiqueta de la lista."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": null,
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "consulta",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": null
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "ana"
+  },
+  {
+   "accion": "no_estoy_seguro",
+   "etiqueta": "inventada",
+   "r": {
+    "estado": "escalado",
+    "etiqueta": null,
+    "nota": "Sigue en cuarentena para otra persona.",
+    "revisores": [
+     "ana"
+    ]
+   },
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": null,
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "consulta",
+   "segundo": "luis"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": null
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "ana"
+  },
+  {
+   "accion": "otra_cosa",
+   "error": [
+    "ValueError",
+    "La decisión debe ser una de ('es_fraude', 'es_legitimo', 'no_estoy_seguro')."
+   ],
+   "etiqueta": "inventada",
+   "segundo": "luis"
+  }
+ ]
+}
