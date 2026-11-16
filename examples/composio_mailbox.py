@@ -1,25 +1,28 @@
-"""Demostración con Composio: el buzón de Gmail de un agente de IA, con Centinela delante.
+"""Demo with Composio: the Gmail mailbox of an AI agent, with Centinela in front.
 
-Necesita en .env:
+Set in .env:
 
     COMPOSIO_API_KEY=...   # platform.composio.dev → Settings → API Keys
-    COMPOSIO_USUARIO=...   # el User ID con el que se conectó la cuenta de Gmail (ver «cuentas»)
+    COMPOSIO_USER_ID=...   # the User ID the Gmail account was connected with (see «accounts»)
 
-Comandos::
+Commands::
 
-    uv run --group composio python ejemplos/composio_buzon.py conectar
-    uv run --group composio python ejemplos/composio_buzon.py cuentas
-    uv run --group composio python ejemplos/composio_buzon.py enviar [--para correo] [--solo 2 4]
-    uv run --group composio python ejemplos/composio_buzon.py vigilar [--desde correo] [--etiquetar]
-    uv run --group composio python ejemplos/composio_buzon.py agente [--desde correo]
+    uv run --group composio python examples/composio_mailbox.py connect
+    uv run --group composio python examples/composio_mailbox.py accounts
+    uv run --group composio python examples/composio_mailbox.py send [--recipient email] [--only 2 4]
+    uv run --group composio python examples/composio_mailbox.py watch [--from-address email] [--apply-label]
+    uv run --group composio python examples/composio_mailbox.py agent [--from-address email]
 
-- conectar: da el enlace para conectar la cuenta de Gmail al proyecto, con la autenticación
-  que administra Composio, y espera a que la autoricen.
-- cuentas: las cuentas de Gmail conectadas en Composio, con su User ID.
-- enviar: manda los cinco correos ficticios de la demostración, por defecto al mismo buzón.
-- vigilar: revisa cada correo nuevo. Con --etiquetar, saca los sospechosos de la bandeja de
-  entrada y les pone la etiqueta Centinela-Cuarentena.
-- agente: muestra lo que recibe un agente que lee su correo por Composio con el buzón seguro.
+- connect: gives the link to connect the Gmail account to the project, with the authentication
+  that Composio manages, and waits for it to be authorized.
+- accounts: the Gmail accounts connected in Composio, with their User ID.
+- send: sends the five fictional emails of the demo, by default to the same mailbox.
+- watch: checks every new email. With --apply-label, it takes the suspicious ones out of the
+  inbox and puts the Centinela-Quarantine label on them.
+- agent: shows what an agent that reads its email through Composio receives with the safe inbox.
+
+With watch and agent, the notices and the review cards come out in English; with --lang es, in
+Spanish.
 """
 
 from __future__ import annotations
@@ -38,13 +41,14 @@ from watch_mailbox import LINE, show
 
 from centinela import LEAD_LABELS, Guard, RulesDetector, render_card
 from centinela._env import load_env
+from centinela.catalog import DEFAULT_LANG, LANGS
 from centinela.safe_inbox import check_message, modifiers
 
-LABEL = "Centinela-Cuarentena"
+LABEL = "Centinela-Quarantine"
 
 
 class Gmail:
-    """Ejecuta herramientas de Gmail de Composio en nombre de un usuario."""
+    """Runs Composio's Gmail tools on behalf of a user."""
 
     def __init__(self, user: str):
         from composio import Composio
@@ -104,12 +108,12 @@ def connect(user: str) -> int:
 
     composio = Composio(api_key=os.environ["COMPOSIO_API_KEY"])
     request = composio.toolkits.authorize(user_id=user, toolkit="gmail")
-    print("Abran este enlace, entren con la cuenta de Gmail de pruebas y autoricen el acceso:\n")
+    print("Open this link, sign in with the test Gmail account and authorize the access:\n")
     print(request.redirect_url)
-    print("\nEsperando la autorización (hasta 5 minutos)…")
+    print("\nWaiting for the authorization (up to 5 minutes)…")
     sys.stdout.flush()
-    tally = request.wait_for_connection(300)
-    print(f"Conectada: {getattr(tally, 'id', '?')} · User ID: {user}")
+    account = request.wait_for_connection(300)
+    print(f"Connected: {getattr(account, 'id', '?')} · User ID: {user}")
     return 0
 
 
@@ -117,15 +121,16 @@ def accounts() -> int:
     from composio import Composio
 
     composio = Composio(api_key=os.environ["COMPOSIO_API_KEY"])
-    joined = composio.connected_accounts.list(toolkit_slugs=["gmail"])
-    items = getattr(joined, "items", None) or []
+    response = composio.connected_accounts.list(toolkit_slugs=["gmail"])
+    items = getattr(response, "items", None) or []
     if not items:
-        print("No hay cuentas de Gmail conectadas en este proyecto de Composio.")
+        print("There are no Gmail accounts connected in this Composio project.")
         return 1
-    for tally in items:  # solo campos que no son secretos
-        user = getattr(tally, "user_id", None) or getattr(tally, "userId", None) or "?"
+    for account in items:  # only fields that are not secrets
+        user = getattr(account, "user_id", None) or getattr(account, "userId", None) or "?"
         print(
-            f"User ID: {user} · cuenta conectada: {getattr(tally, 'id', '?')} · estado: {getattr(tally, 'status', '?')}"
+            f"User ID: {user} · connected account: {getattr(account, 'id', '?')} · "
+            f"status: {getattr(account, 'status', '?')}"
         )
     return 0
 
@@ -133,7 +138,7 @@ def accounts() -> int:
 def send(gmail: Gmail, recipient: str | None, only: list[int] | None) -> int:
     recipient_address = recipient or gmail.address()
     if not recipient_address:
-        print("No sé a quién enviar: usa --para.", file=sys.stderr)
+        print("No recipient to send to: use --recipient.", file=sys.stderr)
         return 1
     for n in only or range(1, len(MAILS) + 1):
         subject, plain, html, _ = MAILS[n - 1]
@@ -147,7 +152,7 @@ def send(gmail: Gmail, recipient: str | None, only: list[int] | None) -> int:
                 "include_signature": False,
             },
         )
-        print(f"Enviado {n}: {subject} → {recipient_address}")
+        print(f"Sent {n}: {subject} → {recipient_address}")
         time.sleep(1)
     return 0
 
@@ -156,11 +161,12 @@ def watch(
     gmail: Gmail, guard: Guard, from_address: str | None, apply_label: bool, each: float
 ) -> int:
     search = query(from_address)
-    seen = set(gmail.ids(search))  # solo cuentan los correos que lleguen desde ahora
+    seen = set(gmail.ids(search))  # only the emails that arrive from now on count
     label = gmail.label(LABEL) if apply_label else None
-    filter_lines = f", solo correos de {from_address}" if from_address else ""
+    filter_note = f", only emails from {from_address}" if from_address else ""
     print(
-        f"Vigilando el buzón de {gmail.address() or gmail.user} por Composio{filter_lines}. Ctrl+C para salir."
+        f"Watching the mailbox of {gmail.address() or gmail.user} through Composio{filter_note}. "
+        "Press Ctrl+C to exit."
     )
     while True:
         for message_id in gmail.ids(search):
@@ -186,28 +192,30 @@ def watch(
                         "remove_label_ids": ["INBOX"],
                     },
                 )
-                print(f"\n→ Fuera de la bandeja de entrada, con la etiqueta {LABEL}.")
+                print(f"\n→ Taken out of the inbox and labeled {LABEL}.")
             sys.stdout.flush()
         time.sleep(each)
 
 
 def agent(gmail: Gmail, guard: Guard, from_address: str | None) -> int:
-    held_all = []
+    held_cards = []
     data = gmail.execute(
         "GMAIL_FETCH_EMAILS",
         {"query": query(from_address), "max_results": 10},
-        modifiers=modifiers(guard, on_hold=lambda c, v, t: held_all.append(t)),
+        modifiers=modifiers(guard, on_hold=lambda c, v, t: held_cards.append(t)),
     )
-    print("Lo que recibe el agente al leer su correo por Composio, con el buzón seguro:\n")
+    print(
+        "What the agent receives when it reads its email through Composio, with the safe inbox:\n"
+    )
     for message in (data or {}).get("messages") or []:
         decision = (message.get("centinela") or {}).get("decision", "?")
         text = str(message.get("messageText") or message.get("preview") or "").strip()
         print(LINE)
-        print(f"Asunto: {message.get('subject')} · Centinela: {decision}")
+        print(f"Subject: {message.get('subject')} · Centinela: {decision}")
         print(text[:400] + ("…" if len(text) > 400 else ""))
-    if held_all:
-        print(f"\n{LINE}\nPara la persona que revisa, {len(held_all)} tarjeta(s):\n")
-        for card in held_all:
+    if held_cards:
+        print(f"\n{LINE}\nFor the person who reviews, {len(held_cards)} card(s):\n")
+        for card in held_cards:
             print(render_card(card) + "\n")
     return 0
 
@@ -215,43 +223,52 @@ def agent(gmail: Gmail, guard: Guard, from_address: str | None) -> int:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     sub = parser.add_subparsers(dest="command", required=True)
-    sub.add_parser("connect", help="conecta la cuenta de Gmail al proyecto de Composio")
-    sub.add_parser("accounts", help="cuentas de Gmail conectadas en Composio")
-    p_send = sub.add_parser("send", help="envía los correos ficticios de la demostración")
-    p_send.add_argument("--recipient", help="destinatario (por defecto, el mismo buzón)")
+    sub.add_parser("connect", help="connect the Gmail account to the Composio project")
+    sub.add_parser("accounts", help="list the Gmail accounts connected in Composio")
+    p_send = sub.add_parser("send", help="send the fictional emails of the demo")
+    p_send.add_argument("--recipient", help="recipient (by default, the same mailbox)")
     p_send.add_argument("--only", type=int, nargs="+", choices=range(1, len(MAILS) + 1))
-    p_watch = sub.add_parser("watch", help="revisa cada correo nuevo")
-    p_watch.add_argument("--from-address", help="revisa solo los correos de esta dirección")
-    p_watch.add_argument("--apply-label", action="store_true", help="aparta los sospechosos")
-    p_watch.add_argument("--each", type=float, default=8, help="segundos entre revisiones")
-    p_agent = sub.add_parser("agent", help="lo que recibe un agente con el buzón seguro")
-    p_agent.add_argument("--from-address", help="solo los correos de esta dirección")
+    p_watch = sub.add_parser("watch", help="check every new email")
+    p_watch.add_argument("--from-address", help="check only the emails from this address")
+    p_watch.add_argument("--apply-label", action="store_true", help="set the suspicious ones aside")
+    p_watch.add_argument("--each", type=float, default=8, help="seconds between checks")
+    p_agent = sub.add_parser("agent", help="what an agent receives with the safe inbox")
+    p_agent.add_argument("--from-address", help="only the emails from this address")
     for p in (p_watch, p_agent):
-        p.add_argument("--claude", action="store_true", help="suma a Claude como revisor")
+        p.add_argument("--claude", action="store_true", help="add Claude as a reviewer")
+        p.add_argument(
+            "--lang",
+            choices=LANGS,
+            default=DEFAULT_LANG,
+            help="language of the notices and the review cards",
+        )
     args = parser.parse_args(argv)
 
     load_env()
     if not os.environ.get("COMPOSIO_API_KEY"):
-        print("Falta COMPOSIO_API_KEY en .env.", file=sys.stderr)
+        print("COMPOSIO_API_KEY is missing from .env.", file=sys.stderr)
         return 1
     if os.environ["COMPOSIO_API_KEY"].startswith("ck_"):
         print(
-            "COMPOSIO_API_KEY es una clave de Composio Connect (ck_), que sirve para su MCP. "
-            "Este script usa la plataforma de desarrolladores: pongan la clave de un proyecto "
-            "(empieza por ak_, en platform.composio.dev → Settings → API Keys).",
+            "COMPOSIO_API_KEY is a Composio Connect key (ck_), which works for its MCP. "
+            "This script uses the developer platform: use the key of a project "
+            "(it starts with ak_, in platform.composio.dev → Settings → API Keys).",
             file=sys.stderr,
         )
         return 1
-    if args.command == "cuentas":
+    if args.command == "accounts":
         return accounts()
-    user = os.environ.get("COMPOSIO_USUARIO")
+    user = os.environ.get("COMPOSIO_USER_ID")
     if not user:
-        print("Falta COMPOSIO_USUARIO en .env (el comando «cuentas» lo muestra).", file=sys.stderr)
+        print(
+            "COMPOSIO_USER_ID is missing from .env (the «accounts» command shows it).",
+            file=sys.stderr,
+        )
         return 1
-    if args.command == "conectar":
+    if args.command == "connect":
         return connect(user)
     gmail = Gmail(user)
-    if args.command == "enviar":
+    if args.command == "send":
         return send(gmail, args.recipient, args.only)
     detectors = [RulesDetector(labels=LEAD_LABELS)]
     if args.claude:
@@ -259,13 +276,13 @@ def main(argv: list[str] | None = None) -> int:
         from centinela.providers.anthropic import AnthropicProvider
 
         detectors.append(LLMDetector(AnthropicProvider()))
-    guard = Guard(detectors)
+    guard = Guard(detectors, lang=args.lang)
     try:
-        if args.command == "vigilar":
+        if args.command == "watch":
             return watch(gmail, guard, args.from_address, args.apply_label, args.each)
         return agent(gmail, guard, args.from_address)
     except KeyboardInterrupt:
-        print("\nListo.")
+        print("\nDone.")
         return 0
 
 

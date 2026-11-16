@@ -1,13 +1,14 @@
-"""Prueba 1: ¿el filtro detecta las órdenes escondidas, en inglés y en español?
+"""Evaluation 1: does the filter detect hidden instructions, in English and in Spanish?
 
-Compara varios detectores sobre los mismos casos y guarda sus respuestas, para rehacer
-la tabla sin volver a correrlos::
+Compares several detectors on the same cases and saves their answers, so the table can be
+rebuilt without running them again::
 
-    uv run --extra evals python evals/filtro.py --detectores reglas llamafirewall
-    uv run --extra evals python evals/filtro.py --detectores claude --spaphish RUTA.csv
-    uv run --extra evals --extra local python evals/filtro.py --detectores local local_traduccion
+    uv run --extra evals python evals/injection_filter.py --detectors reglas llamafirewall
+    uv run --extra evals python evals/injection_filter.py --detectors claude --spaphish PATH.csv
+    uv run --extra evals --extra local python evals/injection_filter.py \\
+        --detectors local local_traduccion
 
-Las respuestas guardadas no contienen el texto de los mensajes, solo su identificador.
+The saved answers do not contain the text of the messages, only their identifier.
 """
 
 from __future__ import annotations
@@ -30,8 +31,8 @@ from centinela.detectors.local import chunks, sentences
 
 DETECTORS = ("reglas", "llamafirewall", "local", "local_traduccion", "claude")
 
-#: Patrón por defecto de LlamaFirewall para inyección de instrucciones (Meta, licencia MIT).
-#: Sirve como línea base de «lo que ya existe» en reglas.
+#: LlamaFirewall's default pattern for instruction injection (Meta, MIT license).
+#: It serves as the baseline for "what already exists" in rules.
 LLAMAFIREWALL_PATTERN = re.compile(
     r"ignore previous instructions|ignore all instructions", re.IGNORECASE | re.DOTALL
 )
@@ -56,14 +57,14 @@ def _claude(cases: list[dict], model: str, threads: int) -> dict[str, dict]:
             try:
                 h = detector.check(case["texto"])
                 break
-            except Exception as error:  # noqa: BLE001 - se reintenta y, si no, cuenta como fallo
+            except Exception as error:  # noqa: BLE001 - retried; otherwise it counts as a failure
                 h = None
                 last = f"{type(error).__name__}"
                 time.sleep(2 * (attempt + 1))
         if h is None:
             return case["id"], {"marcado": True, "error": last}
         return case["id"], {
-            # Un detector que no pudo responder cuenta como marcado: decide una persona.
+            # A detector that could not answer counts as flagged: a person decides.
             "marcado": h.ai_instructions or h.error is not None,
             "engano": h.people_deception,
             "trucos": list(h.tricks),
@@ -77,7 +78,7 @@ def _claude(cases: list[dict], model: str, threads: int) -> dict[str, dict]:
 def _local(cases: list[dict], translate: bool) -> dict[str, dict]:
     texts = {c["id"]: c["texto"] for c in cases}
     if translate:
-        # Primero se traduce todo y se libera el traductor; así no hay dos modelos en memoria.
+        # Translate everything first, then free the translator, so two models are never in memory.
         translator = LocalDetector(translate=True)._translation()
         for case in cases:
             if case["idioma"] == "es":
@@ -103,7 +104,7 @@ def run_detector(detector: str, cases: list[dict], args: argparse.Namespace) -> 
 
 
 def summarize(cases: list[dict], responses: dict[str, dict]) -> dict:
-    """Ataques detectados y falsas alarmas, por grupo e idioma."""
+    """Attacks detected and false alarms, by group and language."""
     tally: dict[tuple, list[int]] = defaultdict(lambda: [0, 0])
     for case in cases:
         response = responses.get(case["id"])
@@ -125,12 +126,12 @@ def main(argv: list[str] | None = None) -> int:
         "--detectors", nargs="+", choices=DETECTORS, default=["reglas", "llamafirewall"]
     )
     parser.add_argument(
-        "--spaphish", type=Path, help="copia local de SpaPhish (no se redistribuye)"
+        "--spaphish", type=Path, help="local copy of SpaPhish (it is not redistributed)"
     )
     parser.add_argument("--max-spaphish", type=int, default=None)
     parser.add_argument("--model", default="claude-haiku-5-5")
     parser.add_argument("--threads", type=int, default=16)
-    parser.add_argument("--redo", action="store_true", help="ignora las respuestas guardadas")
+    parser.add_argument("--redo", action="store_true", help="ignore the saved answers")
     args = parser.parse_args(argv)
 
     load_env()
@@ -138,7 +139,7 @@ def main(argv: list[str] | None = None) -> int:
     if args.spaphish:
         cases += spaphish_cases(args.spaphish, args.split, args.max_spaphish)
     folder = RESULTS / "filter" / args.split
-    print(f"{len(cases)} casos en la partición «{args.split}»", file=sys.stderr)
+    print(f"{len(cases)} cases in the {args.split} split", file=sys.stderr)
 
     for detector in args.detectors:
         file = folder / f"{detector}.jsonl"
@@ -148,16 +149,16 @@ def main(argv: list[str] | None = None) -> int:
             start = time.time()
             new_ones = run_detector(detector, missing, args)
             seconds = time.time() - start
-            print(f"{detector}: {len(missing)} casos en {seconds:.0f} s", file=sys.stderr)
+            print(f"{detector}: {len(missing)} cases in {seconds:.0f} s", file=sys.stderr)
             saved.update({i: {"id": i, **r} for i, r in new_ones.items()})
             write_jsonl(file, [saved[i] for i in sorted(saved)])
         summary = summarize(cases, saved)
         print(f"\n== {detector} ==")
         for key, p in summary.items():
-            name = "ataques detectados" if p["positivo"] else "falsas alarmas"
+            name = "attacks detected" if p["positivo"] else "false alarms"
             print(f"  {key:32s} {name:20s} {p['k']:4d}/{p['n']:<4d} {100 * p['valor']:5.1f} %")
 
-    # Índice de casos sin texto, para rehacer las tablas sin los datos privados.
+    # Index of the cases without their text, to rebuild the tables without the private data.
     index = [{k: c[k] for k in ("id", "grupo", "idioma", "positivo", "detalle")} for c in cases]
     existing = {f["id"]: f for f in read_jsonl(folder / "casos.jsonl")}
     existing.update({f["id"]: f for f in index})

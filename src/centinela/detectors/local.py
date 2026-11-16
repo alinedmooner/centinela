@@ -70,7 +70,7 @@ class LocalDetector:
         self.translation_model = translation_model
         self._classify = classify
         self._translate_texts = translate_texts
-        self.name = "local+traduccion" if translate else "local"
+        self.name = "local+translation" if translate else "local"
 
     def check(self, text: str) -> Finding:
         if self.translate:
@@ -78,7 +78,7 @@ class LocalDetector:
         scores = self._classification()(chunks(text))
         score = max(scores) if scores else 0.0
         flagged = score >= self.threshold
-        evidence = (f"el modelo local da {score:.2f} de probabilidad de inyección",)
+        evidence = (f"the local model gives {score:.2f} probability of injection",)
         return Finding(self.name, ai_instructions=flagged, evidence=evidence if flagged else ())
 
     def _classification(self) -> Callable[[Sequence[str]], list[float]]:

@@ -1,4 +1,4 @@
-"""Los proveedores de Google y OpenRouter, con clientes falsos: sin red ni SDK."""
+"""The Google and OpenRouter providers, with fake clients: no network or SDK required."""
 
 import json
 from types import SimpleNamespace
@@ -44,10 +44,10 @@ class FakeOpenRouter:
         return self.response
 
 
-def from_google(text, fin="STOP", block=None):
+def from_google(text, finish="STOP", block=None):
     return SimpleNamespace(
         text=text,
-        candidates=[SimpleNamespace(finish_reason=fin)],
+        candidates=[SimpleNamespace(finish_reason=finish)],
         prompt_feedback=SimpleNamespace(block_reason=block),
         usage_metadata=SimpleNamespace(
             prompt_token_count=10, candidates_token_count=5, thoughts_token_count=2
@@ -55,26 +55,26 @@ def from_google(text, fin="STOP", block=None):
     )
 
 
-def from_openrouter(text, fin="stop", refusal=None):
+def from_openrouter(text, finish="stop", refusal=None):
     return SimpleNamespace(
         choices=[
             SimpleNamespace(
-                finish_reason=fin, message=SimpleNamespace(content=text, refusal=refusal)
+                finish_reason=finish, message=SimpleNamespace(content=text, refusal=refusal)
             )
         ],
         usage=SimpleNamespace(prompt_tokens=8, completion_tokens=4),
     )
 
 
-def error_from(modulo, **attributes):
-    error_class = type("ErrorDelSdk", (Exception,), {"__module__": modulo})
-    error = error_class("fallo")
+def error_from(module, **attributes):
+    error_class = type("SdkError", (Exception,), {"__module__": module})
+    error = error_class("failure")
     for name, value in attributes.items():
         setattr(error, name, value)
     return error
 
 
-def test_google_pide_json_con_esquema_y_razonamiento_minimo():
+def test_google_asks_for_json_with_a_schema_and_minimal_reasoning():
     client = FakeGoogle(from_google(json.dumps(JSON)))
     response = GoogleProvider(client=client).respond_json(
         system="reglas", message="hola", schema=SCHEMA
@@ -90,7 +90,7 @@ def test_google_pide_json_con_esquema_y_razonamiento_minimo():
     assert call["config"]["thinking_config"] == {"thinking_level": "minimal"}
 
 
-def test_google_sin_nivel_de_razonamiento_para_gemma():
+def test_google_sends_no_reasoning_level_for_gemma():
     client = FakeGoogle(from_google(json.dumps(JSON)))
     GoogleProvider("gemma-4-26b-a4b-it", reasoning=None, client=client).respond_json(
         system="s", message="m", schema=SCHEMA
@@ -99,27 +99,27 @@ def test_google_sin_nivel_de_razonamiento_para_gemma():
 
 
 @pytest.mark.parametrize(
-    "response", [from_google("", fin="SAFETY"), from_google("", block="OTHER")]
+    "response", [from_google("", finish="SAFETY"), from_google("", block="OTHER")]
 )
-def test_google_un_bloqueo_es_un_rechazo(response):
+def test_google_a_block_is_a_refusal(response):
     result = GoogleProvider(client=FakeGoogle(response)).respond_json(
         system="s", message="m", schema=SCHEMA
     )
     assert result.refusal and result.data is None
 
 
-def test_google_traduce_los_errores_del_sdk_y_deja_pasar_los_demas():
+def test_google_translates_sdk_errors_and_lets_the_others_through():
     limit = FakeGoogle(error=error_from("google.genai.errors", code=429))
     with pytest.raises(ProviderError, match="rate limit") as caught:
         GoogleProvider(client=limit).respond_json(system="s", message="m", schema=SCHEMA)
     assert caught.value.code == "rate_limit"
     with pytest.raises(TypeError):
-        GoogleProvider(client=FakeGoogle(error=TypeError("error de programación"))).respond_json(
+        GoogleProvider(client=FakeGoogle(error=TypeError("programming error"))).respond_json(
             system="s", message="m", schema=SCHEMA
         )
 
 
-def test_openrouter_pide_salida_estructurada_y_acepta_json_entre_marcas():
+def test_openrouter_asks_for_structured_output_and_accepts_json_inside_code_fences():
     client = FakeOpenRouter(from_openrouter("```json\n" + json.dumps(JSON) + "\n```"))
     provider = OpenRouterProvider("meta-llama/llama-3.1-8b-instruct", client=client)
     response = provider.respond_json(system="reglas", message="hola", schema=SCHEMA)
@@ -132,23 +132,23 @@ def test_openrouter_pide_salida_estructurada_y_acepta_json_entre_marcas():
 
 
 @pytest.mark.parametrize(
-    "response", [from_openrouter("", fin="content_filter"), from_openrouter("", refusal="No.")]
+    "response", [from_openrouter("", finish="content_filter"), from_openrouter("", refusal="No.")]
 )
-def test_openrouter_un_filtro_o_una_negativa_es_un_rechazo(response):
+def test_openrouter_a_content_filter_or_a_declined_request_is_a_refusal(response):
     result = OpenRouterProvider(client=FakeOpenRouter(response)).respond_json(
         system="s", message="m", schema=SCHEMA
     )
     assert result.refusal
 
 
-def test_openrouter_traduce_los_errores_de_la_api():
+def test_openrouter_translates_the_api_errors():
     client = FakeOpenRouter(error=error_from("openai._exceptions", status_code=401))
     with pytest.raises(ProviderError, match="401") as caught:
         OpenRouterProvider(client=client).respond_json(system="s", message="m", schema=SCHEMA)
     assert (caught.value.code, caught.value.details) == ("api_error", {"status": 401})
 
 
-def test_con_cualquier_proveedor_el_guardia_manda_a_revision_lo_sospechoso():
+def test_with_any_provider_the_guard_sends_what_is_suspicious_to_review():
     for provider in (
         GoogleProvider(client=FakeGoogle(from_google(json.dumps(JSON)))),
         OpenRouterProvider(client=FakeOpenRouter(from_openrouter(json.dumps(JSON)))),
@@ -157,18 +157,18 @@ def test_con_cualquier_proveedor_el_guardia_manda_a_revision_lo_sospechoso():
         assert verdict.decision == "review"
 
 
-def test_una_respuesta_que_no_es_json_manda_a_revision():
+def test_a_response_that_is_not_json_goes_to_review():
     provider = OpenRouterProvider(client=FakeOpenRouter(from_openrouter("prioritario")))
     assert Guard([LLMDetector(provider)]).check("Hola").decision == "review"
 
 
-def test_json_de_texto():
+def test_json_from_text():
     assert json_from_text('{"a": 1}') == {"a": 1}
     assert json_from_text('```\n{"a": 1}\n```') == {"a": 1}
     assert json_from_text("[1, 2]") is None and json_from_text("hola") is None
 
 
-def test_crear_proveedor_sin_clave_o_con_un_nombre_desconocido(monkeypatch):
+def test_creating_a_provider_without_a_key_or_with_an_unknown_name_fails(monkeypatch):
     for variable in (
         "GOOGLE_API_KEY",
         "GEMINI_API_KEY",
@@ -182,17 +182,17 @@ def test_crear_proveedor_sin_clave_o_con_un_nombre_desconocido(monkeypatch):
             create_provider(name)
         assert caught.value.code in {"missing_key", "missing_sdk"}  # the SDK may not be installed
     with pytest.raises(ValueError, match="unknown provider"):
-        create_provider("otro")
+        create_provider("other")
 
 
-def test_el_comando_usa_el_proveedor_elegido(monkeypatch, capsys):
+def test_the_command_uses_the_chosen_provider(monkeypatch, capsys):
     import centinela.cli
     import centinela.providers
 
-    asks_found = []
+    requested = []
 
     def fake(name="anthropic", model=None):
-        asks_found.append((name, model))
+        requested.append((name, model))
         return GoogleProvider(client=FakeGoogle(from_google(json.dumps(JSON))))
 
     monkeypatch.setattr(centinela.cli, "load_env", lambda: None)
@@ -200,5 +200,5 @@ def test_el_comando_usa_el_proveedor_elegido(monkeypatch, capsys):
     code = centinela.cli.main(
         ["check", "Hola, quiero el plan.", "--provider", "google", "--model", "gemma-4-31b-it"]
     )
-    assert code == 2 and asks_found == [("google", "gemma-4-31b-it")]
+    assert code == 2 and requested == [("google", "gemma-4-31b-it")]
     assert "review" in capsys.readouterr().out

@@ -1,13 +1,13 @@
-"""Revisión chica con otros proveedores: el mismo revisor de Centinela con Gemini u OpenRouter.
+"""Small review with other providers: the same Centinela reviewer with Gemini or OpenRouter.
 
-Toma 20 casos en español de la partición de prueba (5 de cada grupo: ataques públicos,
-ataques a leads, mensajes normales y leads normales), los revisa con ``DetectorLLM`` y
-compara con lo que respondió Claude Haiku 5.5 en la prueba 1 para los mismos casos::
+Takes 20 Spanish cases from the test split (5 from each group: public attacks, attacks on
+leads, normal messages and normal leads), checks them with ``LLMDetector`` and compares
+with what Claude Haiku 5.5 answered in evaluation 1 for the same cases::
 
-    uv run --extra evals python evals/proveedores.py --proveedor google
-    uv run --extra evals python evals/proveedores.py --proveedor openrouter --modelo MODELO
+    uv run --extra evals python evals/provider_eval.py --provider google
+    uv run --extra evals python evals/provider_eval.py --provider openrouter --model MODEL
 
-Guarda las respuestas (sin el texto de los mensajes) en ``resultados/proveedores/``.
+Saves the answers (without the text of the messages) in ``results/providers/``.
 """
 
 from __future__ import annotations
@@ -29,7 +29,7 @@ FOLDER = RESULTS / "providers"
 
 
 class CountingProvider:
-    """Cuenta las llamadas y los tokens de un proveedor."""
+    """Counts the calls and the tokens of a provider."""
 
     def __init__(self, provider):
         self.provider, self.name = provider, provider.name
@@ -59,7 +59,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--provider", choices=PROVIDERS, required=True)
     parser.add_argument("--model")
     parser.add_argument("--per-group", type=int, default=5)
-    parser.add_argument("--redo", action="store_true", help="repite también los casos ya listos")
+    parser.add_argument("--redo", action="store_true", help="also repeat the cases already done")
     args = parser.parse_args(argv)
 
     load_env()
@@ -67,7 +67,7 @@ def main(argv: list[str] | None = None) -> int:
     detector = LLMDetector(provider)
     cases = choose_cases(args.per_group)
     name = re.sub(r"[^a-z0-9.-]+", "-", provider.name.lower())
-    # Los casos que ya respondieron bien no se repiten (salvo con --rehacer).
+    # Cases that already got a good answer are not repeated (except with --redo).
     ready = (
         {}
         if args.redo
@@ -82,14 +82,14 @@ def main(argv: list[str] | None = None) -> int:
             try:
                 finding = detector.check(case["texto"])
                 break
-            except Exception as error:  # noqa: BLE001 - se reintenta y, si no, cuenta como marcado
+            except Exception as error:  # noqa: BLE001 - retried; otherwise it counts as flagged
                 finding, last = None, f"{type(error).__name__}: {error}"
                 time.sleep(5 * (attempt + 1))
         row = {"id": case["id"], "grupo": case["grupo"], "positivo": case["positivo"]}
         if finding is None:
             row.update({"marcado": True, "error": last})
         else:
-            # Igual que en la prueba 1: si el revisor no respondió bien, decide una persona.
+            # Same as in evaluation 1: if the reviewer did not answer properly, a person decides.
             row.update({"marcado": finding.ai_instructions or finding.error is not None})
             row.update({"engano": finding.people_deception})
             if finding.error:
@@ -115,8 +115,8 @@ def main(argv: list[str] | None = None) -> int:
     )
     print(json.dumps(summary, ensure_ascii=False, indent=1))
     print(
-        f"En esta corrida: {provider.calls} llamadas, {provider.input_count} tokens de entrada "
-        f"y {provider.output} de salida."
+        f"In this run: {provider.calls} calls, {provider.input_count} input tokens "
+        f"and {provider.output} output tokens."
     )
     return 0
 

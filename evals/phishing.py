@@ -1,13 +1,13 @@
-"""Prueba 3: ¿el revisor reconoce el phishing en español y nombra el truco?
+"""Evaluation 3: does the reviewer recognize phishing in Spanish and name the trick?
 
-Usa SpaPhish, 1395 correos reales en español con etiquetas de tres anotadores. El conjunto
-no se redistribuye con Centinela: hay que tener una copia local y pasar su ruta::
+It uses SpaPhish, 1395 real emails in Spanish labeled by three annotators. The dataset is
+not redistributed with Centinela: you need a local copy and must pass its path::
 
-    uv run --extra evals python evals/phishing.py --spaphish "RUTA/Spaphish dataset - DiB.csv"
+    uv run --extra evals python evals/phishing.py --spaphish "PATH/Spaphish dataset - DiB.csv"
 
-Se guardan las respuestas del modelo por identificador, sin el texto de los correos, y un
-resumen con las métricas. La línea base es un clasificador clásico (TF-IDF y regresión
-logística) entrenado y probado con validación cruzada sobre el mismo conjunto.
+The model's answers are saved by identifier, without the text of the emails, along with a
+summary of the metrics. The baseline is a classic classifier (TF-IDF and logistic
+regression) trained and tested with cross-validation on the same dataset.
 """
 
 from __future__ import annotations
@@ -25,7 +25,7 @@ from cases import mail_text, read_spaphish
 from centinela import LLMDetector
 from centinela._env import load_env
 
-#: Truco de Centinela -> columna de consenso de SpaPhish.
+#: Centinela trick -> SpaPhish consensus column.
 COLUMNS = {
     "autoridad": "authority",
     "prueba_social": "social_proof",
@@ -35,17 +35,17 @@ COLUMNS = {
 }
 
 
-def measured(predicted: list[bool], reales: list[bool]) -> dict:
-    """Aciertos, precisión, cobertura y F1 de la clase positiva."""
-    tp = sum(p and r for p, r in zip(predicted, reales, strict=True))
-    fp = sum(p and not r for p, r in zip(predicted, reales, strict=True))
-    fn = sum(not p and r for p, r in zip(predicted, reales, strict=True))
-    tn = sum(not p and not r for p, r in zip(predicted, reales, strict=True))
+def measured(predicted: list[bool], actual: list[bool]) -> dict:
+    """Accuracy, precision, recall and F1 of the positive class."""
+    tp = sum(p and r for p, r in zip(predicted, actual, strict=True))
+    fp = sum(p and not r for p, r in zip(predicted, actual, strict=True))
+    fn = sum(not p and r for p, r in zip(predicted, actual, strict=True))
+    tn = sum(not p and not r for p, r in zip(predicted, actual, strict=True))
     precision = tp / (tp + fp) if tp + fp else 0.0
     coverage = tp / (tp + fn) if tp + fn else 0.0
     f1 = 2 * precision * coverage / (precision + coverage) if precision + coverage else 0.0
     return {
-        "aciertos": proportion(tp + tn, len(reales)),
+        "aciertos": proportion(tp + tn, len(actual)),
         "precision": precision,
         "cobertura": coverage,
         "f1": f1,
@@ -74,7 +74,7 @@ def check_with_model(rows: list[dict], model: str, threads: int, file: Path) -> 
                     "trucos": list(h.tricks),
                     **({"error": h.error} if h.error else {}),
                 }
-            except Exception as error:  # noqa: BLE001 - se reintenta y, si no, queda como error
+            except Exception as error:  # noqa: BLE001 - retried; otherwise it is left as an error
                 last = type(error).__name__
                 time.sleep(2 * (attempt + 1))
         return {"id": ident, "engano": False, "ordenes": False, "trucos": [], "error": last}
@@ -83,36 +83,36 @@ def check_with_model(rows: list[dict], model: str, threads: int, file: Path) -> 
     with ThreadPoolExecutor(max_workers=threads) as group:
         for response in group.map(check, missing):
             saved[response["id"]] = response
-    print(f"{model}: {len(missing)} correos en {time.time() - start:.0f} s", file=sys.stderr)
+    print(f"{model}: {len(missing)} emails in {time.time() - start:.0f} s", file=sys.stderr)
     write_jsonl(file, [saved[i] for i in sorted(saved)])
     return saved
 
 
 def baseline(rows: list[dict]) -> list[bool]:
-    """TF-IDF y regresión logística, con validación cruzada de 5 partes."""
+    """TF-IDF and logistic regression, with 5-fold cross-validation."""
     from sklearn.feature_extraction.text import TfidfVectorizer
     from sklearn.linear_model import LogisticRegression
     from sklearn.model_selection import StratifiedKFold, cross_val_predict
     from sklearn.pipeline import make_pipeline
 
     texts = [mail_text(f) for f in rows]
-    reales = [f["Label"] == "1" for f in rows]
+    actual = [f["Label"] == "1" for f in rows]
     model = make_pipeline(
         TfidfVectorizer(ngram_range=(1, 2), min_df=2, sublinear_tf=True),
         LogisticRegression(max_iter=1000),
     )
     parts = StratifiedKFold(n_splits=5, shuffle=True, random_state=0)
-    return [bool(p) for p in cross_val_predict(model, texts, reales, cv=parts)]
+    return [bool(p) for p in cross_val_predict(model, texts, actual, cv=parts)]
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument(
-        "--spaphish", type=Path, required=True, help="copia local del CSV de SpaPhish"
+        "--spaphish", type=Path, required=True, help="local copy of the SpaPhish CSV"
     )
     parser.add_argument("--model", default="claude-haiku-5-5")
     parser.add_argument("--threads", type=int, default=16)
-    parser.add_argument("--maximum", type=int, default=None, help="usa solo los primeros N correos")
+    parser.add_argument("--maximum", type=int, default=None, help="use only the first N emails")
     args = parser.parse_args(argv)
 
     load_env()
@@ -120,21 +120,21 @@ def main(argv: list[str] | None = None) -> int:
     folder = RESULTS / "phishing"
     responses = check_with_model(rows, args.model, args.threads, folder / f"{args.model}.jsonl")
 
-    reales = [f["Label"] == "1" for f in rows]
+    actual = [f["Label"] == "1" for f in rows]
     from_model = [responses[f["hash"][:16]] for f in rows]
     errors = sum(1 for r in from_model if r.get("error"))
     summary = {
         "correos": len(rows),
-        "phishing": sum(reales),
+        "phishing": sum(actual),
         "modelo": args.model,
         "respuestas_con_error": errors,
         "deteccion": {
-            "modelo": measured([r["engano"] for r in from_model], reales),
-            "base_tfidf": measured(baseline(rows), reales),
+            "modelo": measured([r["engano"] for r in from_model], actual),
+            "base_tfidf": measured(baseline(rows), actual),
         },
         "ordenes_para_ia_en_correos_legitimos": proportion(
-            sum(r["ordenes"] for r, real in zip(from_model, reales, strict=True) if not real),
-            len(reales) - sum(reales),
+            sum(r["ordenes"] for r, phish in zip(from_model, actual, strict=True) if not phish),
+            len(actual) - sum(actual),
         ),
         "trucos": {},
     }
@@ -162,16 +162,16 @@ def main(argv: list[str] | None = None) -> int:
         json.dumps(summary, ensure_ascii=False, indent=2) + "\n", encoding="utf-8"
     )
     d = summary["deteccion"]
-    print(f"Correos: {len(rows)} ({sum(reales)} de phishing). Respuestas con error: {errors}")
+    print(f"Emails: {len(rows)} ({sum(actual)} phishing). Answers with an error: {errors}")
     for name in ("modelo", "base_tfidf"):
         m = d[name]
         print(
-            f"  {name:11s} aciertos {100 * m['aciertos']['valor']:.1f} %  precisión "
-            f"{100 * m['precision']:.1f} %  cobertura {100 * m['cobertura']:.1f} %  F1 {m['f1']:.3f}"
+            f"  {name:11s} accuracy {100 * m['aciertos']['valor']:.1f} %  precision "
+            f"{100 * m['precision']:.1f} %  recall {100 * m['cobertura']:.1f} %  F1 {m['f1']:.3f}"
         )
     for trick, t in summary["trucos"].items():
         print(
-            f"  truco {trick:24s} F1 modelo {t['f1_modelo']:.3f}  F1 mayoría {t['f1_mayoria']:.3f}"
+            f"  trick {trick:24s} F1 model {t['f1_modelo']:.3f}  F1 majority {t['f1_mayoria']:.3f}"
         )
     return 0
 

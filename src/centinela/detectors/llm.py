@@ -84,7 +84,7 @@ class LLMDetector:
         evidence: list[str] = []
         if len(text) > self.max_chars:
             text = text[: self.max_chars]
-            evidence.append(f"solo se revisaron los primeros {self.max_chars} caracteres")
+            evidence.append(f"only the first {self.max_chars} characters were checked")
 
         marker = secrets.token_hex(4)
         response = self.provider.respond_json(
@@ -93,10 +93,10 @@ class LLMDetector:
             schema=SCHEMA,
         )
         if response.refusal:
-            return Finding(self.name, error="el modelo se negó a revisar el mensaje")
+            return Finding(self.name, error="the model refused to check the message")
         data = response.data
         if not data or not isinstance(data.get("ordenes_para_ia"), bool):
-            return Finding(self.name, error="el modelo no devolvió una respuesta válida")
+            return Finding(self.name, error="the model did not return a valid answer")
 
         reason = data.get("motivo")
         if isinstance(reason, str) and reason.strip():
