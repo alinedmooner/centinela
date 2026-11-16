@@ -1,4 +1,3 @@
-# Higiene de la cadena de suministro, igual que en el proyecto de Python:
-# solo se instalan versiones publicadas hace al menos 7 días (10080 minutos),
-# incluidas las dependencias indirectas.
+# Supply-chain hygiene, the same as in the Python project: only versions published at least
+# 7 days ago (10080 minutes) are installed, indirect dependencies included.
 minimumReleaseAge: 10080

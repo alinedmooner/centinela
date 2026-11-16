@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  Written by hand: the site has two languages and few pages. Every page lists its alternates
+  (hreflang), itself included. The test page (/pruebas/) is noindex and is not listed.
+  English is the default (x-default) and lives at the root; Spanish lives under /es/.
+-->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:xhtml="http://www.w3.org/1999/xhtml">
+  <url>
+    <loc>https://centinela.alinedlabs.co/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://centinela.alinedlabs.co/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://centinela.alinedlabs.co/es/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://centinela.alinedlabs.co/" />
+  </url>
+  <url>
+    <loc>https://centinela.alinedlabs.co/es/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://centinela.alinedlabs.co/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://centinela.alinedlabs.co/es/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://centinela.alinedlabs.co/" />
+  </url>
+  <url>
+    <loc>https://centinela.alinedlabs.co/sistema/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://centinela.alinedlabs.co/sistema/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://centinela.alinedlabs.co/es/sistema/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://centinela.alinedlabs.co/sistema/" />
+  </url>
+  <url>
+    <loc>https://centinela.alinedlabs.co/es/sistema/</loc>
+    <xhtml:link rel="alternate" hreflang="en" href="https://centinela.alinedlabs.co/sistema/" />
+    <xhtml:link rel="alternate" hreflang="es" href="https://centinela.alinedlabs.co/es/sistema/" />
+    <xhtml:link rel="alternate" hreflang="x-default" href="https://centinela.alinedlabs.co/sistema/" />
+  </url>
+</urlset>

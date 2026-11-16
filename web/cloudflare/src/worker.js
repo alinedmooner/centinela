@@ -1,21 +1,34 @@
-// Worker de centinela.alinedlabs.co. Cloudflare sirve las páginas estáticas sin pasar por
-// aquí: solo las rutas /api/* llegan a este código (runWorkerFirst en cloudflare.config.ts).
+// Worker of centinela.alinedlabs.co. Cloudflare serves the static pages without going through
+// here: only the /api/* routes reach this code (runWorkerFirst in cloudflare.config.ts).
 //
-// POST /api/revisar con {"texto": "..."} revisa un mensaje con el revisor de Centinela y
-// Claude Haiku 5.5: las mismas instrucciones y el mismo esquema que DetectorLLM en la
-// librería (src/reviewer.js se genera desde Python). La clave de la API es un secreto de
-// Cloudflare y nunca llega al navegador. El texto no se guarda ni se registra.
+// POST /api/review with {"text": "...", "lang": "en" | "es"} reviews a message with Centinela's
+// reviewer and Claude Haiku 5.5: the same instructions and the same schema as LLMDetector in the
+// library (src/reviewer.js is generated from Python and is Spanish on purpose: it is what the
+// measurements were made with). The decision is made here, in code, from the model's two
+// answers, as in the library. The Worker answers with ids and flags and no text for people: the
+// page writes the notice in its language from its dictionary (src/i18n). `lang` is checked but
+// does not change the review. The API key is a Cloudflare secret and never reaches the browser.
+// The text is not stored or logged.
 //
-// Para apagarlo: REVISION_EN_VIVO = 'apagada' en cloudflare.config.ts y `cf deploy`.
+// 200 {decision: "review" | "allow", ai_instructions, people_deception, tricks: [ids], reason,
+//      model, tokens: {input, output}, fallback: null | "refusal" | "invalid"}
+//     A refusal or an invalid answer is "review" with both flags null and the fallback's
+//     name: it fails closed, a person decides.
+// Errors: the HTTP status and {"error": {"code": ...}}, where the code is one of
+//     off 503, origin 403, method 405, too_long 413, bad_request 400, empty 400,
+//     rate_limited 429, busy 503, upstream 502, not_found 404.
+//
+// To switch it off: LIVE_REVIEW = 'off' in cloudflare.config.ts and `cf deploy`.
 import Anthropic from '@anthropic-ai/sdk';
 import { ESQUEMA, INSTRUCCIONES, TRUCOS } from './reviewer.js';
 
-const MODELO = 'claude-haiku-5-5';
-const MAX_CARACTERES = 2000;
+const MODEL = 'claude-haiku-5-5';
+const MAX_CHARS = 2000;
 const MAX_BYTES = 16 * 1024;
-const ORIGEN = 'https://centinela.alinedlabs.co';
+const ORIGIN = 'https://centinela.alinedlabs.co';
+const LANGS = ['en', 'es'];
 
-const CABECERAS = {
+const HEADERS = {
   'Content-Type': 'application/json; charset=utf-8',
   'Cache-Control': 'no-store',
   'X-Content-Type-Options': 'nosniff',
@@ -23,124 +36,110 @@ const CABECERAS = {
   'Referrer-Policy': 'no-referrer',
 };
 
-const responder = (estado, datos, extra = {}) =>
-  new Response(JSON.stringify(datos), { status: estado, headers: { ...CABECERAS, ...extra } });
-const error = (estado, mensaje, extra) => responder(estado, { error: mensaje }, extra);
+const respond = (status, data, extra = {}) =>
+  new Response(JSON.stringify(data), { status, headers: { ...HEADERS, ...extra } });
+const fail = (status, code, extra) => respond(status, { error: { code } }, extra);
 
-// Igual que centinela._marcas.envolver: el mensaje va entre marcas con un id al azar, y
-// cualquier marca que traiga dentro se neutraliza.
-function envolver(texto, marca) {
-  const limpio = texto
+// Like centinela._markers.wrap: the message goes between markers with a random id, and any
+// marker it carries inside is neutralized.
+function wrap(text, marker) {
+  const clean = text
     .replaceAll('<mensaje_cliente', '<mensaje-cliente')
     .replaceAll('</mensaje_cliente', '</mensaje-cliente');
-  return `<mensaje_cliente id="${marca}">\n${limpio}\n</mensaje_cliente id="${marca}">`;
+  return `<mensaje_cliente id="${marker}">\n${clean}\n</mensaje_cliente id="${marker}">`;
 }
 
-const marcaAlAzar = () =>
+const randomMarker = () =>
   [...crypto.getRandomValues(new Uint8Array(4))].map((b) => b.toString(16).padStart(2, '0')).join('');
 
-// Igual que centinela.guardia._aviso.
-function aviso(ordenes, engano, trucos) {
-  const partes = [];
-  if (ordenes) partes.push('Trae órdenes dirigidas al asistente de IA.');
-  if (engano) partes.push('Parece un engaño dirigido a una persona.');
-  if (trucos.length) partes.push(`Trucos que usa: ${trucos.map((t) => TRUCOS[t]).join('; ')}.`);
-  return partes.length ? partes.join(' ') : 'Sin señales de manipulación.';
-}
-
-// Si el modelo se niega o no responde bien, decide una persona (falla cerrado).
-const aRevision = (motivo, tokens) => ({
-  decision: 'revisar',
-  aviso: `${motivo} Por precaución, lo ve una persona.`,
-  ordenes_para_ia: null,
-  engano_a_personas: null,
-  trucos: [],
-  motivo: '',
-  modelo: MODELO,
+// If the model refuses or does not answer well, a person decides (it fails closed).
+const toReview = (fallback, tokens) => ({
+  decision: 'review',
+  ai_instructions: null,
+  people_deception: null,
+  tricks: [],
+  reason: '',
+  model: MODEL,
   tokens,
+  fallback,
 });
 
-async function revisar(request, env) {
-  if (request.method !== 'POST') return error(405, 'Usa POST.', { Allow: 'POST' });
-  if (env.REVISION_EN_VIVO !== 'activa' || !env.ANTHROPIC_API_KEY) {
-    return error(503, 'La revisión en vivo con Claude está apagada. La demostración en tu navegador sigue funcionando.');
-  }
-  if (request.headers.get('Origin') !== ORIGEN) return error(403, 'Solo se acepta desde el sitio de Centinela.');
+async function review(request, env) {
+  if (request.method !== 'POST') return fail(405, 'method', { Allow: 'POST' });
+  if (env.LIVE_REVIEW !== 'on' || !env.ANTHROPIC_API_KEY) return fail(503, 'off');
+  if (request.headers.get('Origin') !== ORIGIN) return fail(403, 'origin');
 
-  // Hasta 6 revisiones por minuto por visitante y 60 en total, para cuidar el saldo.
-  const ip = request.headers.get('CF-Connecting-IP') || 'sin-ip';
-  const porVisitante = await env.LIMITE_VISITANTE.limit({ key: ip });
-  const total = porVisitante.success ? await env.LIMITE_TOTAL.limit({ key: 'total' }) : porVisitante;
-  if (!total.success) {
-    return error(429, 'Demasiadas revisiones seguidas. Espera un minuto y vuelve a intentarlo.', { 'Retry-After': '60' });
-  }
+  // At most 6 reviews a minute for each visitor and 60 in total, to look after the balance.
+  const ip = request.headers.get('CF-Connecting-IP') || 'no-ip';
+  const perVisitor = await env.LIMIT_VISITOR.limit({ key: ip });
+  const overall = perVisitor.success ? await env.LIMIT_TOTAL.limit({ key: 'total' }) : perVisitor;
+  if (!overall.success) return fail(429, 'rate_limited', { 'Retry-After': '60' });
 
-  if (Number(request.headers.get('Content-Length') || 0) > MAX_BYTES) {
-    return error(413, `El mensaje es muy largo: máximo ${MAX_CARACTERES} caracteres.`);
-  }
-  let texto;
+  if (Number(request.headers.get('Content-Length') || 0) > MAX_BYTES) return fail(413, 'too_long');
+  let body;
   try {
-    const cuerpo = await request.text();
-    if (cuerpo.length > MAX_BYTES) return error(413, `El mensaje es muy largo: máximo ${MAX_CARACTERES} caracteres.`);
-    texto = JSON.parse(cuerpo)?.texto;
+    const raw = await request.text();
+    if (raw.length > MAX_BYTES) return fail(413, 'too_long');
+    body = JSON.parse(raw);
   } catch {
-    return error(400, 'Envía un JSON con el campo «texto».');
+    return fail(400, 'bad_request');
   }
-  if (typeof texto !== 'string' || !texto.trim()) return error(400, 'Escribe o pega un mensaje.');
-  texto = texto.trim();
-  if (texto.length > MAX_CARACTERES) return error(413, `El mensaje es muy largo: máximo ${MAX_CARACTERES} caracteres.`);
+  if (body === null || typeof body !== 'object' || typeof body.text !== 'string') return fail(400, 'bad_request');
+  if (body.lang !== undefined && !LANGS.includes(body.lang)) return fail(400, 'bad_request');
+  const text = body.text.trim();
+  if (!text) return fail(400, 'empty');
+  if (text.length > MAX_CHARS) return fail(413, 'too_long');
 
-  const cliente = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 25_000 });
-  const marca = marcaAlAzar();
-  let respuesta;
+  const client = new Anthropic({ apiKey: env.ANTHROPIC_API_KEY, maxRetries: 1, timeout: 25_000 });
+  const marker = randomMarker();
+  let response;
   try {
-    respuesta = await cliente.messages.create({
-      model: MODELO,
+    response = await client.messages.create({
+      model: MODEL,
       max_tokens: 700,
-      system: INSTRUCCIONES.replaceAll('{marker}', marca),
-      messages: [{ role: 'user', content: envolver(texto, marca) }],
+      system: INSTRUCCIONES.replaceAll('{marker}', marker),
+      messages: [{ role: 'user', content: wrap(text, marker) }],
       output_config: { effort: 'low', format: { type: 'json_schema', schema: ESQUEMA } },
     });
   } catch (e) {
-    if (e instanceof Anthropic.RateLimitError) return error(503, 'Claude está ocupado. Intenta de nuevo en un minuto.');
-    return error(502, 'No se pudo consultar a Claude en este momento.');
+    if (e instanceof Anthropic.RateLimitError) return fail(503, 'busy');
+    return fail(502, 'upstream');
   }
 
-  const tokens = { entrada: respuesta.usage?.input_tokens ?? null, salida: respuesta.usage?.output_tokens ?? null };
-  if (respuesta.stop_reason === 'refusal') return responder(200, aRevision('El modelo se negó a revisar el mensaje.', tokens));
+  const tokens = { input: response.usage?.input_tokens ?? null, output: response.usage?.output_tokens ?? null };
+  if (response.stop_reason === 'refusal') return respond(200, toReview('refusal', tokens));
 
-  let datos = null;
+  // The keys of the model's JSON are Spanish: they are in the schema it answers with.
+  let data = null;
   try {
-    datos = JSON.parse(respuesta.content.find((b) => b.type === 'text')?.text ?? '');
+    data = JSON.parse(response.content.find((b) => b.type === 'text')?.text ?? '');
   } catch {
-    datos = null;
+    data = null;
   }
-  if (!datos || typeof datos.ordenes_para_ia !== 'boolean') {
-    return responder(200, aRevision('El revisor no devolvió una respuesta válida.', tokens));
-  }
+  if (!data || typeof data.ordenes_para_ia !== 'boolean') return respond(200, toReview('invalid', tokens));
 
-  const ordenes = datos.ordenes_para_ia;
-  const engano = datos.engano_a_personas === true;
-  const trucos = [...new Set(Array.isArray(datos.trucos) ? datos.trucos : [])].filter(
+  const aiInstructions = data.ordenes_para_ia;
+  const peopleDeception = data.engano_a_personas === true;
+  const tricks = [...new Set(Array.isArray(data.trucos) ? data.trucos : [])].filter(
     (t) => typeof t === 'string' && Object.hasOwn(TRUCOS, t),
   );
-  return responder(200, {
-    // Como en la librería, la decisión la toma el código con las dos respuestas del modelo.
-    decision: ordenes || engano ? 'revisar' : 'permitir',
-    aviso: aviso(ordenes, engano, trucos),
-    ordenes_para_ia: ordenes,
-    engano_a_personas: engano,
-    trucos: trucos.map((t) => ({ id: t, descripcion: TRUCOS[t] })),
-    motivo: typeof datos.motivo === 'string' ? datos.motivo.trim().slice(0, 400) : '',
-    modelo: MODELO,
+  return respond(200, {
+    // As in the library, the decision is made by the code from the model's two answers.
+    decision: aiInstructions || peopleDeception ? 'review' : 'allow',
+    ai_instructions: aiInstructions,
+    people_deception: peopleDeception,
+    tricks,
+    reason: typeof data.motivo === 'string' ? data.motivo.trim().slice(0, 400) : '',
+    model: MODEL,
     tokens,
+    fallback: null,
   });
 }
 
 export default {
   async fetch(request, env) {
     const { pathname } = new URL(request.url);
-    if (pathname === '/api/revisar') return revisar(request, env);
-    return error(404, 'No existe.');
+    if (pathname === '/api/review') return review(request, env);
+    return fail(404, 'not_found');
   },
 };

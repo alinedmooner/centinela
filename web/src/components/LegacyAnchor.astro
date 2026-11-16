@@ -1,0 +1,16 @@
+---
+// On the English page, an empty element with the old Spanish id of a section, so that a link
+// shared before the site had two languages (for example /#sala) still lands on the section.
+// The Spanish page already uses those ids, so it gets nothing.
+import { t } from '../i18n/index.js';
+
+interface Props {
+  lang: 'en' | 'es';
+  // The dictionary key of the section's anchor, for example 'anchor.room'.
+  anchor: string;
+}
+
+const { lang, anchor } = Astro.props;
+const legacy = lang === 'es' ? null : t('es', anchor);
+---
+{legacy && <span id={legacy}></span>}

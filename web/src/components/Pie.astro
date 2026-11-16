@@ -1,14 +1,26 @@
 ---
-// Portado de la landing generada con Lovable (index.html).
+// Footer of the landing page, with the link to the design system and the language switch.
+// Ported from the landing page generated with Lovable (index.html).
+import { t } from '../i18n/index.js';
+import { pathFor } from '../i18n/urls.js';
+
+interface Props {
+  lang: 'en' | 'es';
+}
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
+const other = lang === 'en' ? 'es' : 'en';
 ---
 <footer class="cn-pie">
   <div class="cn-contenedor cn-pie__fila">
-    <a class="cn-marca" href="#inicio"><img src="/logo.svg" alt="" width="28" height="28">CENTINELA</a>
-    <p>Centinela · MIT · 2026</p>
+    <a class="cn-marca" href={`#${tt('anchor.home')}`}><img src="/logo.svg" alt="" width="28" height="28">CENTINELA</a>
+    <p>{tt('footer.copyright')}</p>
     <ul class="cn-pie__enlaces">
-      <li><a href="https://github.com/alinedmooner/centinela">Repositorio</a></li>
-      <li><a href="/sistema/">Sistema de diseño Vigía</a></li>
-      <li><span>Sin cookies ni analítica</span></li>
+      <li><a href="https://github.com/alinedmooner/centinela">{tt('footer.repo')}</a></li>
+      <li><a href={pathFor(lang, 'system')}>{tt('footer.design_system')}</a></li>
+      <li><span>{tt('footer.no_tracking')}</span></li>
+      <li><a lang={other} hreflang={other} href={pathFor(other, 'home')}>{tt('lang.other.name')}</a></li>
     </ul>
   </div>
 </footer>

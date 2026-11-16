@@ -1,2 +1,4 @@
 User-agent: *
 Allow: /
+
+Sitemap: https://centinela.alinedlabs.co/sitemap.xml

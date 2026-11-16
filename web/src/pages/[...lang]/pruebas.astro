@@ -1,0 +1,35 @@
+---
+// Tests of the review room's logic (src/scripts/desarmar.js), run in the browser. Not for
+// search engines: it is noindex in both languages.
+// Ported from the landing page generated with Lovable (pruebas.html).
+import Base from '../../layouts/Base.astro';
+import { t } from '../../i18n/index.js';
+import { localePaths, pathFor } from '../../i18n/urls.js';
+
+export function getStaticPaths() {
+  return localePaths();
+}
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
+---
+<Base
+  lang={lang}
+  route="tests"
+  noindex
+  title={tt('meta.tests.title')}
+  description={tt('meta.tests.description')}
+>
+<main id={tt('anchor.content')} class="cn-contenedor cn-doc">
+  <div class="cn-doc__bloque">
+    <a class="cn-marca" href={pathFor(lang, 'home')}><img src="/logo.svg" alt="" width="28" height="28">CENTINELA</a>
+    <h1 class="cn-hero__titulo">{tt('tests.heading')}</h1>
+    <p id="resumen" class="cn-etiqueta" aria-live="polite">{tt('tests.running')}</p>
+    <ul id="pruebas" class="cn-pruebas"></ul>
+  </div>
+</main>
+</Base>
+
+<script>
+  import '../../scripts/pruebas.js';
+</script>

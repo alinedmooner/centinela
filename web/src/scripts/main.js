@@ -1,9 +1,12 @@
 import { iniciar as iniciarHero } from './hero.js';
 import { iniciar as iniciarSala } from './sala.js';
+import { pageLang, t } from '../i18n/index.js';
+
+const T = (key) => t(pageLang(), key);
 
 const CLAVE = 'centinela:pausar-movimiento';
 const leer = () => { try { return localStorage.getItem(CLAVE) === '1'; } catch { return false; } };
-const guardar = (v) => { try { localStorage.setItem(CLAVE, v ? '1' : '0'); } catch { /* sin almacenamiento */ } };
+const guardar = (v) => { try { localStorage.setItem(CLAVE, v ? '1' : '0'); } catch { /* no storage available */ } };
 
 export const movimientoReducido = () =>
   matchMedia('(prefers-reduced-motion: reduce)').matches || document.documentElement.classList.contains('cn-sin-movimiento');
@@ -15,8 +18,8 @@ function iniciarPausa(raiz) {
     html.classList.toggle('cn-sin-movimiento', v);
     botones.forEach((b) => {
       b.setAttribute('aria-pressed', String(v));
-      const t = b.querySelector('.cn-nav__pausa-texto');
-      if (t) t.textContent = v ? 'Reanudar movimiento' : 'Pausar movimiento';
+      const texto = b.querySelector('.cn-nav__pausa-texto');
+      if (texto) texto.textContent = v ? T('js.nav.resume') : T('js.nav.pause');
     });
     document.dispatchEvent(new CustomEvent('cn:movimiento', { detail: { pausado: v } }));
   };
@@ -61,9 +64,9 @@ function iniciarCopiar(raiz) {
   raiz.querySelectorAll('[data-copiar]').forEach((b) => b.addEventListener('click', async () => {
     const fuente = document.getElementById(b.dataset.copiar);
     const texto = fuente ? fuente.textContent : '';
-    try { await navigator.clipboard.writeText(texto); b.textContent = 'Copiado'; }
-    catch { b.textContent = 'Selecciona y copia'; }
-    setTimeout(() => { b.textContent = 'Copiar'; }, 1800);
+    try { await navigator.clipboard.writeText(texto); b.textContent = T('js.copy.done'); }
+    catch { b.textContent = T('js.copy.manual'); }
+    setTimeout(() => { b.textContent = T('js.copy.label'); }, 1800);
   }));
 }
 

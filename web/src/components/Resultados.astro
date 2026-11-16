@@ -1,31 +1,52 @@
 ---
-// Portado de la landing generada con Lovable (index.html).
+// Ported from the landing page generated with Lovable (index.html).
+// The numbers come from results/summary.md (English) and results/summary.es.md (Spanish).
+import { t } from '../i18n/index.js';
+import LegacyAnchor from './LegacyAnchor.astro';
+
+interface Props {
+  lang: 'en' | 'es';
+}
+
+const { lang } = Astro.props;
+const tt = (key: string, fields?: Record<string, string | number>) => t(lang, key, fields);
+// The five pieces of evidence: their number and the keys of their figure, text and sample size.
+const EVIDENCE = [
+  { n: '01', value: 'results.e1.value', text: 'results.e1.text', size: 'results.e1.n' },
+  { n: '02', value: 'results.e2.value', text: 'results.e2.text', size: 'results.e2.n' },
+  { n: '03', value: 'results.e3.value', text: 'results.e3.text', size: 'results.e3.n' },
+  { n: '04', value: 'results.e4.value', text: 'results.e4.text', size: 'results.e4.n' },
+  { n: '05', value: 'results.e5.value', text: 'results.e5.text', size: 'results.e5.n' },
+];
+// The rows of the table: metric, baseline and Centinela.
+const ROWS = [
+  { metric: 'results.table.r1.metric', baseline: 'results.table.r1.baseline', centinela: 'results.table.r1.centinela' },
+  { metric: 'results.table.r2.metric', baseline: 'results.table.r2.baseline', centinela: 'results.table.r2.centinela' },
+  { metric: 'results.table.r3.metric', baseline: 'results.table.r3.baseline', centinela: 'results.table.r3.centinela' },
+  { metric: 'results.table.r4.metric', baseline: 'results.table.r4.baseline', centinela: 'results.table.r4.centinela' },
+  { metric: 'results.table.r5.metric', baseline: 'results.table.r5.baseline', centinela: 'results.table.r5.centinela' },
+  { metric: 'results.table.r6.metric', baseline: 'results.table.r6.baseline', centinela: 'results.table.r6.centinela' },
+  { metric: 'results.table.r7.metric', baseline: 'results.table.r7.baseline', centinela: 'results.table.r7.centinela' },
+  { metric: 'results.table.r8.metric', baseline: 'results.table.r8.baseline', centinela: 'results.table.r8.centinela' },
+];
 ---
-<section id="resultados" class="cn-seccion" aria-labelledby="res-titulo">
+<section id={tt('anchor.results')} class="cn-seccion" aria-labelledby="res-titulo">
+  <LegacyAnchor lang={lang} anchor="anchor.results" />
   <div class="cn-contenedor">
-    <p class="cn-etiqueta cn-seccion__ojo">04 · Resultados</p>
-    <h2 id="res-titulo" class="cn-aparece">Lo medimos.</h2>
-    <p class="cn-seccion__bajada cn-aparece">Con casos reservados, que no se usaron para escribir las reglas. Medido el 14 de noviembre de 2026, con una corrida por condición.</p>
+    <p class="cn-etiqueta cn-seccion__ojo">{tt('results.eyebrow')}</p>
+    <h2 id="res-titulo" class="cn-aparece">{tt('results.title')}</h2>
+    <p class="cn-seccion__bajada cn-aparece">{tt('results.lead')}</p>
     <ul class="cn-evidencias">
-      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 01</span><span class="cn-evidencia__cifra">0 %</span><p class="cn-evidencia__texto">de los ataques cambió la etiqueta del bot con Centinela, con seis modelos de Anthropic y Google, uno de ellos abierto (sin defensa, Claude Opus 5.5 obedeció el 32,9 %)</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 70 por modelo</span><span>resultados/resumen.md</span></span></li>
-      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 02</span><span class="cn-evidencia__cifra">100 %</span><p class="cn-evidencia__texto">de los mensajes normales, bien clasificados con Centinela (Claude Opus 5.5)</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 70</span><span>resultados/resumen.md</span></span></li>
-      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 03</span><span class="cn-evidencia__cifra">0 de 462</span><p class="cn-evidencia__texto">falsas alarmas de las reglas en correos legítimos reales</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 462</span><span>resultados/resumen.md</span></span></li>
-      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 04</span><span class="cn-evidencia__cifra">98,9 %</span><p class="cn-evidencia__texto">de los ataques en español, detectados con Claude Haiku 5.5 como revisor (0,4 % de falsas alarmas)</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 182</span><span>resultados/resumen.md</span></span></li>
-      <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">EVIDENCIA 05</span><span class="cn-evidencia__cifra">93,3 %</span><p class="cn-evidencia__texto">del phishing real, detectado por el revisor sin entrenamiento</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 731</span><span>resultados/resumen.md</span></span></li>
+      {EVIDENCE.map((e) => (
+        <li class="cn-evidencia cn-aparece"><span class="cn-evidencia__num cn-etiqueta">{tt('results.evidence', { n: e.n })}</span><span class="cn-evidencia__cifra">{tt(e.value)}</span><p class="cn-evidencia__texto">{tt(e.text)}</p><span class="cn-evidencia__meta cn-etiqueta"><span>{tt(e.size)}</span><span>{tt('results.source')}</span></span></li>
+      ))}
     </ul>
-    <div class="cn-tabla-caja cn-aparece" tabindex="0" role="region" aria-label="Tabla de resultados">
+    <div class="cn-tabla-caja cn-aparece" tabindex="0" role="region" aria-label={tt('results.table.aria')}>
       <table class="cn-tabla">
-        <caption class="cn-oculto">Comparación de Centinela con la línea base</caption>
-        <thead><tr><th scope="col">Métrica</th><th scope="col">Línea base</th><th scope="col">Centinela</th></tr></thead>
+        <caption class="cn-oculto">{tt('results.table.caption')}</caption>
+        <thead><tr><th scope="col">{tt('results.table.col_metric')}</th><th scope="col">{tt('results.table.col_baseline')}</th><th scope="col">{tt('results.table.col_centinela')}</th></tr></thead>
         <tbody>
-          <tr><th scope="row">Ataques que cambian la etiqueta del bot (Opus 5.5, 70)</th><td>32,9 % sin defensa</td><td>0 %</td></tr>
-          <tr><th scope="row">Lo mismo con seis modelos: Claude Opus 5.5, Sonnet 5.5, Haiku 4.5 y Haiku 5.5, Gemini 3.5 Flash-Lite y Gemma 4, abierto (70 por modelo)</th><td>De 0 a 23 de 70 sin defensa</td><td>0 de 70 con los seis</td></tr>
-          <tr><th scope="row">Mensajes normales bien clasificados (Opus 5.5, 70)</th><td>100 %</td><td>100 %</td></tr>
-          <tr><th scope="row">Ataques en español detectados (182)</th><td>0 % LlamaFirewall · 83,5 % ProtectAI</td><td>73,6 % solo reglas · 98,9 % con revisor</td></tr>
-          <tr><th scope="row">Falsas alarmas en mensajes normales de clientes (70)</th><td>61,4 % ProtectAI</td><td>0 %</td></tr>
-          <tr><th scope="row">Falsas alarmas en correos legítimos reales</th><td>52,7 % ProtectAI (300)</td><td>0 % reglas · 0,4 % revisor (462)</td></tr>
-          <tr><th scope="row">Phishing real detectado (731)</th><td>89,5 % clasificador clásico entrenado</td><td>93,3 % revisor sin entrenar</td></tr>
-          <tr><th scope="row">Enlaces que quien revisa puede abrir (731 correos de phishing)</th><td>103 en el texto original</td><td>0 en la sala de revisión</td></tr>
+          {ROWS.map((r) => <tr><th scope="row">{tt(r.metric)}</th><td>{tt(r.baseline)}</td><td>{tt(r.centinela)}</td></tr>)}
         </tbody>
       </table>
     </div>
