@@ -12,6 +12,7 @@ from __future__ import annotations
 import contextlib
 import io
 import json
+import re
 import runpy
 from pathlib import Path
 
@@ -121,13 +122,26 @@ HIDDEN_TEXT_PHRASES = {
 }
 
 
+#: Messages of the LLM detector (an evidence line and the reasons it fails), in English now.
+DETECTOR_PHRASES = {
+    "the model refused to check the message": "el modelo se negó a revisar el mensaje",
+    "the model did not return a valid answer": "el modelo no devolvió una respuesta válida",
+}
+
+
 def old_evidence(line: str) -> str:
-    """An evidence line with the Spanish rule id (and phrase) of main@9810607."""
+    """An evidence line (or a detector error) with the Spanish wording of main@9810607."""
     rule, sep, rest = line.partition(": ")
     if rule in RULE_IDS:
         rest = HIDDEN_TEXT_PHRASES.get(rest, rest)
         return RULE_IDS[rule] + sep + rest
-    return line
+    if line in DETECTOR_PHRASES:
+        return DETECTOR_PHRASES[line]
+    return re.sub(
+        r"^only the first (\d+) characters were checked$",
+        r"solo se revisaron los primeros \1 caracteres",
+        line,
+    )
 
 
 def old_text(text: str) -> str:
@@ -145,7 +159,7 @@ def old_view(value, key: str | None = None):
     if isinstance(value, (list, tuple)):
         return [old_view(v, key) for v in value]
     if isinstance(value, str):
-        if key == "evidence":
+        if key in ("evidence", "error"):
             return old_evidence(value)
         return OLD_VALUES.get(key, {}).get(value, value)
     return value
@@ -204,12 +218,13 @@ def demo_mails():
 class FakeProvider:
     """A fake model that records what it receives."""
 
-    name = "falso"
+    name = "falso"  # Spanish on purpose: the reference outputs record it as "llm:falso"
 
     def __init__(self, response=None, error=None):
         self.response, self.error, self.calls = response, error, []
 
     def respond_json(self, *, system, message, schema):
+        # Spanish keys on purpose: the reference outputs use them.
         self.calls.append({"sistema": system, "mensaje": message, "esquema": schema})
         if self.error:
             raise self.error

@@ -1,8 +1,8 @@
-"""Arma los casos de la prueba del filtro a partir del banco de pruebas.
+"""Builds the cases for the filter evaluation from the benchmark.
 
-Cada caso es un texto con su idioma, su grupo y si es un ataque (``positivo``). Los
-ataques públicos se incrustan en mensajes normales («portadores»), porque en la práctica
-una orden escondida llega dentro de un mensaje que parece corriente.
+Each case is a text with its language, its group and whether it is an attack (``positivo``).
+Public attacks are embedded in normal messages ("carriers"), because in practice a hidden
+instruction arrives inside a message that looks ordinary.
 """
 
 from __future__ import annotations
@@ -12,12 +12,12 @@ from pathlib import Path
 
 from _common import DATA, fingerprint, in_dev, read_jsonl
 
-#: Los correos de SpaPhish se recortan a este largo antes de revisarlos.
+#: SpaPhish emails are cut to this length before they are checked.
 MAX_CHARS = 4000
 
 
 def embed(carrier: str, attack: str, seed: str) -> str:
-    """Mete el ataque al final, al comienzo o en medio del portador, según la semilla."""
+    """Puts the attack at the end, the start or the middle of the carrier, depending on the seed."""
     mode = int(fingerprint(seed), 16) % 3
     if mode == 0:
         return f"{carrier}\n\n{attack}"
@@ -30,7 +30,7 @@ def embed(carrier: str, attack: str, seed: str) -> str:
 
 
 def benchmark_cases(split: str) -> list[dict]:
-    """Casos construidos con los archivos de ``datos/`` para ``dev`` o ``test``."""
+    """Cases built from the files in ``data/`` for ``dev`` or ``test``."""
     carriers = read_jsonl(DATA / "portadores.jsonl")
     cases: list[dict] = []
 
@@ -85,7 +85,7 @@ def benchmark_cases(split: str) -> list[dict]:
 
 
 def read_spaphish(path: Path) -> list[dict]:
-    """Lee SpaPhish desde una copia local. El conjunto no se redistribuye con Centinela."""
+    """Reads SpaPhish from a local copy. The dataset is not redistributed with Centinela."""
     csv.field_size_limit(10**9)
     with path.open(newline="", encoding="utf-8-sig") as file:
         return list(csv.DictReader(file))
@@ -96,7 +96,7 @@ def mail_text(row: dict) -> str:
 
 
 def spaphish_cases(path: Path, split: str, maximum: int | None = None) -> list[dict]:
-    """Correos legítimos reales en español, como mensajes normales difíciles."""
+    """Real legitimate emails in Spanish, used as hard normal messages."""
     rows = [
         f
         for f in read_spaphish(path)

@@ -1,21 +1,22 @@
-"""Bot de demostración: vigila un buzón por IMAP y revisa con Centinela cada correo nuevo.
+"""Demo bot: watches a mailbox over IMAP and checks every new email with Centinela.
 
-- Solo lee los correos que lleguen después de arrancar.
-- Con --solo-de, solo los de esa dirección: el filtro lo hace el servidor, así que el bot ni
-  siquiera abre los demás correos del buzón.
-- Funciona sin clave de IA, con las reglas.
-- Sin --mover no cambia nada en el buzón (lo abre en modo de solo lectura). Con --mover, los
-  correos sospechosos pasan a la carpeta Centinela-Cuarentena.
+- It only reads the emails that arrive after it starts.
+- With --only-from, only the ones from that address: the server does the filtering, so the bot
+  does not even open the other emails in the mailbox.
+- It works without an AI key, using the rules alone.
+- Without --move it changes nothing in the mailbox (it opens it read-only). With --move, the
+  suspicious emails go to the Centinela-Quarantine folder.
+- The notices and the review cards come out in English; with --lang es, in Spanish.
 
-Credenciales en .env (con Gmail, contraseña de aplicación, no la contraseña normal):
+Credentials in .env (with Gmail, an app password, not the regular password):
 
-    BUZON_USUARIO=buzon-del-bot@...
-    BUZON_CLAVE=...
+    MAILBOX_USER=bot-mailbox@...
+    MAILBOX_PASSWORD=...
 
-Uso::
+Usage::
 
-    uv run python ejemplos/vigilar_buzon.py --solo-de cuenta-de-pruebas@...
-    uv run python ejemplos/vigilar_buzon.py --solo-de cuenta-de-pruebas@... --mover
+    uv run python examples/watch_mailbox.py --only-from test-account@...
+    uv run python examples/watch_mailbox.py --only-from test-account@... --move
 """
 
 from __future__ import annotations
@@ -37,6 +38,7 @@ from centinela import (
     render_card,
 )
 from centinela._env import load_env
+from centinela.catalog import DEFAULT_LANG, LANGS
 from centinela.mail import Mail, read_mail, text_to_check
 
 IMAP = {
@@ -48,23 +50,23 @@ IMAP = {
     "hotmail.com": "outlook.office365.com",
     "live.com": "outlook.office365.com",
 }
-QUARANTINE = "Centinela-Cuarentena"
+QUARANTINE = "Centinela-Quarantine"
 LINE = "─" * 72
 
 
-def quotes(name: str) -> str:
+def quote(name: str) -> str:
     return '"' + name.replace("\\", "\\\\").replace('"', '\\"') + '"'
 
 
 def server(user: str, value: str | None = None) -> str:
     host = value or IMAP.get(user.rsplit("@", 1)[-1].lower())
     if not host:
-        raise ValueError("No conozco el servidor IMAP de esa cuenta: pon BUZON_IMAP=host en .env.")
+        raise ValueError("Unknown IMAP server for that account: set MAILBOX_IMAP=host in .env.")
     return host
 
 
 def process(raw: bytes, guard: Guard) -> tuple[Mail, Verdict, str | None]:
-    """Revisa un correo. Si va a revisión, devuelve también la tarjeta para quien revisa."""
+    """Check an email. If it goes to review, also return the card for the person who reviews it."""
     mail = read_mail(raw)
     text = text_to_check(mail)
     verdict = guard.check(text)
@@ -76,80 +78,80 @@ def process(raw: bytes, guard: Guard) -> tuple[Mail, Verdict, str | None]:
 
 def show(folder: str, mail: Mail, verdict: Verdict, card: str | None) -> None:
     print(LINE)
-    print(f"Correo nuevo en {folder}")
-    print(f"De: {mail.sender}")
-    print(f"Asunto: {mail.subject}")
+    print(f"New email in {folder}")
+    print(f"From: {mail.sender}")
+    print(f"Subject: {mail.subject}")
     if mail.hidden_fragments:
-        print(f"Trae {mail.hidden_fragments} fragmento(s) de texto oculto en el HTML.")
+        print(f"It has {mail.hidden_fragments} fragment(s) of hidden text in the HTML.")
     if verdict.decision == "allow":
-        print("Decisión: permitir. El asistente puede leerlo.")
+        print("Decision: allow. The assistant can read it.")
     else:
-        print("Decisión: revisar. Va a la sala de revisión; el asistente no lo lee.\n")
+        print("Decision: review. It goes to the review room; the assistant does not read it.\n")
         print(card)
     sys.stdout.flush()
 
 
 def spam_folder(imap: imaplib.IMAP4) -> str | None:
-    """La carpeta de correo no deseado, por su atributo \\Junk (el nombre cambia por idioma)."""
+    """The spam folder, found by its \\Junk attribute (its name changes with the language)."""
     _, rows = imap.list()
     for row in rows or []:
         if not isinstance(row, bytes):
             continue
         m = re.match(
-            r'\((?P<attrs>[^)]*)\) (?:"[^"]*"|NIL) (?P<nombre>.+)$', row.decode("utf-8", "replace")
+            r'\((?P<attrs>[^)]*)\) (?:"[^"]*"|NIL) (?P<name>.+)$', row.decode("utf-8", "replace")
         )
         if m and "\\Junk" in m.group("attrs"):
-            name = m.group("nombre").strip()
+            name = m.group("name").strip()
             return name[1:-1] if name.startswith('"') else name
     return None
 
 
-def uid_siguiente(imap: imaplib.IMAP4, folder: str) -> int:
-    _, data = imap.status(quotes(folder), "(UIDNEXT)")
+def next_uid(imap: imaplib.IMAP4, folder: str) -> int:
+    _, data = imap.status(quote(folder), "(UIDNEXT)")
     m = re.search(rb"UIDNEXT (\d+)", data[0] or b"")
     return int(m.group(1)) if m else 1
 
 
 def move(imap: imaplib.IMAP4, uid: bytes) -> None:
     if "MOVE" in imap.capabilities:
-        imap.uid("MOVE", uid, quotes(QUARANTINE))
+        imap.uid("MOVE", uid, quote(QUARANTINE))
         return
-    imap.uid("COPY", uid, quotes(QUARANTINE))
+    imap.uid("COPY", uid, quote(QUARANTINE))
     imap.uid("STORE", uid, "+FLAGS", r"(\Deleted)")
-    if "UIDPLUS" in imap.capabilities:  # borra solo este correo, nunca otros ya marcados
+    if "UIDPLUS" in imap.capabilities:  # deletes only this email, never others already marked
         imap.uid("EXPUNGE", uid)
 
 
 def connect(user: str) -> imaplib.IMAP4_SSL:
     imap = imaplib.IMAP4_SSL(
-        server(user, os.environ.get("BUZON_IMAP")),
+        server(user, os.environ.get("MAILBOX_IMAP")),
         993,
         ssl_context=ssl.create_default_context(),
     )
-    imap.login(user, os.environ["BUZON_CLAVE"])
+    imap.login(user, os.environ["MAILBOX_PASSWORD"])
     return imap
 
 
 def watch(args: argparse.Namespace, guard: Guard) -> None:
-    user = os.environ["BUZON_USUARIO"]
+    user = os.environ["MAILBOX_USER"]
     imap = connect(user)
     folders = ["INBOX"]
     spam = spam_folder(imap)
     if spam:
         folders.append(spam)
     if args.move:
-        imap.create(quotes(QUARANTINE))  # si ya existe, el servidor responde NO y no pasa nada
-    last = {c: uid_siguiente(imap, c) - 1 for c in folders}
-    filter_lines = f", solo correos de {args.only_from}" if args.only_from else ""
-    print(f"Vigilando {' y '.join(folders)} de {user}{filter_lines}. Ctrl+C para salir.")
+        imap.create(quote(QUARANTINE))  # if it already exists, the server answers NO: harmless
+    last = {c: next_uid(imap, c) - 1 for c in folders}
+    filter_note = f", only emails from {args.only_from}" if args.only_from else ""
+    print(f"Watching {' and '.join(folders)} for {user}{filter_note}. Press Ctrl+C to exit.")
 
     while True:
         try:
             for folder in folders:
-                imap.select(quotes(folder), readonly=not args.move)
+                imap.select(quote(folder), readonly=not args.move)
                 criteria = ["UID", f"{last[folder] + 1}:*"]
                 if args.only_from:
-                    criteria += ["FROM", quotes(args.only_from)]
+                    criteria += ["FROM", quote(args.only_from)]
                 _, data = imap.uid("SEARCH", *criteria)
                 for uid in (data[0] or b"").split():
                     if int(uid) <= last[folder]:
@@ -160,32 +162,36 @@ def watch(args: argparse.Namespace, guard: Guard) -> None:
                     show(folder, mail, verdict, card)
                     if card and args.move:
                         move(imap, uid)
-                        print(f"\n→ Movido a la carpeta {QUARANTINE}.")
+                        print(f"\n→ Moved to the {QUARANTINE} folder.")
                     last[folder] = max(last[folder], int(uid))
             time.sleep(args.each)
         except (imaplib.IMAP4.abort, OSError):
-            print(
-                "Se perdió la conexión con el servidor; reconecto en 5 segundos.", file=sys.stderr
-            )
+            print("Lost the connection to the server; reconnecting in 5 seconds.", file=sys.stderr)
             time.sleep(5)
             imap = connect(user)
 
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
-    parser.add_argument("--only-from", help="revisa solo los correos que vengan de esta dirección")
+    parser.add_argument("--only-from", help="check only the emails that come from this address")
     parser.add_argument(
-        "--move", action="store_true", help="pasa los sospechosos a la carpeta de cuarentena"
+        "--move", action="store_true", help="move the suspicious emails to the quarantine folder"
     )
-    parser.add_argument("--each", type=float, default=5, help="segundos entre revisiones")
-    parser.add_argument("--claude", action="store_true", help="suma a Claude como revisor")
+    parser.add_argument("--each", type=float, default=5, help="seconds between checks")
+    parser.add_argument("--claude", action="store_true", help="add Claude as a reviewer")
     parser.add_argument("--model", default="claude-haiku-5-5")
+    parser.add_argument(
+        "--lang",
+        choices=LANGS,
+        default=DEFAULT_LANG,
+        help="language of the notices and the review cards",
+    )
     args = parser.parse_args(argv)
 
     load_env()
-    missing = [v for v in ("BUZON_USUARIO", "BUZON_CLAVE") if not os.environ.get(v)]
+    missing = [v for v in ("MAILBOX_USER", "MAILBOX_PASSWORD") if not os.environ.get(v)]
     if missing:
-        print("Faltan en .env: " + ", ".join(missing), file=sys.stderr)
+        print("Missing from .env: " + ", ".join(missing), file=sys.stderr)
         return 1
     detectors = [RulesDetector(labels=LEAD_LABELS)]
     if args.claude:
@@ -194,16 +200,16 @@ def main(argv: list[str] | None = None) -> int:
 
         detectors.append(LLMDetector(AnthropicProvider(args.model)))
     try:
-        watch(args, Guard(detectors))
+        watch(args, Guard(detectors, lang=args.lang))
     except imaplib.IMAP4.error as error:
         print(
-            f"El servidor IMAP respondió: {error}. Con Gmail hace falta una contraseña de "
-            "aplicación y tener IMAP activado.",
+            f"The IMAP server answered: {error}. With Gmail you need an app password and IMAP "
+            "turned on.",
             file=sys.stderr,
         )
         return 1
     except KeyboardInterrupt:
-        print("\nListo.")
+        print("\nDone.")
     return 0
 
 

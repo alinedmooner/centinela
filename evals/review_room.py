@@ -1,18 +1,18 @@
-"""Prueba 4: la sala de revisión sobre correos reales. No usa clave ni internet.
+"""Evaluation 4: the review room on real emails. It needs neither an API key nor internet access.
 
-    uv run python evals/revision.py --spaphish "RUTA/Spaphish dataset - DiB.csv"
+    uv run python evals/review_room.py --spaphish "PATH/Spaphish dataset - DiB.csv"
 
-Para cada correo de SpaPhish arma la tarjeta que vería quien lo revisa y cuenta:
+For each SpaPhish email it builds the card that the person reviewing it would see, and counts:
 
-- cuántos enlaces del texto siguen activos después de desarmarlo;
-- en cuántos correos un enlace lleva a un dominio que no aparece escrito en el texto. En un
-  correo real ese destino va escondido en el HTML; aquí se toma del campo ``urls`` del
-  conjunto y se le pasa a la tarjeta, como lo haría una integración con el correo;
-- si la tarjeta reconoce qué pide el correo y con qué presiona;
-- cuánto del texto queda igual.
+- how many links in the text are still active after defanging it;
+- in how many emails a link leads to a domain that is not written in the text. In a real
+  email that destination is hidden in the HTML; here it is taken from the dataset's ``urls``
+  field and passed to the card, as an email integration would do;
+- whether the card recognizes what the email asks for and what pressure it applies;
+- how much of the text stays the same.
 
-Si existe la respuesta guardada del revisor de la prueba 3, se usa para saber qué correos
-habría marcado como engaño. Guarda solo conteos por identificador, nunca el texto.
+If the reviewer's saved answer from evaluation 3 exists, it is used to know which emails
+it would have flagged as a deception. It saves only counts per identifier, never the text.
 """
 
 from __future__ import annotations
@@ -31,16 +31,16 @@ from cases import mail_text, read_spaphish
 from centinela import LEAD_LABELS, Guard, RulesDetector, create_card
 from centinela.review import SENSITIVE_ASKS
 
-#: Señal de enlace activo, independiente de las expresiones del desarmador.
+#: Signal of an active link, independent of the expressions the defanger uses.
 ACTIVE = re.compile(r"(?i)(?:https?|ftp)://\S|\bwww\.\S")
 WEB = re.compile(r"(?i)https?://|www\.")
 INSTRUCT_AI = "darle órdenes al asistente de IA"
 
 
 def registered_links(field: str) -> list[str]:
-    """Los enlaces web que SpaPhish registra para un correo, en su formato «[a],[b]».
+    """The web links that SpaPhish records for an email, in its "[a],[b]" format.
 
-    Deja fuera lo que no lleva a una página: anclas («#») e imágenes incrustadas («cid:»).
+    It leaves out whatever does not lead to a page: anchors ("#") and embedded images ("cid:").
     """
     candidates = (u.strip() for u in re.findall(r"\[([^\[\]]+)\]", field or ""))
     return [u for u in candidates if WEB.match(u)]
@@ -64,8 +64,8 @@ def measure(row: dict, deception: bool | None, guard: Guard) -> dict:
     defanged = card.defanged_text
     lowercase = text.lower()
     destinations = {d for d in map(domain_of, registered) if d}
-    antes, after = text.split(), defanged.split()
-    blocks = SequenceMatcher(None, antes, after, autojunk=False).get_matching_blocks()
+    before, after = text.split(), defanged.split()
+    blocks = SequenceMatcher(None, before, after, autojunk=False).get_matching_blocks()
     return {
         "id": row["hash"][:16],
         "phishing": row["Label"] == "1",
@@ -82,7 +82,7 @@ def measure(row: dict, deception: bool | None, guard: Guard) -> dict:
         "presiona_con": list(card.pressure),
         "dice_ser": bool(card.claims_to_be),
         "segunda_persona": card.needs_second_person,
-        "palabras": len(antes),
+        "palabras": len(before),
         "palabras_iguales": sum(b.size for b in blocks),
         "numeros_ocultos": defanged.count("[número oculto"),
     }
@@ -129,10 +129,10 @@ def summarize(rows: list[dict]) -> dict:
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument(
-        "--spaphish", type=Path, required=True, help="copia local del CSV de SpaPhish"
+        "--spaphish", type=Path, required=True, help="local copy of the SpaPhish CSV"
     )
-    parser.add_argument("--reviewer", default="claude-haiku-5-5", help="respuestas de la prueba 3")
-    parser.add_argument("--maximum", type=int, default=None, help="usa solo los primeros N correos")
+    parser.add_argument("--reviewer", default="claude-haiku-5-5", help="answers from evaluation 3")
+    parser.add_argument("--maximum", type=int, default=None, help="use only the first N emails")
     args = parser.parse_args(argv)
 
     mails = sorted(read_spaphish(args.spaphish), key=lambda f: f["hash"])[: args.maximum]

@@ -1,10 +1,10 @@
-"""Los datos, las reglas congeladas y las tablas no cambian al renombrar el código.
+"""The data, the frozen rules and the tables do not change when the code is renamed.
 
-- Las reglas dan las mismas decisiones sobre los 652 casos del banco de pruebas que no
-  dependen de SpaPhish (que no se redistribuye).
-- Ningún archivo de datos ni registro de resultados cambia un byte.
-- La última línea de reglas_congeladas.txt es el hash del archivo de reglas actual.
-- Las tablas de resumen se rehacen, sin clave, igual que las publicadas.
+- The rules give the same decisions on the 652 benchmark cases that do not depend on SpaPhish
+  (which is not redistributed).
+- No data file or results record changes by a single byte.
+- The last line of rules_frozen.txt is the hash of the current rules file.
+- The summary tables are rebuilt, without an API key, the same as the published ones.
 """
 
 import hashlib
@@ -42,19 +42,19 @@ def _path(text: str):
     return ROOT / text
 
 
-def test_las_reglas_dan_las_mismas_decisiones_y_evidencias():
+def test_the_rules_give_the_same_decisions_and_evidence():
     expected = load("rules_cases.json")
     detector = RulesDetector(labels=LEAD_LABELS)
     differing = []
     was_seen = 0
     for split in ("dev", "test"):
         for case in cases.benchmark_cases(split):
-            h = detector.check(case["texto"])
+            finding = detector.check(case["texto"])
             actual = {
-                "ordenes_para_ia": h.ai_instructions,
-                "engano_a_personas": h.people_deception,
-                "trucos": list(h.tricks),
-                "evidencias": [old_evidence(line) for line in h.evidence],
+                "ordenes_para_ia": finding.ai_instructions,
+                "engano_a_personas": finding.people_deception,
+                "trucos": list(finding.tricks),
+                "evidencias": [old_evidence(line) for line in finding.evidence],
             }
             was_seen += 1
             if actual != expected[f"{split}:{case['id']}"]:
@@ -64,7 +64,7 @@ def test_las_reglas_dan_las_mismas_decisiones_y_evidencias():
 
 
 @pytest.mark.parametrize("split", ["dev", "test"])
-def test_las_reglas_coinciden_con_las_filas_guardadas_en_resultados(split):
+def test_the_rules_match_the_rows_saved_in_results(split):
     saved_value = {
         json.loads(line)["id"]: json.loads(line)["marcado"]
         for line in _path(f"resultados/filtro/{split}/reglas.jsonl")
@@ -79,7 +79,7 @@ def test_las_reglas_coinciden_con_las_filas_guardadas_en_resultados(split):
         assert detector.check(case["texto"]).ai_instructions == saved_value[case["id"]], case["id"]
 
 
-def test_ningun_archivo_de_datos_ni_de_resultados_cambia():
+def test_no_data_or_results_file_changes():
     lines = (GOLDEN / "records.sha256").read_text(encoding="utf-8").splitlines()
     assert len(lines) == 39
     changed = []
@@ -90,19 +90,19 @@ def test_ningun_archivo_de_datos_ni_de_resultados_cambia():
     assert changed == []
 
 
-def test_la_ultima_linea_de_reglas_congeladas_es_el_hash_del_archivo_actual():
+def test_the_last_line_of_the_frozen_rules_is_the_hash_of_the_current_file():
     text = _path("resultados/reglas_congeladas.txt").read_text(encoding="utf-8")
     pinned = re.findall(r"^sha256 de (\S+): ([0-9a-f]{64})$", text, flags=re.MULTILINE)
-    assert pinned, "reglas_congeladas.txt no tiene ninguna línea «sha256 de <ruta>: <hash>»"
+    assert pinned, "rules_frozen.txt has no line like 'sha256 de <path>: <hash>'"
     path, expected = pinned[-1]
     actual = hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
     assert actual == expected, (
-        f"{path} cambió. Si el cambio no altera las decisiones, agreguen (sin borrar las "
-        "anteriores) una línea nueva con el hash y la explicación."
+        f"{path} changed. If the change does not alter the decisions, add (without deleting "
+        "the previous ones) a new line with the hash and the explanation."
     )
 
 
-def test_las_tablas_de_resumen_se_rehacen_igual_sin_clave(tmp_path, monkeypatch):
+def test_the_summary_tables_are_rebuilt_the_same_without_an_api_key(tmp_path, monkeypatch):
     copy_dir = tmp_path / "results"
     shutil.copytree(_path("results"), copy_dir, ignore=shutil.ignore_patterns("raw"))
     monkeypatch.setattr(tables, "RESULTS", copy_dir)

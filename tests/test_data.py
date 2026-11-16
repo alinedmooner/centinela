@@ -1,4 +1,4 @@
-"""Los datos del banco de pruebas deben pasar el validador."""
+"""The benchmark data must pass the validator."""
 
 import importlib.util
 import shutil
@@ -9,19 +9,19 @@ FILES = ("ataques.jsonl", "portadores.jsonl", "leads.jsonl")
 
 
 def load_validator():
-    """Importa scripts/validar_datos.py por su ruta (no es parte del paquete)."""
+    """Import scripts/validate_data.py by its path (it is not part of the package)."""
     path = ROOT / "scripts" / "validate_data.py"
-    spec = importlib.util.spec_from_file_location("validar_datos", path)
-    modulo = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(modulo)
-    return modulo
+    spec = importlib.util.spec_from_file_location("validate_data", path)
+    module = importlib.util.module_from_spec(spec)
+    spec.loader.exec_module(module)
+    return module
 
 
-def test_los_datos_pasan_el_validador():
+def test_the_data_passes_the_validator():
     assert load_validator().main() == 0
 
 
-def test_el_validador_rechaza_datos_rotos(tmp_path):
+def test_the_validator_rejects_broken_data(tmp_path):
     for name in FILES:
         shutil.copy(ROOT / "data" / name, tmp_path / name)
     with (tmp_path / "leads.jsonl").open("a", encoding="utf-8") as file:

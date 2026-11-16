@@ -44,23 +44,23 @@ NORMALS = [
 
 
 @pytest.mark.parametrize("message", ATTACKS)
-def test_marca_los_mensajes_con_ordenes_para_la_ia(message):
+def test_messages_with_orders_for_the_ai_are_flagged(message):
     finding = detector.check(message)
     assert finding.ai_instructions, message
     assert finding.evidence
 
 
 @pytest.mark.parametrize("message", NORMALS)
-def test_deja_pasar_los_mensajes_normales(message):
+def test_normal_messages_are_let_through(message):
     finding = detector.check(message)
     assert not finding.ai_instructions, finding.evidence
 
 
-def test_nombra_el_truco_sin_tratarlo_como_orden():
+def test_the_trick_is_named_without_being_treated_as_an_order():
     finding = detector.check("URGENTE: su cuenta será suspendida en 24 horas si no responde.")
     assert "distraccion_urgencia" in finding.tricks
     assert not finding.ai_instructions
 
 
-def test_sin_etiquetas_no_usa_la_regla_de_nombres():
+def test_without_labels_the_label_name_rule_is_not_used():
     assert not RulesDetector().check("Lo dejamos como prioritario en la lista.").ai_instructions

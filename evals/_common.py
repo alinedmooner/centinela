@@ -1,4 +1,4 @@
-"""Utilidades que comparten las pruebas: archivos, huellas e intervalos de confianza."""
+"""Utilities that the evaluations share: files, fingerprints and confidence intervals."""
 
 from __future__ import annotations
 
@@ -10,7 +10,7 @@ from collections.abc import Iterable
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-#: Carpeta del banco de pruebas. Se puede cambiar con la variable CENTINELA_DATOS.
+#: Folder with the benchmark data. It can be changed with the CENTINELA_DATOS environment variable.
 DATA = Path(os.environ.get("CENTINELA_DATOS", ROOT / "data"))
 RESULTS = ROOT / "results"
 
@@ -30,17 +30,17 @@ def write_jsonl(path: Path, rows: Iterable[dict]) -> None:
 
 
 def fingerprint(text: str) -> str:
-    """Identificador corto y estable de un texto."""
+    """A short, stable identifier of a text."""
     return hashlib.sha256(text.encode("utf-8")).hexdigest()[:16]
 
 
 def in_dev(key: str) -> bool:
-    """Reparte de forma estable el 30 % de los elementos a la partición ``dev``."""
+    """Stably assigns 30% of the items to the ``dev`` split."""
     return int(fingerprint(key), 16) % 10 < 3
 
 
 def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
-    """Intervalo de confianza de Wilson al 95 % para una proporción."""
+    """Wilson 95% confidence interval for a proportion."""
     if n == 0:
         return (0.0, 0.0)
     p = k / n
@@ -50,12 +50,12 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 
 
 def proportion(k: int, n: int) -> dict:
-    low, alto = wilson(k, n)
-    return {"k": k, "n": n, "valor": k / n if n else None, "ic95": [low, alto]}
+    low, high = wilson(k, n)
+    return {"k": k, "n": n, "valor": k / n if n else None, "ic95": [low, high]}
 
 
 def pct(value: float | None) -> str:
-    """Porcentaje con coma decimal, como se escribe en español."""
+    """Percentage with a decimal comma, as it is written in Spanish."""
     return "s. d." if value is None else f"{value * 100:.1f} %".replace(".", ",")
 
 

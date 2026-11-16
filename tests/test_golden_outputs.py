@@ -1,8 +1,7 @@
-"""Lo que muestra Centinela no cambia al renombrar o traducir el código.
+"""What Centinela shows does not change when the code is renamed or translated.
 
-Compara la CLI, las tarjetas, la sala de revisión, el correo y el clasificador con las
-salidas de referencia de main@9810607. Si una de estas pruebas falla, cambió el
-comportamiento, no solo los nombres.
+Compares the CLI, the cards, the review room, the mail and the classifier with the reference
+outputs of main@9810607. If one of these tests fails, the behavior changed, not just the names.
 """
 
 import base64
@@ -40,7 +39,7 @@ CLI_IDS = [k for k in CLI if k in MESSAGES and CLI[k]["json"]]
 
 
 @pytest.mark.parametrize("id_", CLI_IDS)
-def test_la_cli_da_lo_mismo_en_json_y_en_texto(id_):
+def test_the_cli_gives_the_same_in_json_and_in_text(id_):
     expected = CLI[id_]
     json_output = cli("check", "--json", "--card", MESSAGES[id_])
     assert json_output["exit"] == expected["json"]["exit"]
@@ -51,7 +50,7 @@ def test_la_cli_da_lo_mismo_en_json_y_en_texto(id_):
 
 
 @pytest.mark.parametrize("id_", [k.split("@")[0] for k in CLI if k.endswith("@clinica")])
-def test_la_cli_con_las_etiquetas_de_una_clinica(id_):
+def test_the_cli_with_the_labels_of_a_clinic(id_):
     expected = CLI[f"{id_}@clinica"]["json"]
     r = cli("check", "--json", "--labels", str(CLINIC_LABELS), MESSAGES[id_])
     assert r["exit"] == expected["exit"]
@@ -59,15 +58,15 @@ def test_la_cli_con_las_etiquetas_de_una_clinica(id_):
     assert r["stderr"] == expected["stderr"]
 
 
-def test_la_cli_avisa_de_etiquetas_raras_y_rechaza_las_invalidas(tmp_path):
-    odd = tmp_path / "raras.json"
+def test_the_cli_warns_about_odd_labels_and_rejects_invalid_ones(tmp_path):
+    odd = tmp_path / "odd.json"
     odd.write_text('{"muy urgente": "x", "spam": "y"}', encoding="utf-8")
     r = cli("check", "--labels", str(odd), "Hola")
     assert (r["exit"], r["stderr"]) == (
         CLI["etiquetas_raras"]["exit"],
         CLI["etiquetas_raras"]["stderr"],
     )
-    empty_ones = tmp_path / "vacias.json"
+    empty_ones = tmp_path / "empty.json"
     empty_ones.write_text("[]", encoding="utf-8")
     r = cli("check", "--labels", str(empty_ones), "Hola")
     assert (r["exit"], r["stderr"]) == (
@@ -76,7 +75,7 @@ def test_la_cli_avisa_de_etiquetas_raras_y_rechaza_las_invalidas(tmp_path):
     )
 
 
-def test_la_cli_sin_comando_muestra_la_ayuda_y_sale_con_0():
+def test_the_cli_without_a_command_shows_the_help_and_exits_with_0():
     assert cli()["exit"] == CLI["sin_comando"]["exit"] == 0
 
 
@@ -84,7 +83,7 @@ CARDS = load("cards.json")
 
 
 @pytest.mark.parametrize("id_", list(CARDS))
-def test_la_tarjeta_de_revision_es_la_misma(id_):
+def test_the_review_card_is_the_same(id_):
     expected = CARDS[id_]
     verdict = verdict_of(id_)
     card = create_card(MESSAGES[id_], verdict)
@@ -97,10 +96,10 @@ ROOM = load("review_room.json")
 
 
 @pytest.mark.parametrize("id_", list(ROOM))
-def test_las_reglas_de_la_sala_de_revision_son_las_mismas(id_):
+def test_the_review_room_rules_are_the_same(id_):
     card = create_card(MESSAGES[id_], verdict_of(id_))
     actual = []
-    for action, label, segundo in itertools.product(
+    for action, label, second in itertools.product(
         ("is_fraud", "is_legitimate", "not_sure", "otra_cosa"),
         (None, "consulta", "inventada"),
         (None, "ana", "luis"),
@@ -108,11 +107,11 @@ def test_las_reglas_de_la_sala_de_revision_son_las_mismas(id_):
         row = {
             "accion": OLD_VALUES["actions"].get(action, action),
             "etiqueta": label,
-            "segundo": segundo,
+            "segundo": second,
         }
         try:
             row["r"] = via_json(
-                asdict(resolve(card, action, "ana", label=label, second_reviewer=segundo))
+                asdict(resolve(card, action, "ana", label=label, second_reviewer=second))
             )
         except Exception as error:  # noqa: BLE001
             message = str(error)
@@ -127,7 +126,7 @@ def _b64(data: bytes) -> str:
     return base64.urlsafe_b64encode(data).decode().rstrip("=")
 
 
-def test_el_lector_de_correo_y_el_buzon_seguro_dan_lo_mismo():
+def test_the_mail_reader_and_the_safe_inbox_give_the_same():
     expected = load("mail.json")
     raws = []
     for n, message in enumerate(demo_mails(), 1):
@@ -151,11 +150,11 @@ def test_el_lector_de_correo_y_el_buzon_seguro_dan_lo_mismo():
                 }
             )
             == expected[str(n)]
-        ), f"correo {n}"
+        ), f"mail {n}"
         raws.append({"messageId": f"id{n}", "threadId": f"hilo{n}", "raw": _b64(raw)})
     clean = sanitize_response({"messages": raws, "nextPageToken": None}, GUARD)
     for m in clean["messages"]:
-        m.pop("raw", None)  # trae la fecha y el Message-ID del momento
+        m.pop("raw", None)  # it carries the date and Message-ID of the moment
     # A Gmail message, not a Mail object: its keys are Gmail's own. Only the field Centinela
     # adds (``centinela``) changed names and values.
     actual = plain_json(clean)
@@ -174,12 +173,12 @@ SCENARIOS = {
     "sin_clave": ("n01", ModelResponse({"otra_cosa": 1}), None),
     "sin_datos": ("n01", ModelResponse(None), None),
     "rechazo": ("n01", ModelResponse(None, refusal=True), None),
-    "error": ("n01", None, RuntimeError("falla de red")),
+    "error": ("n01", None, RuntimeError("network failure")),
 }
 
 
 @pytest.mark.parametrize("name", list(SCENARIOS))
-def test_el_clasificador_decide_lo_mismo_y_envia_lo_mismo(name, monkeypatch):
+def test_the_classifier_decides_the_same_and_sends_the_same(name, monkeypatch):
     monkeypatch.setattr(secrets, "token_hex", lambda n=8: "0123abcd")
     id_, response, error = SCENARIOS[name]
     provider = FakeProvider(response, error)
@@ -200,7 +199,7 @@ def test_el_clasificador_decide_lo_mismo_y_envia_lo_mismo(name, monkeypatch):
     assert as_text(provider.calls) == as_text(expected["llamadas"])
 
 
-def test_el_detector_con_modelo_da_lo_mismo_y_envia_lo_mismo(monkeypatch):
+def test_the_model_detector_gives_the_same_and_sends_the_same(monkeypatch):
     monkeypatch.setattr(secrets, "token_hex", lambda n=8: "0123abcd")
     expected = load("llm_detector.json")
     provider = FakeProvider(
@@ -228,5 +227,5 @@ def test_el_detector_con_modelo_da_lo_mismo_y_envia_lo_mismo(monkeypatch):
     assert via_json(asdict(length.check("x" * 50))) == expected["truncado"]
 
 
-def test_las_etiquetas_de_ejemplo_siguen_siendo_las_de_un_bot_de_ventas():
+def test_the_example_labels_are_still_those_of_a_sales_bot():
     assert list(LEAD_LABELS) == ["prioritario", "interesado", "consulta", "soporte", "spam"]
