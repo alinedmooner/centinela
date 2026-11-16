@@ -1,49 +1,57 @@
 ---
-// Plantilla común: <head>, fuentes y estilos del sistema de diseño Vigía.
+// Shared <head>, fonts and styles of the Vigía design system. Every page says its language.
 import '../styles/tokens.css';
 import '../styles/base.css';
 import '../styles/componentes.css';
 import '../styles/secciones.css';
+import { DEFAULT_LANG, LANGS } from '../i18n/index.js';
+import { pathFor } from '../i18n/urls.js';
 
 interface Props {
-  titulo: string;
-  descripcion: string;
-  ogTitulo?: string;
-  ogDescripcion?: string;
-  indexar?: boolean;
+  lang: 'en' | 'es';
+  title: string;
+  description: string;
+  ogDescription?: string;
+  // The page without its language ('home', 'system', 'tests'). A page that exists once, like
+  // the 404, leaves it out and gets no canonical link and no alternates.
+  route?: 'home' | 'system' | 'tests';
+  noindex?: boolean;
 }
 
-const {
-  titulo,
-  descripcion,
-  ogTitulo = titulo,
-  ogDescripcion = descripcion,
-  indexar = true,
-} = Astro.props;
-const canonica = new URL(Astro.url.pathname, Astro.site);
-const FUENTES =
+const { lang, title, description, ogDescription = description, route, noindex = false } = Astro.props;
+const absolute = (l: string) => new URL(pathFor(l, route!), Astro.site).href;
+const canonical = route ? absolute(lang) : null;
+// <link rel="alternate" hreflang> for each language, and x-default for the default one.
+const alternates = route
+  ? [...LANGS.map((l) => ({ hreflang: l, href: absolute(l) })), { hreflang: 'x-default', href: absolute(DEFAULT_LANG) }]
+  : [];
+const OG_LOCALE: Record<string, string> = { en: 'en_US', es: 'es_CO' };
+const FONTS =
   'https://fonts.googleapis.com/css2?family=Big+Shoulders:wght@800;900&family=Big+Shoulders+Stencil:wght@900&family=Instrument+Sans:wght@400;500;600&family=Martian+Mono:wght@400;500&display=swap';
 ---
 
 <!doctype html>
-<html lang="es">
+<html lang={lang}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>{titulo}</title>
-    <meta name="description" content={descripcion} />
-    <link rel="canonical" href={canonica} />
-    <meta property="og:title" content={ogTitulo} />
-    <meta property="og:description" content={ogDescripcion} />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    {canonical && <link rel="canonical" href={canonical} />}
+    {alternates.map((a) => <link rel="alternate" hreflang={a.hreflang} href={a.href} />)}
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={ogDescription} />
     <meta property="og:type" content="website" />
-    <meta property="og:url" content={canonica} />
+    <meta property="og:locale" content={OG_LOCALE[lang]} />
+    {route && LANGS.filter((l) => l !== lang).map((l) => <meta property="og:locale:alternate" content={OG_LOCALE[l]} />)}
+    {canonical && <meta property="og:url" content={canonical} />}
     <meta name="twitter:card" content="summary" />
     <meta name="theme-color" content="#050505" />
-    {!indexar && <meta name="robots" content="noindex" />}
+    {noindex && <meta name="robots" content="noindex" />}
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link rel="stylesheet" href={FUENTES} />
+    <link rel="stylesheet" href={FONTS} />
   </head>
   <body>
     <slot />

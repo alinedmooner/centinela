@@ -1,209 +1,53 @@
 ---
-// Dónde usar Centinela: un ejemplo por tipo de bot. Los fragmentos van como texto
-// (Astro los escapa), así las llaves de Python no se leen como expresiones.
-const INTEGRACIONES = [
-  {
-    id: 'whatsapp',
-    titulo: 'WhatsApp Business',
-    donde: 'Webhook con FastAPI',
-    texto: 'La API de WhatsApp Cloud avisa cada mensaje a tu webhook. Centinela lo revisa antes de que lo vea tu bot. (Meta también pide verificar el webhook con un GET; aquí va solo la parte de los mensajes).',
-    codigo: String.raw`from fastapi import FastAPI, Request
-from centinela import revisar
+// Where to use Centinela: one example for each kind of bot. The snippets are dictionary
+// entries (a list of lines each, in the language of the page) and are written as text, which
+// Astro escapes, so the braces of Python are not read as expressions. Every name in them is
+// checked against the library by tests/test_web_i18n.py.
+import { t } from '../i18n/index.js';
+import LegacyAnchor from './LegacyAnchor.astro';
 
-app = FastAPI()
-
-@app.post("/webhook")
-async def whatsapp(request: Request):
-    datos = await request.json()
-    for entrada in datos.get("entry", []):
-        for cambio in entrada.get("changes", []):
-            for mensaje in cambio.get("value", {}).get("messages", []):
-                if mensaje.get("type") != "text":
-                    continue
-                texto = mensaje["text"]["body"]
-                veredicto = revisar(texto)
-                if veredicto.decision == "revisar":
-                    enviar_a_revision(mensaje, veredicto.aviso)  # lo ve una persona
-                else:
-                    responder(mensaje["from"], tu_bot(texto))
-    return {"ok": True}`,
-  },
-  {
-    id: 'telegram',
-    titulo: 'Telegram',
-    donde: 'python-telegram-bot',
-    texto: 'El manejador de mensajes revisa primero. Si el guardia sospecha, el mensaje nunca llega al modelo.',
-    codigo: String.raw`from telegram import Update
-from telegram.ext import Application, ContextTypes, MessageHandler, filters
-from centinela import revisar
-
-async def atender(update: Update, context: ContextTypes.DEFAULT_TYPE) -> None:
-    texto = update.message.text
-    veredicto = revisar(texto)
-    if veredicto.decision == "revisar":
-        enviar_a_revision(update.message, veredicto.aviso)
-        await update.message.reply_text("Gracias. Una persona del equipo te responde pronto.")
-        return
-    await update.message.reply_text(tu_bot(texto))
-
-app = Application.builder().token("TOKEN").build()
-app.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, atender))
-app.run_polling()`,
-  },
-  {
-    id: 'slack',
-    titulo: 'Slack',
-    donde: 'Bolt para Python',
-    texto: 'Sirve para asistentes internos que leen canales o mensajes directos, donde también puede llegar texto de afuera.',
-    codigo: String.raw`import os
-from slack_bolt import App
-from slack_bolt.adapter.socket_mode import SocketModeHandler
-from centinela import revisar
-
-app = App(token=os.environ["SLACK_BOT_TOKEN"])
-
-@app.message("")
-def atender(message, say):
-    texto = message.get("text", "")
-    veredicto = revisar(texto)
-    if veredicto.decision == "revisar":
-        say(f"Mensaje en cuarentena para revisión humana: {veredicto.aviso}")
-        return
-    say(tu_bot(texto))
-
-SocketModeHandler(app, os.environ["SLACK_APP_TOKEN"]).start()`,
-  },
-  {
-    id: 'discord',
-    titulo: 'Discord',
-    donde: 'discord.py',
-    texto: 'Comunidades y soporte: cualquiera puede escribirle al bot, así que todo pasa por el guardia.',
-    codigo: String.raw`import discord
-from centinela import revisar
-
-intents = discord.Intents.default()
-intents.message_content = True
-client = discord.Client(intents=intents)
-
-@client.event
-async def on_message(message):
-    if message.author == client.user:
-        return
-    veredicto = revisar(message.content)
-    if veredicto.decision == "revisar":
-        await message.channel.send("Tu mensaje quedó para revisión humana.")
-        return
-    await message.channel.send(tu_bot(message.content))
-
-client.run("TOKEN")`,
-  },
-  {
-    id: 'correo',
-    titulo: 'Correo',
-    donde: 'Gmail con Composio, IMAP o .eml',
-    texto: 'Con Composio, el agente lee su correo y los sospechosos le llegan retenidos, sin su texto. Sin Composio, Centinela lee el correo y saca también el texto oculto del HTML.',
-    codigo: String.raw`from composio import Composio
-from centinela.buzon_seguro import modificadores
-
-composio = Composio()
-herramientas = composio.tools.get(user_id, toolkits=["gmail"], modifiers=modificadores())
-# El agente usa estas herramientas: los correos sospechosos le llegan retenidos
-# y la tarjeta de revisión queda para una persona.
-
-# Sin Composio (IMAP o archivos .eml):
-from centinela import revisar
-from centinela.correo import leer_correo, texto_a_revisar
-
-correo = leer_correo(bytes_del_correo)
-veredicto = revisar(texto_a_revisar(correo))`,
-  },
-  {
-    id: 'chat-web',
-    titulo: 'Chat de tu sitio web',
-    donde: 'Una ruta de FastAPI',
-    texto: 'El chat de la página manda el mensaje a tu servidor; el servidor revisa antes de llamar al modelo.',
-    codigo: String.raw`from fastapi import FastAPI
-from pydantic import BaseModel
-from centinela import revisar
-
-app = FastAPI()
-
-class Mensaje(BaseModel):
-    texto: str
-
-@app.post("/chat")
-def chat(mensaje: Mensaje):
-    veredicto = revisar(mensaje.texto)
-    if veredicto.decision == "revisar":
-        enviar_a_revision(mensaje.texto, veredicto.aviso)
-        return {"respuesta": "Una persona del equipo revisará tu mensaje."}
-    return {"respuesta": tu_bot(mensaje.texto)}`,
-  },
-  {
-    id: 'rag',
-    titulo: 'Agentes y búsqueda en documentos',
-    donde: 'RAG con LangChain u otro buscador',
-    texto: 'Las órdenes escondidas también llegan en documentos, páginas web o respuestas de herramientas. Se revisan antes de que el modelo las lea.',
-    codigo: String.raw`from centinela import revisar
-
-def solo_seguros(documentos):
-    """Aparta los textos con órdenes escondidas antes de que el modelo los lea."""
-    seguros = []
-    for documento in documentos:
-        veredicto = revisar(documento.page_content)
-        if veredicto.decision == "revisar":
-            enviar_a_revision(documento, veredicto.aviso)
-        else:
-            seguros.append(documento)
-    return seguros
-
-contexto = solo_seguros(retriever.invoke(pregunta))  # LangChain; igual con otro buscador`,
-  },
-  {
-    id: 'leads',
-    titulo: 'Clasificar leads o tickets',
-    donde: 'Etiquetas que define tu negocio',
-    texto: 'El modelo solo puede responder una etiqueta de la lista. La lista la define cada negocio: estas son las de una clínica. Si el guardia sospecha, el código pone revision_humana. Necesita el extra llm y ANTHROPIC_API_KEY.',
-    codigo: String.raw`from centinela import ClasificadorSeguro
-from centinela.proveedores.anthropic import ProveedorAnthropic
-
-# Las etiquetas las define cada negocio. Estas son las de una clínica:
-etiquetas = {
-    "urgencia": "Dolor, sangrado o un problema que necesita atención hoy.",
-    "cita": "Quiere pedir, cambiar o cancelar una cita.",
-    "consulta": "Pregunta por precios, horarios, ubicación o tratamientos, sin pedir cita.",
-    "reclamo": "Paciente con una queja sobre una atención o un cobro.",
-    "spam": "Publicidad, cadenas o mensajes sin relación con la clínica.",
+interface Props {
+  lang: 'en' | 'es';
 }
-clasificador = ClasificadorSeguro(ProveedorAnthropic(), etiquetas=etiquetas)
-resultado = clasificador.clasificar("Hola, ¿puedo mover mi cita del martes?")
-print(resultado.etiqueta)  # «cita», o «revision_humana» si el guardia sospecha`,
-  },
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
+// `id` pairs each copy button with its code block; the keys are the entry's dictionary keys.
+const CASES = [
+  { id: 'whatsapp', title: 'where.whatsapp.title', tool: 'where.whatsapp.tool', text: 'where.whatsapp.text', code: 'where.whatsapp.code' },
+  { id: 'telegram', title: 'where.telegram.title', tool: 'where.telegram.tool', text: 'where.telegram.text', code: 'where.telegram.code' },
+  { id: 'slack', title: 'where.slack.title', tool: 'where.slack.tool', text: 'where.slack.text', code: 'where.slack.code' },
+  { id: 'discord', title: 'where.discord.title', tool: 'where.discord.tool', text: 'where.discord.text', code: 'where.discord.code' },
+  { id: 'correo', title: 'where.email.title', tool: 'where.email.tool', text: 'where.email.text', code: 'where.email.code' },
+  { id: 'chat-web', title: 'where.web_chat.title', tool: 'where.web_chat.tool', text: 'where.web_chat.text', code: 'where.web_chat.code' },
+  { id: 'rag', title: 'where.rag.title', tool: 'where.rag.tool', text: 'where.rag.text', code: 'where.rag.code' },
+  { id: 'leads', title: 'where.leads.title', tool: 'where.leads.tool', text: 'where.leads.text', code: 'where.leads.code' },
 ];
 ---
-<section id="donde" class="cn-seccion" aria-labelledby="donde-titulo">
+<section id={tt('anchor.where')} class="cn-seccion" aria-labelledby="donde-titulo">
+  <LegacyAnchor lang={lang} anchor="anchor.where" />
   <div class="cn-contenedor">
-    <p class="cn-etiqueta cn-seccion__ojo">06 · Dónde usarlo</p>
-    <h2 id="donde-titulo" class="cn-aparece">En cualquier bot hecho en Python.</h2>
-    <p class="cn-seccion__bajada cn-aparece">Centinela es un paquete de Python y va justo antes de que el modelo lea el mensaje. El patrón es siempre el mismo: revisar primero. Si el guardia sospecha, el mensaje va a una persona y no al modelo.</p>
+    <p class="cn-etiqueta cn-seccion__ojo">{tt('where.eyebrow')}</p>
+    <h2 id="donde-titulo" class="cn-aparece">{tt('where.title')}</h2>
+    <p class="cn-seccion__bajada cn-aparece">{tt('where.lead')}</p>
     <div class="cn-codigo cn-codigo--linea cn-aparece cn-donde__patron">
-<pre><code>mensaje → revisar(texto) → «permitir»: tu bot · «revisar»: una persona</code></pre>
+<pre><code>{tt('where.pattern')}</code></pre>
     </div>
     <div class="cn-donde">
-      {INTEGRACIONES.map((i, n) => (
+      {CASES.map((c, n) => (
         <details class="cn-donde__caso" open={n === 0}>
           <summary class="cn-donde__resumen">
-            <span class="cn-donde__titulo">{i.titulo}</span>
-            <span class="cn-etiqueta cn-donde__herramienta">{i.donde}</span>
+            <span class="cn-donde__titulo">{tt(c.title)}</span>
+            <span class="cn-etiqueta cn-donde__herramienta">{tt(c.tool)}</span>
           </summary>
-          <p class="cn-donde__texto">{i.texto}</p>
+          <p class="cn-donde__texto">{tt(c.text)}</p>
           <div class="cn-codigo">
-            <div class="cn-codigo__barra cn-etiqueta"><span>python</span><button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-copiar={`donde-${i.id}`}>Copiar</button></div>
-            <pre><code id={`donde-${i.id}`}>{i.codigo}</code></pre>
+            <div class="cn-codigo__barra cn-etiqueta"><span>python</span><button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-copiar={`donde-${c.id}`}>{tt('js.copy.label')}</button></div>
+            <pre><code id={`donde-${c.id}`}>{tt(c.code)}</code></pre>
           </div>
         </details>
       ))}
     </div>
-    <p class="cn-sala__nota cn-donde__nota">En los ejemplos, <code>tu_bot()</code>, <code>responder()</code> y <code>enviar_a_revision()</code> son tu código. <code>revisar()</code> usa las reglas, sin clave ni internet. Para sumar un modelo como segundo revisor: <code>Guardia([DetectorReglas(), DetectorLLM(crear_proveedor("google"))])</code>, también con <code>"anthropic"</code> u <code>"openrouter"</code>, o con una clase propia para otro proveedor. Instalación: <code>pip install centinela-ia</code>.</p>
+    <p class="cn-sala__nota cn-donde__nota" set:html={tt('where.note')} />
   </div>
 </section>

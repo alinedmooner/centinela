@@ -1,24 +1,41 @@
 ---
-// Portado de la landing generada con Lovable (index.html).
+// Header of the landing page: brand, links to the sections, language switch and actions.
+// Ported from the landing page generated with Lovable (index.html).
+import { t } from '../i18n/index.js';
+import { pathFor } from '../i18n/urls.js';
+
+interface Props {
+  lang: 'en' | 'es';
+}
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
+// The link to the other language: its code is what is seen, its name is what is read.
+const other = lang === 'en' ? 'es' : 'en';
+// Each link goes to the id of a section (see anchor.* in the dictionaries).
+const ITEMS = [
+  { anchor: 'anchor.problem', label: 'nav.problem' },
+  { anchor: 'anchor.how', label: 'nav.how' },
+  { anchor: 'anchor.room', label: 'nav.room' },
+  { anchor: 'anchor.results', label: 'nav.results' },
+  { anchor: 'anchor.limits', label: 'nav.limits' },
+  { anchor: 'anchor.where', label: 'nav.where' },
+  { anchor: 'anchor.team', label: 'nav.team' },
+];
 ---
 <header class="cn-nav">
   <div class="cn-contenedor cn-nav__barra">
-    <a class="cn-marca" href="#inicio" aria-label="Centinela, inicio"><img src="/logo.svg" alt="" width="28" height="28">CENTINELA</a>
-    <button class="cn-boton cn-boton--fantasma cn-nav__menu" type="button" aria-expanded="false" aria-controls="menu-principal">Menú</button>
-    <nav aria-label="Principal">
+    <a class="cn-marca" href={`#${tt('anchor.home')}`} aria-label={tt('nav.home_label')}><img src="/logo.svg" alt="" width="28" height="28">CENTINELA</a>
+    <button class="cn-boton cn-boton--fantasma cn-nav__menu" type="button" aria-expanded="false" aria-controls="menu-principal">{tt('nav.menu')}</button>
+    <nav aria-label={tt('nav.label')}>
       <ul class="cn-nav__lista" id="menu-principal">
-        <li><a href="#problema">El problema</a></li>
-        <li><a href="#como-funciona">Cómo funciona</a></li>
-        <li><a href="#sala">Sala de revisión</a></li>
-        <li><a href="#resultados">Resultados</a></li>
-        <li><a href="#limites">Límites</a></li>
-        <li><a href="#donde">Dónde usarlo</a></li>
-        <li><a href="#equipo">Equipo</a></li>
+        {ITEMS.map((item) => <li><a href={`#${tt(item.anchor)}`}>{tt(item.label)}</a></li>)}
+        <li><a lang={other} hreflang={other} href={pathFor(other, 'home')} aria-label={tt('lang.other.name')}>{tt('lang.other.short')}</a></li>
       </ul>
     </nav>
     <div class="cn-nav__acciones">
-      <button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-pausar aria-pressed="false"><svg class="cn-icono" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span class="cn-nav__pausa-texto">Pausar movimiento</span></button>
-      <a class="cn-boton cn-boton--primario" href="https://github.com/alinedmooner/centinela"><svg class="cn-icono" aria-hidden="true"><use href="#i-github"/></svg>Ver en GitHub</a>
+      <button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-pausar aria-pressed="false"><svg class="cn-icono" aria-hidden="true"><path d="M8 5v14M16 5v14"/></svg><span class="cn-nav__pausa-texto">{tt('js.nav.pause')}</span></button>
+      <a class="cn-boton cn-boton--primario" href="https://github.com/alinedmooner/centinela"><svg class="cn-icono" aria-hidden="true"><use href="#i-github"/></svg>{tt('nav.github')}</a>
     </div>
   </div>
 </header>

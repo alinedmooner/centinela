@@ -2,13 +2,14 @@
   "name": "centinela-web",
   "version": "0.1.0",
   "private": true,
-  "description": "Sitio de presentación de Centinela, con el sistema de diseño Vigía.",
+  "description": "Centinela's site, with the Vigía design system, in English and Spanish.",
   "license": "MIT",
   "type": "module",
   "scripts": {
     "dev": "astro dev",
     "build": "astro build",
-    "preview": "astro preview"
+    "preview": "astro preview",
+    "test": "node --test"
   },
   "dependencies": {
     "astro": "7.4.7"

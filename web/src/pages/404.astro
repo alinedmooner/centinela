@@ -1,19 +1,30 @@
 ---
+// One page for every missing URL, in both languages: Cloudflare serves 404.html for any
+// address that does not exist, in English or in Spanish, so the page cannot know which one
+// the visitor wanted. It says it in both. Astro only treats /404 as special, so it is a
+// single page and not one per language.
 import Base from '../layouts/Base.astro';
+import { t } from '../i18n/index.js';
+import { pathFor } from '../i18n/urls.js';
+
+const en = (key: string) => t('en', key);
+const es = (key: string) => t('es', key);
 ---
 
-<Base
-  titulo="Página no encontrada · Centinela"
-  descripcion="Esta página no existe."
-  indexar={false}
->
-  <main id="contenido" class="cn-contenedor cn-doc">
+<Base lang="en" noindex title={en('meta.notfound.title')} description={en('meta.notfound.description')}>
+  <main id={en('anchor.content')} class="cn-contenedor cn-doc">
     <section class="cn-doc__bloque">
-      <a class="cn-marca" href="/"><img src="/logo.svg" alt="" width="28" height="28" />CENTINELA</a>
-      <p class="cn-insignia cn-etiqueta">Error 404</p>
-      <h1 class="cn-hero__titulo">Esta página no existe.</h1>
-      <p class="cn-hero__bajada">Puede que el enlace esté mal escrito o que la página se haya movido.</p>
-      <p><a class="cn-boton cn-boton--primario" href="/">Volver al inicio</a></p>
+      <a class="cn-marca" href={pathFor('en', 'home')}><img src="/logo.svg" alt="" width="28" height="28" />CENTINELA</a>
+      <p class="cn-insignia cn-etiqueta">{en('notfound.badge')}</p>
+      <h1 class="cn-hero__titulo">{en('notfound.title')}</h1>
+      <p class="cn-hero__bajada">{en('notfound.text')}</p>
+      <p><a class="cn-boton cn-boton--primario" href={pathFor('en', 'home')}>{en('notfound.button')}</a></p>
+    </section>
+    <section class="cn-doc__bloque" lang="es">
+      <p class="cn-insignia cn-etiqueta">{es('notfound.badge')}</p>
+      <h1 class="cn-hero__titulo">{es('notfound.title')}</h1>
+      <p class="cn-hero__bajada">{es('notfound.text')}</p>
+      <p><a class="cn-boton cn-boton--primario" href={pathFor('es', 'home')}>{es('notfound.button')}</a></p>
     </section>
   </main>
 </Base>

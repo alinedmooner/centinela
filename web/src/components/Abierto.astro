@@ -1,22 +1,41 @@
 ---
-// Portado de la landing generada con Lovable (index.html).
+// Ported from the landing page generated with Lovable (index.html).
+import { t } from '../i18n/index.js';
+
+interface Props {
+  lang: 'en' | 'es';
+}
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
+// The only rule of the CSS that depends on the id of a section is `#abierto .cn-rejilla-2`.
+// The English id of this section is "open", so on the English page the old id sits on a
+// wrapper around the grid: the CSS keeps working without touching it, and the same id is the
+// alias that keeps old links to #abierto alive. The Spanish page already has that id.
+const legacyId = lang === 'es' ? undefined : t('es', 'anchor.open');
+// Documents of the repository (on GitHub, main branch) and how the page names them.
+const DOCUMENTS = [
+  { file: lang === 'es' ? 'README.es.md' : 'README.md', label: 'README' },
+  { file: 'CONTRIBUTING.md', label: 'CONTRIBUTING.md' },
+  { file: 'SECURITY.md', label: 'SECURITY.md' },
+  { file: 'ATTRIBUTIONS.md', label: 'ATTRIBUTIONS.md' },
+];
 ---
-<section id="abierto" class="cn-seccion cn-claro" aria-labelledby="abierto-titulo">
-  <div class="cn-contenedor cn-rejilla-2">
-    <div>
-      <p class="cn-etiqueta cn-seccion__ojo">07 · Código abierto</p>
-      <h2 id="abierto-titulo">Código abierto y <span class="cn-resaltado">uso responsable</span></h2>
-    </div>
-    <div class="cn-abierto__texto">
-      <p>Licencia MIT. Agregar un caso de tu país es agregar una línea a un archivo.</p>
-      <p>¿Encontraste cómo saltarte el guardia? Avísanos en privado desde la pestaña Security del repositorio.</p>
-      <p>El banco de pruebas trae mensajes de ataque porque hacen falta para medir defensas: son traducciones de ataques ya públicos y ejemplos genéricos. No uses Centinela ni sus datos contra sistemas de terceros sin permiso escrito.</p>
-      <ul class="cn-abierto__enlaces">
-        <li><a class="cn-enlace" href="https://github.com/alinedmooner/centinela/blob/main/README.md">README</a></li>
-        <li><a class="cn-enlace" href="https://github.com/alinedmooner/centinela/blob/main/CONTRIBUTING.md">CONTRIBUTING.md</a></li>
-        <li><a class="cn-enlace" href="https://github.com/alinedmooner/centinela/blob/main/SECURITY.md">SECURITY.md</a></li>
-        <li><a class="cn-enlace" href="https://github.com/alinedmooner/centinela/blob/main/ATRIBUCIONES.md">ATRIBUCIONES.md</a></li>
-      </ul>
+<section id={tt('anchor.open')} class="cn-seccion cn-claro" aria-labelledby="abierto-titulo">
+  <div id={legacyId}>
+    <div class="cn-contenedor cn-rejilla-2">
+      <div>
+        <p class="cn-etiqueta cn-seccion__ojo">{tt('open.eyebrow')}</p>
+        <h2 id="abierto-titulo" set:html={tt('open.title')} />
+      </div>
+      <div class="cn-abierto__texto">
+        <p>{tt('open.p1')}</p>
+        <p>{tt('open.p2')}</p>
+        <p>{tt('open.p3')}</p>
+        <ul class="cn-abierto__enlaces">
+          {DOCUMENTS.map((d) => <li><a class="cn-enlace" href={`https://github.com/alinedmooner/centinela/blob/main/${d.file}`}>{d.label}</a></li>)}
+        </ul>
+      </div>
     </div>
   </div>
 </section>

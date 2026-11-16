@@ -1,7 +1,7 @@
 {
   "name": "centinela-web-cloudflare",
   "private": true,
-  "description": "Publica en Cloudflare el sitio estático que genera web/ en ../dist.",
+  "description": "Publishes to Cloudflare the static site that web/ builds into ../dist.",
   "license": "MIT",
   "type": "module",
   "devDependencies": {

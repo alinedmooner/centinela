@@ -1,0 +1,137 @@
+---
+// The Vigía design system page, once per language (/sistema/ and /es/sistema/).
+// Ported from the landing page generated with Lovable (sistema.html).
+import Base from '../../layouts/Base.astro';
+import tokens from '../../styles/tokens.css?raw';
+import { t } from '../../i18n/index.js';
+import { localePaths, pathFor } from '../../i18n/urls.js';
+
+export function getStaticPaths() {
+  return localePaths();
+}
+
+const { lang } = Astro.props;
+const tt = (key: string, fields?: Record<string, string | number>) => t(lang, key, fields);
+const other = lang === 'en' ? 'es' : 'en';
+// The sample message of the "Defanged" pattern is Spanish on purpose (it is what the product
+// reads); on a page in another language it is marked as Spanish.
+const messageLang = lang === 'es' ? undefined : 'es';
+// The colors of the palette. The names are the CSS variables (--noche-950, ...), which are
+// not translated; `text` is the dictionary key of what each color is for.
+const SWATCHES = [
+  { name: 'noche-950', value: '#050505', text: 'system.color.noche_950' },
+  { name: 'noche-900', value: '#0C0C0D', text: 'system.color.noche_900' },
+  { name: 'noche-800', value: '#151517', text: 'system.color.noche_800' },
+  { name: 'noche-700', value: '#1F2023', text: 'system.color.noche_700' },
+  { name: 'noche-600', value: '#2C2D31', text: 'system.color.noche_600' },
+  { name: 'noche-400', value: '#6B6E76', text: 'system.color.noche_400' },
+  { name: 'niebla-200', value: '#B4B7BE', text: 'system.color.niebla_200' },
+  { name: 'papel-50', value: '#F6F4EE', text: 'system.color.papel_50' },
+  { name: 'voltaje-300', value: '#FFF36B', text: 'system.color.voltaje_300' },
+  { name: 'voltaje-500', value: '#FFEA00', text: 'system.color.voltaje_500' },
+  { name: 'voltaje-600', value: '#E6D200', text: 'system.color.voltaje_600' },
+  { name: 'senal-roja', value: '#FF3B30', text: 'system.color.senal_roja' },
+];
+---
+<Base
+  lang={lang}
+  route="system"
+  title={tt('meta.system.title')}
+  description={tt('meta.system.description')}
+  ogDescription={tt('meta.system.og_description')}
+>
+<a class="cn-saltar" href={`#${tt('anchor.content')}`}>{tt('skip.label')}</a>
+<header class="cn-nav"><div class="cn-contenedor cn-nav__barra"><a class="cn-marca" href={pathFor(lang, 'home')}><img src="/logo.svg" alt="" width="28" height="28">CENTINELA</a><span class="cn-etiqueta">{tt('system.header_label')}</span><a class="cn-boton cn-boton--fantasma cn-boton--peq" lang={other} hreflang={other} href={pathFor(other, 'system')} aria-label={tt('lang.other.name')}>{tt('lang.other.short')}</a></div></header>
+<main id={tt('anchor.content')} class="cn-contenedor cn-doc">
+<section class="cn-doc__bloque" aria-labelledby="s-intro">
+  <p class="cn-insignia cn-etiqueta">{tt('system.badge')}</p>
+  <h1 id="s-intro" class="cn-hero__titulo">{tt('system.title')}</h1>
+  <p class="cn-hero__bajada">{tt('system.lead')}</p>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-prin"><h2 id="s-prin">{tt('system.principles.title')}</h2>
+  <ol class="cn-rejilla-4">
+    <li class="cn-pieza"><span class="cn-pieza__numero">01</span><h3 class="cn-pieza__titulo">{tt('system.principles.p1.title')}</h3><p class="cn-pieza__texto">{tt('system.principles.p1.text')}</p></li>
+    <li class="cn-pieza"><span class="cn-pieza__numero">02</span><h3 class="cn-pieza__titulo">{tt('system.principles.p2.title')}</h3><p class="cn-pieza__texto">{tt('system.principles.p2.text')}</p></li>
+    <li class="cn-pieza"><span class="cn-pieza__numero">03</span><h3 class="cn-pieza__titulo">{tt('system.principles.p3.title')}</h3><p class="cn-pieza__texto">{tt('system.principles.p3.text')}</p></li>
+    <li class="cn-pieza"><span class="cn-pieza__numero">04</span><h3 class="cn-pieza__titulo">{tt('system.principles.p4.title')}</h3><p class="cn-pieza__texto">{tt('system.principles.p4.text')}</p></li>
+  </ol>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-color"><h2 id="s-color">{tt('system.color.title')}</h2>
+  <p set:html={tt('system.color.note')} />
+  <ul class="cn-muestras">{SWATCHES.map((s) => <li class="cn-muestra" data-muestra data-valor={s.value}><div class={`cn-muestra__color cn-sw--${s.name}`}></div><div class="cn-muestra__datos"><strong>{`--${s.name}`}</strong><span>{`${s.value} · ${tt(s.text)}`}</span><span data-negro></span><span data-papel></span></div></li>)}</ul>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-tipo"><h2 id="s-tipo">{tt('system.type.title')}</h2>
+  <div class="cn-especimen"><span class="cn-etiqueta">{tt('system.type.display')}</span><p class="cn-momento__cifras">0/70</p></div>
+  <div class="cn-especimen"><span class="cn-etiqueta">{tt('system.type.h1')}</span><p class="cn-hero__titulo">{tt('system.type.h1_sample')}</p></div>
+  <div class="cn-especimen"><span class="cn-etiqueta">{tt('system.type.h2')}</span><h3 class="cn-doc__h2">{tt('results.title')}</h3></div>
+  <div class="cn-especimen"><span class="cn-etiqueta">{tt('system.type.h3')}</span><p class="cn-pieza__titulo cn-doc__h3">{tt('how.step2.title')}</p></div>
+  <div class="cn-especimen"><span class="cn-etiqueta">{tt('system.type.body')}</span><p>{tt('system.type.body_sample')}</p></div>
+  <div class="cn-especimen"><span class="cn-etiqueta">{tt('system.type.label')}</span><p class="cn-etiqueta">{`${tt('results.evidence', { n: '01' })} · n = 70`}</p></div>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-esp"><h2 id="s-esp">{tt('system.spacing.title')}</h2>
+  <p>{tt('system.spacing.text')}</p>
+  <div class="cn-escala" aria-hidden="true"><div class="cn-escala__paso cn-esc--1" title="4px"></div><div class="cn-escala__paso cn-esc--2" title="8px"></div><div class="cn-escala__paso cn-esc--3" title="12px"></div><div class="cn-escala__paso cn-esc--4" title="16px"></div><div class="cn-escala__paso cn-esc--5" title="24px"></div><div class="cn-escala__paso cn-esc--6" title="32px"></div><div class="cn-escala__paso cn-esc--7" title="48px"></div><div class="cn-escala__paso cn-esc--8" title="64px"></div><div class="cn-escala__paso cn-esc--9" title="96px"></div><div class="cn-escala__paso cn-esc--10" title="128px"></div></div>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-mot"><h2 id="s-mot">{tt('system.motifs.title')}</h2>
+  <div class="cn-rejilla-2">
+    <div class="cn-doc__bloque"><div class="cn-motivo cn-motivo--cinta"></div><h3>{tt('system.motifs.tape.title')}</h3><p>{tt('system.motifs.tape.text')}</p></div>
+    <div class="cn-doc__bloque"><div class="cn-remitente" lang={messageLang}>Ingrese a <span class="cn-desarmado">hxxp://</span>banco<span class="cn-desarmado">[.]</span>example<span class="cn-desarmado">[.]</span>com · soporte<span class="cn-desarmado">[@]</span>banco<span class="cn-desarmado">[.]</span>example<span class="cn-desarmado">[.]</span>com</div><h3>{tt('system.motifs.defang.title')}</h3><p>{tt('system.motifs.defang.text')}</p></div>
+    <div class="cn-doc__bloque cn-claro cn-fila-demo"><p set:html={tt('system.motifs.highlight')} /></div>
+    <div class="cn-doc__bloque"><div class="cn-motivo cn-motivo--rejilla"></div><h3>{tt('system.motifs.grid.title')}</h3><p>{tt('system.motifs.grid.text')}</p></div>
+    <div class="cn-doc__bloque"><div class="cn-motivo cn-motivo--trama"></div><h3>{tt('system.motifs.pattern.title')}</h3><p>{tt('system.motifs.pattern.text')}</p></div>
+    <div class="cn-doc__bloque"><article class="cn-evidencia"><span class="cn-evidencia__num cn-etiqueta">{tt('results.evidence', { n: '00' })}</span><span class="cn-evidencia__cifra">{tt('results.e1.value')}</span><p class="cn-evidencia__texto">{tt('system.motifs.evidence.text')}</p><span class="cn-evidencia__meta cn-etiqueta"><span>n = 70</span><span>{tt('results.source')}</span></span></article><p>{tt('system.motifs.evidence.note')}</p></div>
+  </div>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-comp"><h2 id="s-comp">{tt('system.components.title')}</h2>
+  <h3>{tt('system.components.buttons')}</h3>
+  <div class="cn-fila-demo"><button class="cn-boton cn-boton--primario" type="button">{tt('system.components.primary')}</button><button class="cn-boton cn-boton--primario" type="button" disabled>{tt('system.components.disabled')}</button><button class="cn-boton cn-boton--secundario" type="button">{tt('system.components.secondary')}</button><button class="cn-boton cn-boton--secundario" type="button" disabled>{tt('system.components.disabled')}</button><button class="cn-boton cn-boton--fantasma" type="button">{tt('system.components.ghost')}</button><button class="cn-boton cn-boton--fantasma" type="button" aria-pressed="true">{tt('system.components.ghost_active')}</button><a class="cn-enlace" href="#s-comp">{tt('system.components.link')}</a></div>
+  <h3>{tt('system.components.chips')}</h3>
+  <div class="cn-fila-demo"><button class="cn-chip" type="button" aria-pressed="false">{tt('system.components.chip')}</button><button class="cn-chip" type="button" aria-pressed="true">{tt('system.components.chip_active')}</button><button class="cn-chip" type="button" disabled>{tt('system.components.disabled')}</button><span class="cn-chip cn-chip--desarmado">hxxp://x<span class="cn-desarmado">[.]</span>com</span><span class="cn-insignia cn-etiqueta">{tt('system.components.badge')}</span></div>
+  <h3>{tt('system.components.piece')}</h3>
+  <div class="cn-rejilla-2"><article class="cn-pieza"><span class="cn-pieza__numero">01</span><h4 class="cn-pieza__titulo">{tt('system.components.piece_normal.title')}</h4><p class="cn-pieza__texto">{tt('system.components.piece_normal.text')}</p></article><article class="cn-pieza cn-pieza--activa"><span class="cn-pieza__numero">02</span><h4 class="cn-pieza__titulo">{tt('system.components.piece_active.title')}</h4><p class="cn-pieza__texto">{tt('system.components.piece_active.text')}</p></article></div>
+  <h3>{tt('system.components.code_block')}</h3>
+  <div class="cn-codigo"><div class="cn-codigo__barra cn-etiqueta"><span>bash</span><button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-copiar="d-cod">{tt('js.copy.label')}</button></div><pre><code id="d-cod">centinela check "Hola"</code></pre></div>
+  <h3>{tt('system.components.quarantine')}</h3>
+  <article class="cn-cuarentena"><div class="cn-cuarentena__interior"><header class="cn-cuarentena__encabezado cn-etiqueta"><span>{tt('js.card.title')}</span></header><dl class="cn-cuarentena__filas"><div class="cn-cuarentena__fila"><dt class="cn-etiqueta">{tt('js.card.field.notice')}</dt><dd>{tt('js.notice.ai_instructions')}</dd></div></dl><div class="cn-decisiones"><button class="cn-boton cn-decision cn-decision--fraude" type="button" aria-pressed="true">{tt('js.action.is_fraud')}</button><button class="cn-boton cn-decision" type="button" aria-pressed="false">{tt('js.action.is_legitimate')}<span class="cn-decision__nota">{tt('js.card.second_person')}</span></button><button class="cn-boton cn-decision" type="button" disabled>{tt('js.action.not_sure')}</button></div><p class="cn-sello cn-sello--bloqueado">{tt('js.state.blocked')}</p></div></article>
+  <h3>{tt('system.components.limits')}</h3>
+  <div class="cn-aviso"><div class="cn-aviso__cabeza"><p class="cn-etiqueta">{tt('system.components.limits_label')}</p></div><ul class="cn-aviso__lista"><li>{tt('system.components.limits_item')}</li></ul></div>
+  <h3>{tt('system.components.table')}</h3>
+  <div class="cn-tabla-caja"><table class="cn-tabla"><thead><tr><th scope="col">{tt('results.table.col_metric')}</th><th scope="col">{tt('results.table.col_baseline')}</th><th scope="col">{tt('results.table.col_centinela')}</th></tr></thead><tbody><tr><th scope="row">{tt('system.components.table_example')}</th><td>{tt('system.components.table_baseline')}</td><td>{tt('system.components.table_centinela')}</td></tr></tbody></table></div>
+  <h3>{tt('system.components.field')}</h3>
+  <div class="cn-campo"><label class="cn-etiqueta" for="d-campo">{tt('system.components.field_label')}</label><input id="d-campo" class="cn-campo__entrada" placeholder={tt('system.components.field_placeholder')}></div>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-mov"><h2 id="s-mov">{tt('system.motion.title')}</h2>
+  <p>{tt('system.motion.text')}</p>
+  <div class="cn-fila-demo"><div class="cn-demo-mov" data-demo-mov></div><button class="cn-boton cn-boton--secundario" type="button" data-demo-btn aria-pressed="false">{tt('js.demo.play')}</button></div>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-ico"><h2 id="s-ico">{tt('system.icons.title')}</h2>
+  <p>{tt('system.icons.text')}</p>
+  <ul class="cn-iconos">
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z"/><rect x="10" y="10" width="4" height="4"/></svg><span class="cn-etiqueta">{tt('system.icons.eye')}</span></li>
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.5 9 8 11 4.5-2 8-6 8-11V5Z"/><path d="M8 12h8"/></svg><span class="cn-etiqueta">{tt('system.icons.shield')}</span></li>
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 8h20v8H2Z"/><path d="m6 8-4 8M12 8l-4 8M18 8l-4 8M22 10l-3 6"/></svg><span class="cn-etiqueta">{tt('system.icons.tape')}</span></li>
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h18v13H9l-5 4v-4H3Z"/></svg><span class="cn-etiqueta">{tt('system.icons.message')}</span></li>
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 5h20v14H2Z"/><path d="m2 5 10 8 10-8"/></svg><span class="cn-etiqueta">{tt('system.icons.envelope')}</span></li>
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 4h20v16H2Z"/><path d="m6 9 3 3-3 3M12 15h6"/></svg><span class="cn-etiqueta">{tt('system.icons.terminal')}</span></li>
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v18M6 21h12M4 7h16"/><path d="m4 7-3 7h6ZM20 7l-3 7h6Z"/></svg><span class="cn-etiqueta">{tt('system.icons.scale')}</span></li>
+    <li><svg class="cn-icono" viewBox="0 0 24 24" aria-hidden="true"><rect x="8" y="3" width="8" height="8"/><path d="M4 21v-4a4 4 0 0 1 4-4h8a4 4 0 0 1 4 4v4"/></svg><span class="cn-etiqueta">{tt('system.icons.person')}</span></li>
+    <li><img src="/logo.svg" alt="" width="24" height="24"><span class="cn-etiqueta">{tt('system.icons.logo')}</span></li>
+  </ul>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-voz"><h2 id="s-voz">{tt('system.voice.title')}</h2>
+  <p>{tt('system.voice.text')}</p>
+  <div class="cn-sino">
+    <div class="cn-sino__caja"><span class="cn-etiqueta">{tt('system.voice.yes')}</span><p>{tt('system.voice.yes1')}</p><p>{tt('system.voice.yes2')}</p><p>{tt('system.voice.yes3')}</p></div>
+    <div class="cn-sino__caja cn-sino__caja--no"><span class="cn-etiqueta">{tt('system.voice.no')}</span><p>{tt('system.voice.no1')}</p><p>{tt('system.voice.no2')}</p><p>{tt('system.voice.no3')}</p></div>
+  </div>
+</section>
+<section class="cn-doc__bloque" aria-labelledby="s-tok"><h2 id="s-tok">{tt('system.tokens.title')}</h2>
+  <div class="cn-codigo"><div class="cn-codigo__barra cn-etiqueta"><span>css/tokens.css</span><button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-copiar="d-tokens">{tt('js.copy.label')}</button></div><pre><code id="d-tokens">{tokens}</code></pre></div>
+</section>
+</main>
+<footer class="cn-pie"><div class="cn-contenedor cn-pie__fila"><a class="cn-marca" href={pathFor(lang, 'home')}><img src="/logo.svg" alt="" width="28" height="28">CENTINELA</a><p>{tt('footer.copyright')}</p><a href={pathFor(lang, 'home')}>{tt('system.back')}</a><a lang={other} hreflang={other} href={pathFor(other, 'system')}>{tt('lang.other.name')}</a></div></footer>
+</Base>
+
+<script>
+  import '../../scripts/sistema.js';
+</script>

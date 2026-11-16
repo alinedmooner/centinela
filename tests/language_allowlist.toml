@@ -18,5 +18,5 @@ reason = "Vigía is the proper name of the website's design system."
 
 [[prose]]
 file = "web/README.md"
-contains = "*"
-reason = "Still the Spanish original: the website pull request (step 8) translates it and removes this entry."
+contains = "Vigía"
+reason = "Vigía is the proper name of the website's design system."

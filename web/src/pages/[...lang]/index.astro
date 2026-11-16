@@ -1,0 +1,59 @@
+---
+// The landing page, once per language: English at / and Spanish at /es/. Both are built from
+// the same components; the text comes from src/i18n/{en,es}.json.
+import Base from '../../layouts/Base.astro';
+import Abierto from '../../components/Abierto.astro';
+import Cinta from '../../components/Cinta.astro';
+import ComoFunciona from '../../components/ComoFunciona.astro';
+import Equipo from '../../components/Equipo.astro';
+import Hero from '../../components/Hero.astro';
+import Iconos from '../../components/Iconos.astro';
+import Integraciones from '../../components/Integraciones.astro';
+import Limites from '../../components/Limites.astro';
+import Navegacion from '../../components/Navegacion.astro';
+import Pie from '../../components/Pie.astro';
+import Problema from '../../components/Problema.astro';
+import Resultados from '../../components/Resultados.astro';
+import Sala from '../../components/Sala.astro';
+import Uso from '../../components/Uso.astro';
+import { t } from '../../i18n/index.js';
+import { localePaths } from '../../i18n/urls.js';
+
+export function getStaticPaths() {
+  return localePaths();
+}
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
+---
+
+<Base
+  lang={lang}
+  route="home"
+  title={tt('meta.home.title')}
+  description={tt('meta.home.description')}
+  ogDescription={tt('meta.home.og_description')}
+>
+  <Iconos />
+  <a class="cn-saltar" href={`#${tt('anchor.content')}`}>{tt('skip.label')}</a>
+  <Navegacion lang={lang} />
+  <main id={tt('anchor.content')}>
+    <Hero lang={lang} />
+    <Cinta lang={lang} />
+    <Problema lang={lang} />
+    <ComoFunciona lang={lang} />
+    <Sala lang={lang} />
+    <Cinta lang={lang} inversa />
+    <Resultados lang={lang} />
+    <Limites lang={lang} />
+    <Uso lang={lang} />
+    <Integraciones lang={lang} />
+    <Abierto lang={lang} />
+    <Equipo lang={lang} />
+  </main>
+  <Pie lang={lang} />
+</Base>
+
+<script>
+  import '../../scripts/main.js';
+</script>

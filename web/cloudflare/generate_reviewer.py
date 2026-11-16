@@ -6,7 +6,8 @@ the texts from Python so they do not drift apart; a test checks that they match:
     uv run python web/cloudflare/generate_reviewer.py
 
 The instructions and the schema are Spanish on purpose: they are what the measurements were
-made with. The trick descriptions are the Spanish ones of the catalog, for the Worker's notice.
+made with. The trick descriptions are the Spanish ones of the catalog; the Worker only uses
+their ids (the pages write the notices from their own dictionaries, src/i18n).
 """
 
 import json

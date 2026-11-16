@@ -1,5 +1,5 @@
-// Ajustes de compilación para Cloudflare: el sitio es estático y ya está compilado
-// en ../dist (lo genera `pnpm build` en web/). El CLI `cf` lo publica con Wrangler.
+// Build settings for Cloudflare: the site is static and already built in ../dist (`pnpm build`
+// in web/ generates it). The `cf` CLI publishes it with Wrangler.
 import { defineWranglerConfig } from 'wrangler/experimental-config';
 
 export default defineWranglerConfig({

@@ -1,32 +1,49 @@
 ---
-// Portado de la landing generada con Lovable (index.html).
+// Ported from the landing page generated with Lovable (index.html).
+import { LIVE_REVIEW_ENABLED } from '../config.js';
+import { t } from '../i18n/index.js';
+import LegacyAnchor from './LegacyAnchor.astro';
+
+interface Props {
+  lang: 'en' | 'es';
+}
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
+// The room analyzes Spanish messages, so the text area is marked as Spanish on a page in
+// another language (the placeholder and what people paste are Spanish).
+const messageLang = lang === 'es' ? undefined : 'es';
+// The note about the live review is only part of the page while the review is on.
+const note = LIVE_REVIEW_ENABLED ? `${tt('room.note_local')} ${tt('room.note_live')}` : tt('room.note_local');
 ---
-<section id="sala" class="cn-seccion" aria-labelledby="sala-titulo">
+<section id={tt('anchor.room')} class="cn-seccion" aria-labelledby="sala-titulo">
+  <LegacyAnchor lang={lang} anchor="anchor.room" />
   <div class="cn-contenedor">
-    <p class="cn-etiqueta cn-seccion__ojo">03 · Demostración</p>
-    <h2 id="sala-titulo" class="cn-aparece">Sala de revisión blindada</h2>
-    <p class="cn-seccion__bajada cn-aparece">Un mensaje bien hecho también puede engañar a quien lo revisa. Por eso la persona lo ve desarmado y con decisiones acotadas.</p>
+    <p class="cn-etiqueta cn-seccion__ojo">{tt('room.eyebrow')}</p>
+    <h2 id="sala-titulo" class="cn-aparece">{tt('room.title')}</h2>
+    <p class="cn-seccion__bajada cn-aparece">{tt('room.lead')}</p>
     <div class="cn-sala" data-sala>
       <form class="cn-sala__entrada">
         <div class="cn-campo">
-          <label class="cn-etiqueta" for="sala-texto">Pega un mensaje</label>
-          <textarea id="sala-texto" class="cn-campo__entrada" spellcheck="false" maxlength="2000" placeholder="Hola, ¿a qué hora abren mañana?"></textarea>
+          <label class="cn-etiqueta" for="sala-texto">{tt('room.field_label')}</label>
+          <textarea id="sala-texto" class="cn-campo__entrada" lang={messageLang} spellcheck="false" maxlength="2000" placeholder={tt('room.placeholder')}></textarea>
         </div>
-        <div class="cn-sala__ejemplos" data-ejemplos role="group" aria-label="Ejemplos"></div>
+        <div class="cn-sala__ejemplos" data-ejemplos role="group" aria-label={tt('room.examples_aria')}></div>
+        <p class="cn-sala__nota" data-gloss aria-live="polite" hidden></p>
         <div class="cn-sala__botones">
-          <button class="cn-boton cn-boton--primario" type="submit"><svg class="cn-icono" aria-hidden="true"><use href="#i-ojo"/></svg>Revisar</button>
-          <button class="cn-boton cn-boton--secundario" type="button" data-claude>Revisar con Claude, en vivo</button>
+          <button class="cn-boton cn-boton--primario" type="submit"><svg class="cn-icono" aria-hidden="true"><use href="#i-ojo"/></svg>{tt('room.review_button')}</button>
+          {LIVE_REVIEW_ENABLED && <button class="cn-boton cn-boton--secundario" type="button" data-claude>{tt('room.live_button')}</button>}
         </div>
-        <div class="cn-sala__claude" data-claude-salida aria-live="polite" hidden></div>
-        <p class="cn-sala__nota"><strong>Revisar</strong> usa una versión simplificada de las reglas, en tu navegador y sin enviar nada. En Centinela, a la sala llegan los mensajes que marca el guardia; aquí puedes ver la tarjeta de cualquiera. <strong>Revisar con Claude</strong> envía el texto al revisor de Centinela con Claude Haiku 5.5, con las mismas instrucciones que la librería: hasta 2000 caracteres y solo hasta la presentación del hackathon. No guardamos el texto; no pegues datos personales.</p>
+        {LIVE_REVIEW_ENABLED && <div class="cn-sala__claude" data-claude-salida aria-live="polite" hidden></div>}
+        <p class="cn-sala__nota" set:html={note} />
       </form>
       <div class="cn-sala__salida" data-salida aria-live="polite">
-        <p class="cn-sala__vacio">Elige un ejemplo o pega un mensaje para ver su tarjeta de cuarentena.</p>
+        <p class="cn-sala__vacio">{tt('room.empty')}</p>
       </div>
     </div>
     <figure class="cn-sala__cifra cn-aparece">
-      <p class="cn-sala__numero">0 de 103</p>
-      <figcaption>0 de 103 enlaces quedaron activos en 731 correos reales de phishing (SpaPhish). En el 91,5 % de esos correos, un enlace llevaba a un dominio que no aparece escrito en el texto; la tarjeta lo muestra.</figcaption>
+      <p class="cn-sala__numero">{tt('room.figure.number')}</p>
+      <figcaption>{tt('room.figure.caption')}</figcaption>
     </figure>
   </div>
 </section>

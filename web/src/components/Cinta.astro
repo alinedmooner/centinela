@@ -1,12 +1,14 @@
 ---
-// Separador de cinta de precaución, con un texto que corre.
+// Caution-tape separator, with a running text.
+import { t } from '../i18n/index.js';
+
 interface Props {
+  lang: 'en' | 'es';
   inversa?: boolean;
 }
 
-const { inversa = false } = Astro.props;
-const texto =
-  'CENTINELA · REVISA ANTES DE OBEDECER · '.repeat(3) + 'CENTINELA · REVISA ANTES DE OBEDECER ·';
+const { lang, inversa = false } = Astro.props;
+const texto = Array(4).fill(t(lang, 'ribbon.unit')).join(' ');
 ---
 
 <div class:list={['cn-cinta', { 'cn-cinta--inversa': inversa }]} aria-hidden="true"><div class="cn-cinta__pista"><span class="cn-cinta__texto">{texto}&nbsp;</span><span class="cn-cinta__texto">{texto}&nbsp;</span></div></div>

@@ -1,27 +1,37 @@
 ---
-// Portado de la landing generada con Lovable (index.html).
+// Ported from the landing page generated with Lovable (index.html).
+import { t } from '../i18n/index.js';
+import LegacyAnchor from './LegacyAnchor.astro';
+
+interface Props {
+  lang: 'en' | 'es';
+}
+
+const { lang } = Astro.props;
+const tt = (key: string) => t(lang, key);
 ---
-<section id="inicio" class="cn-hero" aria-labelledby="hero-titulo">
+<section id={tt('anchor.home')} class="cn-hero" aria-labelledby="hero-titulo">
+  <LegacyAnchor lang={lang} anchor="anchor.home" />
   <div class="cn-hero__rejilla" aria-hidden="true"></div>
   <div class="cn-contenedor cn-hero__reticula">
     <div class="cn-hero__texto">
-      <p class="cn-insignia cn-etiqueta">Hackathon DefAcc 2026 · Track 1: Seguridad de agentes</p>
-      <h1 id="hero-titulo" class="cn-hero__titulo">Tu bot lee todo. <span class="cn-hero__acento">Centinela lee primero.</span></h1>
-      <p class="cn-hero__bajada">Guardia de código abierto para asistentes de IA que leen mensajes en español. Detecta órdenes escondidas y trucos de engaño, y deja en código las decisiones delicadas.</p>
+      <p class="cn-insignia cn-etiqueta">{tt('hero.badge')}</p>
+      <h1 id="hero-titulo" class="cn-hero__titulo" set:html={tt('hero.title')} />
+      <p class="cn-hero__bajada">{tt('hero.lead')}</p>
       <div class="cn-hero__botones">
-        <a class="cn-boton cn-boton--primario" href="https://github.com/alinedmooner/centinela"><svg class="cn-icono" aria-hidden="true"><use href="#i-github"/></svg>Ver en GitHub</a>
-        <a class="cn-boton cn-boton--secundario" href="#sala">Probar la sala de revisión</a>
+        <a class="cn-boton cn-boton--primario" href="https://github.com/alinedmooner/centinela"><svg class="cn-icono" aria-hidden="true"><use href="#i-github"/></svg>{tt('nav.github')}</a>
+        <a class="cn-boton cn-boton--secundario" href={`#${tt('anchor.room')}`}>{tt('hero.cta_room')}</a>
       </div>
       <div class="cn-codigo cn-codigo--linea">
         <pre><code id="cod-instalar">pip install centinela-ia</code></pre>
-        <button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-copiar="cod-instalar">Copiar</button>
+        <button class="cn-boton cn-boton--fantasma cn-boton--peq" type="button" data-copiar="cod-instalar">{tt('js.copy.label')}</button>
       </div>
-      <p class="cn-hero__datos cn-etiqueta">Licencia MIT · Funciona sin clave ni internet en modo reglas · Python 3.11+</p>
+      <p class="cn-hero__datos cn-etiqueta">{tt('hero.facts')}</p>
     </div>
     <div class="cn-hero__bandeja">
-      <p class="cn-oculto">Ejemplo de bandeja: tres mensajes normales pasan con sus etiquetas (consulta, soporte y prioritario). Dos mensajes quedan en cuarentena: uno trae órdenes para el asistente de IA y otro, además, trae un enlace que Centinela desarma.</p>
+      <p class="cn-oculto">{tt('hero.tray_desc')}</p>
       <div class="cn-bandeja" data-bandeja aria-hidden="true">
-        <div class="cn-bandeja__cabeza cn-etiqueta"><span>BANDEJA · WHATSAPP</span><span class="cn-bandeja__vivo">EN VIVO</span></div>
+        <div class="cn-bandeja__cabeza cn-etiqueta"><span>{tt('hero.tray_head')}</span><span class="cn-bandeja__vivo">{tt('hero.tray_live')}</span></div>
         <div class="cn-bandeja__escaner"></div>
         <ul class="cn-bandeja__lista"></ul>
       </div>

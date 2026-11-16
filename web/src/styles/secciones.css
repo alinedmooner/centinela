@@ -186,7 +186,7 @@
 .cn-doc__h2 { font-size: var(--t-h2); text-transform: uppercase; } .cn-doc__h3 { font-family: var(--f-titular); font-size: var(--t-h3); }
 .cn-hero__titulo, .cn-hero__bajada, .cn-insignia { overflow-wrap: anywhere; } .cn-hero__bandeja { min-width: 0; }
 
-/* Sala: revisión en vivo con Claude */
+/* Review room: live review with Claude */
 .cn-sala__botones { display: flex; flex-wrap: wrap; gap: var(--e-3); }
 .cn-sala__claude { justify-self: stretch; }
 .cn-sala__pista { color: var(--texto-suave); margin-top: var(--e-2); }
