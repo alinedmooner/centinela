@@ -12,90 +12,104 @@ import json
 import re
 import shutil
 
-import casos
+import cases
 import pytest
-import tabla
-from golden_support import GOLDEN, RAIZ, cargar
+import tables
+from golden_support import GOLDEN, ROOT, load
 
-from centinela import ETIQUETAS_LEADS, DetectorReglas
+from centinela import LEAD_LABELS, RulesDetector
 
-#: Carpetas que cambian de nombre en el proyecto (se completa al pasarlas a inglés).
-CARPETAS = {}
+#: Old path (the one the reference files use) -> current path, for what moved in the change
+#: to English. A path that is not listed is used as it is.
+RENAMES = [
+    ("resultados/filtro", "results/filter"),
+    ("resultados/proveedores", "results/providers"),
+    ("resultados/revision", "results/review"),
+    ("resultados/externos", "results/external"),
+    ("resultados/reglas_congeladas.txt", "results/rules_frozen.txt"),
+    ("resultados", "results"),
+    ("datos", "data"),
+    ("ejemplos/etiquetas_ventas.json", "examples/labels_sales.json"),
+    ("ejemplos/etiquetas_clinica.json", "examples/labels_clinic.json"),
+    ("ejemplos", "examples"),
+]
 
 
-def _ruta(texto: str):
-    carpeta, _, resto = texto.partition("/")
-    return RAIZ / CARPETAS.get(carpeta, carpeta) / resto
+def _path(text: str):
+    for old, new in sorted(RENAMES, key=lambda pair: -len(pair[0])):
+        if text == old or text.startswith(old + "/"):
+            return ROOT / (new + text[len(old) :])
+    return ROOT / text
 
 
 def test_las_reglas_dan_las_mismas_decisiones_y_evidencias():
-    esperado = cargar("rules_cases.json")
-    detector = DetectorReglas(etiquetas=ETIQUETAS_LEADS)
-    distintos = []
-    visto = 0
-    for particion in ("dev", "test"):
-        for caso in casos.casos_del_banco(particion):
-            h = detector.revisar(caso["texto"])
-            obtenido = {
-                "ordenes_para_ia": h.ordenes_para_ia,
-                "engano_a_personas": h.engano_a_personas,
-                "trucos": list(h.trucos),
-                "evidencias": list(h.evidencias),
+    expected = load("rules_cases.json")
+    detector = RulesDetector(labels=LEAD_LABELS)
+    differing = []
+    was_seen = 0
+    for split in ("dev", "test"):
+        for case in cases.benchmark_cases(split):
+            h = detector.check(case["texto"])
+            actual = {
+                "ordenes_para_ia": h.ai_instructions,
+                "engano_a_personas": h.people_deception,
+                "trucos": list(h.tricks),
+                "evidencias": list(h.evidence),
             }
-            visto += 1
-            if obtenido != esperado[f"{particion}:{caso['id']}"]:
-                distintos.append(f"{particion}:{caso['id']}")
-    assert visto == len(esperado) == 652
-    assert distintos == []
+            was_seen += 1
+            if actual != expected[f"{split}:{case['id']}"]:
+                differing.append(f"{split}:{case['id']}")
+    assert was_seen == len(expected) == 652
+    assert differing == []
 
 
-@pytest.mark.parametrize("particion", ["dev", "test"])
-def test_las_reglas_coinciden_con_las_filas_guardadas_en_resultados(particion):
-    guardado = {
-        json.loads(linea)["id"]: json.loads(linea)["marcado"]
-        for linea in _ruta(f"resultados/filtro/{particion}/reglas.jsonl")
+@pytest.mark.parametrize("split", ["dev", "test"])
+def test_las_reglas_coinciden_con_las_filas_guardadas_en_resultados(split):
+    saved_value = {
+        json.loads(line)["id"]: json.loads(line)["marcado"]
+        for line in _path(f"resultados/filtro/{split}/reglas.jsonl")
         .read_text(encoding="utf-8")
         .splitlines()
-        if linea.strip()
+        if line.strip()
     }
-    detector = DetectorReglas(etiquetas=ETIQUETAS_LEADS)
-    casos_del_banco = casos.casos_del_banco(particion)
-    assert casos_del_banco
-    for caso in casos_del_banco:
-        assert detector.revisar(caso["texto"]).ordenes_para_ia == guardado[caso["id"]], caso["id"]
+    detector = RulesDetector(labels=LEAD_LABELS)
+    benchmark_cases = cases.benchmark_cases(split)
+    assert benchmark_cases
+    for case in benchmark_cases:
+        assert detector.check(case["texto"]).ai_instructions == saved_value[case["id"]], case["id"]
 
 
 def test_ningun_archivo_de_datos_ni_de_resultados_cambia():
-    lineas = (GOLDEN / "records.sha256").read_text(encoding="utf-8").splitlines()
-    assert len(lineas) == 39
-    cambiados = []
-    for linea in lineas:
-        digest, ruta = linea.split("  ", 1)
-        if hashlib.sha256(_ruta(ruta).read_bytes()).hexdigest() != digest:
-            cambiados.append(ruta)
-    assert cambiados == []
+    lines = (GOLDEN / "records.sha256").read_text(encoding="utf-8").splitlines()
+    assert len(lines) == 39
+    changed = []
+    for line in lines:
+        digest, path = line.split("  ", 1)
+        if hashlib.sha256(_path(path).read_bytes()).hexdigest() != digest:
+            changed.append(path)
+    assert changed == []
 
 
 def test_la_ultima_linea_de_reglas_congeladas_es_el_hash_del_archivo_actual():
-    texto = _ruta("resultados/reglas_congeladas.txt").read_text(encoding="utf-8")
-    fijados = re.findall(r"^sha256 de (\S+): ([0-9a-f]{64})$", texto, flags=re.MULTILINE)
-    assert fijados, "reglas_congeladas.txt no tiene ninguna línea «sha256 de <ruta>: <hash>»"
-    ruta, esperado = fijados[-1]
-    actual = hashlib.sha256((RAIZ / ruta).read_bytes()).hexdigest()
-    assert actual == esperado, (
-        f"{ruta} cambió. Si el cambio no altera las decisiones, agreguen (sin borrar las "
+    text = _path("resultados/reglas_congeladas.txt").read_text(encoding="utf-8")
+    pinned = re.findall(r"^sha256 de (\S+): ([0-9a-f]{64})$", text, flags=re.MULTILINE)
+    assert pinned, "reglas_congeladas.txt no tiene ninguna línea «sha256 de <ruta>: <hash>»"
+    path, expected = pinned[-1]
+    actual = hashlib.sha256((ROOT / path).read_bytes()).hexdigest()
+    assert actual == expected, (
+        f"{path} cambió. Si el cambio no altera las decisiones, agreguen (sin borrar las "
         "anteriores) una línea nueva con el hash y la explicación."
     )
 
 
 def test_las_tablas_de_resumen_se_rehacen_igual_sin_clave(tmp_path, monkeypatch):
-    copia = tmp_path / "resultados"
-    shutil.copytree(_ruta("resultados"), copia, ignore=shutil.ignore_patterns("crudo"))
-    monkeypatch.setattr(tabla, "RESULTADOS", copia)
-    assert tabla.main([]) == 0
-    assert (copia / "resumen.md").read_text(encoding="utf-8") == (GOLDEN / "resumen.md").read_text(
-        encoding="utf-8"
-    )
-    assert (copia / "resumen.json").read_text(encoding="utf-8") == (
+    copy_dir = tmp_path / "results"
+    shutil.copytree(_path("results"), copy_dir, ignore=shutil.ignore_patterns("raw"))
+    monkeypatch.setattr(tables, "RESULTS", copy_dir)
+    assert tables.main([]) == 0
+    assert (copy_dir / "resumen.md").read_text(encoding="utf-8") == (
+        GOLDEN / "resumen.md"
+    ).read_text(encoding="utf-8")
+    assert (copy_dir / "resumen.json").read_text(encoding="utf-8") == (
         GOLDEN / "resumen.json"
     ).read_text(encoding="utf-8")

@@ -3,12 +3,12 @@
 //
 // POST /api/revisar con {"texto": "..."} revisa un mensaje con el revisor de Centinela y
 // Claude Haiku 5.5: las mismas instrucciones y el mismo esquema que DetectorLLM en la
-// librería (src/revisor.js se genera desde Python). La clave de la API es un secreto de
+// librería (src/reviewer.js se genera desde Python). La clave de la API es un secreto de
 // Cloudflare y nunca llega al navegador. El texto no se guarda ni se registra.
 //
 // Para apagarlo: REVISION_EN_VIVO = 'apagada' en cloudflare.config.ts y `cf deploy`.
 import Anthropic from '@anthropic-ai/sdk';
-import { ESQUEMA, INSTRUCCIONES, TRUCOS } from './revisor.js';
+import { ESQUEMA, INSTRUCCIONES, TRUCOS } from './reviewer.js';
 
 const MODELO = 'claude-haiku-5-5';
 const MAX_CARACTERES = 2000;
@@ -97,7 +97,7 @@ async function revisar(request, env) {
     respuesta = await cliente.messages.create({
       model: MODELO,
       max_tokens: 700,
-      system: INSTRUCCIONES.replaceAll('{marca}', marca),
+      system: INSTRUCCIONES.replaceAll('{marker}', marca),
       messages: [{ role: 'user', content: envolver(texto, marca) }],
       output_config: { effort: 'low', format: { type: 'json_schema', schema: ESQUEMA } },
     });

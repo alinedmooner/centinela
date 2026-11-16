@@ -57,7 +57,7 @@ openrouter = [
 
 [dependency-groups]
 dev = ["pytest", "ruff"]
-# Para la demostración con Composio (ejemplos/composio_buzon.py); no es parte del paquete.
+# Para la demostración con Composio (examples/composio_mailbox.py); no es parte del paquete.
 composio = ["composio>=0.31.0"]
 
 [build-system]

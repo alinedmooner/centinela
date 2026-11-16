@@ -8,41 +8,41 @@ Uso mínimo, sin clave ni internet::
     print(veredicto.decision, veredicto.aviso)
 """
 
-from centinela.clasificador import Clasificacion, ClasificadorSeguro
-from centinela.detectores import Detector, DetectorLLM, DetectorLocal, DetectorReglas
-from centinela.etiquetas import ETIQUETAS_LEADS, REVISION_HUMANA
-from centinela.guardia import Guardia, revisar
-from centinela.revision import (
-    Resolucion,
-    TarjetaRevision,
-    crear_tarjeta,
-    desarmar,
-    resolver,
-    texto_de_tarjeta,
+from centinela.classifier import Classification, SafeClassifier
+from centinela.detectors import Detector, LLMDetector, LocalDetector, RulesDetector
+from centinela.guard import Guard, check
+from centinela.labels import HUMAN_REVIEW, LEAD_LABELS
+from centinela.review import (
+    Resolution,
+    ReviewCard,
+    create_card,
+    defang,
+    render_card,
+    resolve,
 )
-from centinela.tipos import TRUCOS, Hallazgo, Veredicto
+from centinela.verdict import TRICKS, Finding, Verdict
 
 __version__ = "0.1.1"
 
 __all__ = [
-    "ETIQUETAS_LEADS",
-    "REVISION_HUMANA",
-    "TRUCOS",
-    "Clasificacion",
-    "ClasificadorSeguro",
+    "HUMAN_REVIEW",
+    "LEAD_LABELS",
+    "TRICKS",
+    "Classification",
     "Detector",
-    "DetectorLLM",
-    "DetectorLocal",
-    "DetectorReglas",
-    "Guardia",
-    "Hallazgo",
-    "Resolucion",
-    "TarjetaRevision",
-    "Veredicto",
+    "Finding",
+    "Guard",
+    "LLMDetector",
+    "LocalDetector",
+    "Resolution",
+    "ReviewCard",
+    "RulesDetector",
+    "SafeClassifier",
+    "Verdict",
     "__version__",
-    "crear_tarjeta",
-    "desarmar",
-    "resolver",
-    "revisar",
-    "texto_de_tarjeta",
+    "check",
+    "create_card",
+    "defang",
+    "render_card",
+    "resolve",
 ]

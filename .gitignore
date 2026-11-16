@@ -14,11 +14,11 @@ dist/
 build/
 
 # Datos de terceros que no se redistribuyen (por ejemplo, SpaPhish)
-datos/externos/
+data/external/
 
 # Registros de Inspect y salidas crudas que pueden contener texto de terceros
 logs/
-resultados/crudo/
+results/raw/
 
 # Editor y sistema
 .idea/

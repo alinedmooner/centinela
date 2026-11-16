@@ -29,7 +29,7 @@ cd cloudflare && pnpm install && pnpm exec cf deploy
 
 El botón «Revisar con Claude, en vivo» de la sala manda el texto a `POST /api/revisar`. El Worker lo revisa con Claude Haiku 5.5 y el revisor de la librería (`DetectorLLM`): mismas instrucciones, mismo esquema y la misma regla, porque la decisión la toma el código con las dos respuestas del modelo. Si el modelo se niega o responde mal, el mensaje va a revisión humana.
 
-- **Instrucciones:** `cloudflare/src/revisor.js` se genera desde Python con `uv run python web/cloudflare/generar_revisor.py`; `tests/test_web_revisor.py` falla si se desalinea.
+- **Instrucciones:** `cloudflare/src/reviewer.js` se genera desde Python con `uv run python web/cloudflare/generate_reviewer.py`; `tests/test_web_revisor.py` falla si se desalinea.
 - **Clave:** `ANTHROPIC_API_KEY` es un secreto de Cloudflare (`secret_text`); no está en el código ni llega al navegador. Se sube con la publicación, desde un archivo temporal que se borra al terminar:
 
   ```bash

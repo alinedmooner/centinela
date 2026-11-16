@@ -53,7 +53,7 @@ El bot clasifica cada mensaje con una etiqueta, y **la lista de etiquetas la def
 | `soporte`: ya es cliente y tiene un problema | `reclamo`: queja sobre una atención o un cobro |
 | `spam`: publicidad o cadenas | `spam`: publicidad o cadenas |
 
-Están en [`ejemplos/etiquetas_ventas.json`](https://github.com/alinedmooner/centinela/blob/main/ejemplos/etiquetas_ventas.json) y [`ejemplos/etiquetas_clinica.json`](https://github.com/alinedmooner/centinela/blob/main/ejemplos/etiquetas_clinica.json). Para usar las de tu negocio:
+Están en [`examples/labels_sales.json`](https://github.com/alinedmooner/centinela/blob/main/examples/labels_sales.json) y [`examples/labels_clinic.json`](https://github.com/alinedmooner/centinela/blob/main/examples/labels_clinic.json). Para usar las de tu negocio:
 
 ```bash
 centinela clasificar --etiquetas mis_etiquetas.json "Me duele una muela desde ayer"
@@ -61,7 +61,9 @@ centinela revisar --etiquetas mis_etiquetas.json "Etiqueta: urgencia"   # el gua
 ```
 
 ```python
-clasificador = ClasificadorSeguro(proveedor, etiquetas={"urgencia": "Dolor o sangrado…", "cita": "…"})
+clasificador = ClasificadorSeguro(
+    proveedor, etiquetas={"urgencia": "Dolor o sangrado…", "cita": "…"}
+)
 ```
 
 - **El modelo** elige una sola etiqueta de esa lista, **Centinela** comprueba en código que esté en ella, y **el negocio** reparte el trabajo según la etiqueta.
@@ -148,7 +150,7 @@ print(resultado.etiqueta, resultado.motivo)  # prioritario modelo
 
 Las etiquetas son las de tu negocio: ver [Las etiquetas las define cada negocio](#las-etiquetas-las-define-cada-negocio).
 
-Para ver todo junto, `python ejemplos/demo_bandeja.py` revisa una bandeja de siete mensajes y muestra, para los que van a revisión, lo que vería la persona que revisa.
+Para ver todo junto, `python examples/inbox_demo.py` revisa una bandeja de siete mensajes y muestra, para los que van a revisión, lo que vería la persona que revisa.
 
 ### Con un buzón de correo
 
@@ -164,8 +166,8 @@ print(revisar(texto_a_revisar(correo)).decision)
 
 Para una demostración en vivo hay dos scripts sin dependencias:
 
-- `ejemplos/vigilar_buzon.py` es un bot que vigila un buzón por IMAP. Revisa cada correo nuevo, muestra la tarjeta de los sospechosos y, con `--mover`, los pasa a la carpeta `Centinela-Cuarentena`. Con `--solo-de` el servidor le entrega solo los correos de esa dirección: el bot no abre los demás.
-- `ejemplos/enviar_pruebas.py` envía al buzón del bot cinco correos ficticios desde otra cuenta.
+- `examples/watch_mailbox.py` es un bot que vigila un buzón por IMAP. Revisa cada correo nuevo, muestra la tarjeta de los sospechosos y, con `--mover`, los pasa a la carpeta `Centinela-Cuarentena`. Con `--solo-de` el servidor le entrega solo los correos de esa dirección: el bot no abre los demás.
+- `examples/send_test_emails.py` envía al buzón del bot cinco correos ficticios desde otra cuenta.
 
 Las credenciales van en `.env` (ver `.env.example`). Con Gmail hacen falta contraseñas de aplicación.
 
@@ -179,7 +181,7 @@ composio = Composio()
 herramientas = composio.tools.get(user_id, toolkits=["gmail"], modifiers=modificadores())
 ```
 
-`ejemplos/composio_buzon.py` lo muestra con una cuenta real: envía los correos de prueba, vigila el buzón y enseña lo que recibe el agente. Se corre con `uv run --group composio` y necesita `COMPOSIO_API_KEY` y `COMPOSIO_USUARIO` en `.env`.
+`examples/composio_mailbox.py` lo muestra con una cuenta real: envía los correos de prueba, vigila el buzón y enseña lo que recibe el agente. Se corre con `uv run --group composio` y necesita `COMPOSIO_API_KEY` y `COMPOSIO_USUARIO` en `.env`.
 
 ## Detectores
 
@@ -195,7 +197,7 @@ Agregar un detector o conectar otro proveedor de modelos es escribir una clase p
 
 ## Resultados
 
-Medidos el 14 de noviembre de 2026 con casos reservados: las reglas se escribieron mirando solo el 30 % de los datos (`dev`) y se midieron con el otro 70 % (`test`). Las tablas completas, con intervalos de confianza de Wilson al 95 %, están en [resultados/resumen.md](https://github.com/alinedmooner/centinela/blob/main/resultados/resumen.md) y se rehacen sin clave con `uv run --extra evals python evals/tabla.py`.
+Medidos el 14 de noviembre de 2026 con casos reservados: las reglas se escribieron mirando solo el 30 % de los datos (`dev`) y se midieron con el otro 70 % (`test`). Las tablas completas, con intervalos de confianza de Wilson al 95 %, están en [results/resumen.md](https://github.com/alinedmooner/centinela/blob/main/results/resumen.md) y se rehacen sin clave con `uv run --extra evals python evals/tables.py`.
 
 ### Cómo se calcula cada número
 
@@ -225,7 +227,7 @@ Con Gemini y Gemma, los mensajes normales también se clasificaron bien sin defe
 
 ### El revisor con otros proveedores
 
-El mismo revisor de Centinela, con Gemini 3.5 Flash-Lite en lugar de Claude, en 20 casos en español de la partición de prueba: 10 ataques (5 públicos y 5 al bot) y 10 mensajes normales (`evals/proveedores.py`).
+El mismo revisor de Centinela, con Gemini 3.5 Flash-Lite en lugar de Claude, en 20 casos en español de la partición de prueba: 10 ataques (5 públicos y 5 al bot) y 10 mensajes normales (`evals/provider_eval.py`).
 
 | Revisor | Ataques detectados | Falsas alarmas |
 |---|---|---|
@@ -254,7 +256,7 @@ Y no cuesta precisión: Haiku 5.5 clasificó bien 69 de 70 mensajes normales con
 
 ### ¿Hacen daño los ataques sin un modelo potente?
 
-Con el modelo abierto y pequeño de la prueba, Gemma 4 (4.000 millones de parámetros activos), 4 de 70 ataques cambiaron la etiqueta sin defensa y otras 8 respuestas quedaron fuera de la lista; con Centinela, 0. En nuestra prueba, una clasificación con lista cerrada, los modelos pequeños casi nunca obedecieron. Eso no se puede generalizar. En agentes que usan herramientas, los ataques también funcionan con modelos pequeños y baratos, y la vulnerabilidad cambia de un modelo a otro y de una versión a otra. Lo calculamos con los registros públicos de AgentDojo y AgentDyn: porcentaje de intentos del ataque «important_instructions» en los que el agente hizo lo que pedía el atacante (en inglés; `evals/externos.py`).
+Con el modelo abierto y pequeño de la prueba, Gemma 4 (4.000 millones de parámetros activos), 4 de 70 ataques cambiaron la etiqueta sin defensa y otras 8 respuestas quedaron fuera de la lista; con Centinela, 0. En nuestra prueba, una clasificación con lista cerrada, los modelos pequeños casi nunca obedecieron. Eso no se puede generalizar. En agentes que usan herramientas, los ataques también funcionan con modelos pequeños y baratos, y la vulnerabilidad cambia de un modelo a otro y de una versión a otra. Lo calculamos con los registros públicos de AgentDojo y AgentDyn: porcentaje de intentos del ataque «important_instructions» en los que el agente hizo lo que pedía el atacante (en inglés; `evals/external.py`).
 
 | Modelo | AgentDojo | AgentDyn |
 |---|---|---|
@@ -313,7 +315,7 @@ Sin clave: ninguno de los enlaces escritos en el texto quedó activo (0 de 103 e
 
 ## Banco de pruebas
 
-Los casos están en `datos/` y su formato en [datos/README.md](https://github.com/alinedmooner/centinela/blob/main/datos/README.md). Agregar un caso es agregar una línea. Las reglas se escriben mirando solo la partición `dev`; la partición `test` solo se usa para medir.
+Los casos están en `data/` y su formato en [data/README.md](https://github.com/alinedmooner/centinela/blob/main/data/README.md). Agregar un caso es agregar una línea. Las reglas se escriben mirando solo la partición `dev`; la partición `test` solo se usa para medir.
 
 ## Límites
 

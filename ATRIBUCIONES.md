@@ -8,11 +8,11 @@ La organización del Hackathon DefAcc 2026 entregó recursos en seis carpetas te
 
 | Recurso entregado (carpeta) | Para qué lo usamos | Dónde |
 |---|---|---|
-| AgentDojo (Seguridad de agentes) | Cuatro plantillas públicas de ataque y 27 objetivos de inyección, traducidos al español. Su implementación del detector de ProtectAI, como referencia para el detector local. Sus registros públicos, para medir el éxito de los ataques en 22 modelos | `datos/ataques.jsonl`, `src/centinela/detectores/local.py`, `evals/externos.py` |
-| AgentDyn (Seguridad de agentes) | 28 objetivos de inyección. Sus registros públicos, para medir el éxito de los ataques en 10 modelos | `datos/ataques.jsonl`, `evals/externos.py` |
+| AgentDojo (Seguridad de agentes) | Cuatro plantillas públicas de ataque y 27 objetivos de inyección, traducidos al español. Su implementación del detector de ProtectAI, como referencia para el detector local. Sus registros públicos, para medir el éxito de los ataques en 22 modelos | `data/ataques.jsonl`, `src/centinela/detectores/local.py`, `evals/external.py` |
+| AgentDyn (Seguridad de agentes) | 28 objetivos de inyección. Sus registros públicos, para medir el éxito de los ataques en 10 modelos | `data/ataques.jsonl`, `evals/external.py` |
 | Inspect AI, del UK AI Security Institute (Control de IA) | La prueba del bot de leads con cuatro modelos de Claude y dos de Google (Gemini y el modelo abierto Gemma) | `evals/bot.py` |
-| LlamaFirewall, de PurpleLlama, de Meta (Ciberdefensa automatizada) | Su regla por defecto, como línea base del filtro, y la idea de buscar texto oculto con caracteres invisibles | `evals/filtro.py`, `src/centinela/detectores/reglas.py` |
-| SpaPhish (Defensa epistémica) | 1395 correos reales en español para las falsas alarmas, la prueba de phishing y la sala de revisión. Su guía de anotación, para definir los trucos de persuasión | `evals/casos.py`, `evals/phishing.py`, `evals/revision.py`, `src/centinela/detectores/llm.py` |
+| LlamaFirewall, de PurpleLlama, de Meta (Ciberdefensa automatizada) | Su regla por defecto, como línea base del filtro, y la idea de buscar texto oculto con caracteres invisibles | `evals/injection_filter.py`, `src/centinela/detectors/rules.py` |
+| SpaPhish (Defensa epistémica) | 1395 correos reales en español para las falsas alarmas, la prueba de phishing y la sala de revisión. Su guía de anotación, para definir los trucos de persuasión | `evals/cases.py`, `evals/phishing.py`, `evals/review_room.py`, `src/centinela/detectores/llm.py` |
 | Plantilla de la ficha técnica | La estructura de la ficha | `docs/ficha-tecnica.html` |
 
 También revisamos el resto de los recursos, como ControlArena, MCPTox y CyberSecEval, pero no forman parte de Centinela.
@@ -24,9 +24,9 @@ También revisamos el resto de los recursos, como ControlArena, MCPTox y CyberSe
 | [AgentDojo](https://github.com/ethz-spylab/agentdojo) (Debenedetti et al., 2024) | Cuatro plantillas públicas de ataque (`important_instructions`, `ignore_previous`, `injecagent`, `system_message`) y 27 objetivos de inyección | MIT |
 | AgentDyn (Li et al., 2026) | 28 objetivos de inyección de las suites `shopping`, `github` y `dailylife` | MIT |
 | SpaPhish | 1395 correos reales en español, anonimizados, con etiquetas de phishing y de persuasión de tres anotadores. Las definiciones de los trucos de persuasión de `centinela/detectores/llm.py` siguen su guía de anotación | No indica licencia: lo usamos desde una copia local y **no lo redistribuimos**. El repositorio solo guarda respuestas del modelo por identificador y métricas, nunca el texto de los correos |
-| [LlamaFirewall](https://github.com/meta-llama/PurpleLlama) (Meta) | Su patrón por defecto para inyección de instrucciones, como línea base en `evals/filtro.py`, y la idea de buscar texto escondido con caracteres invisibles | MIT |
+| [LlamaFirewall](https://github.com/meta-llama/PurpleLlama) (Meta) | Su patrón por defecto para inyección de instrucciones, como línea base en `evals/injection_filter.py`, y la idea de buscar texto escondido con caracteres invisibles | MIT |
 
-Los mensajes de `datos/leads.jsonl`, los de `datos/portadores.jsonl` y las traducciones al español de `datos/ataques.jsonl` son nuestros. Ver «Uso de IA».
+Los mensajes de `data/leads.jsonl`, los de `data/portadores.jsonl` y las traducciones al español de `data/ataques.jsonl` son nuestros. Ver «Uso de IA».
 
 ## Modelos
 
@@ -61,4 +61,4 @@ Este proyecto se hizo en un día, con ayuda de IA, y lo decimos con claridad:
 - **Datos:** las traducciones de los ataques, los mensajes portadores y los mensajes de leads fueron generados con Claude. Cada fila lo indica en los campos `traduccion` o `generado_con_ia`. La revisión humana está en curso; hasta entonces deben tratarse como datos sintéticos.
 - **Documentación y ficha técnica:** redactadas con ayuda de IA y revisadas por el equipo.
 - **Sitio web (`web/`):** el diseño, el sistema de diseño Vigía y el código inicial los generó Lovable a partir de un prompt del equipo; Claude Code los pasó a Astro y preparó la publicación.
-- **Evaluación:** el revisor y el bot de las pruebas son modelos de Anthropic y, en la prueba del bot y en la revisión con otros proveedores, también de Google. Las respuestas guardadas están en `resultados/`.
+- **Evaluación:** el revisor y el bot de las pruebas son modelos de Anthropic y, en la prueba del bot y en la revisión con otros proveedores, también de Google. Las respuestas guardadas están en `results/`.
