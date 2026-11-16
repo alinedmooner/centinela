@@ -50,7 +50,7 @@ def test_un_rechazo_o_una_respuesta_invalida_se_informan_como_error():
 
 def test_si_el_modelo_no_responde_bien_el_guardia_manda_a_revision():
     guard = Guard([LLMDetector(FakeProvider(ModelResponse(None, refusal=True)))])
-    assert guard.check("Hola").decision == "revisar"
+    assert guard.check("Hola").decision == "review"
 
 
 def test_recorta_los_mensajes_muy_largos_y_lo_dice():

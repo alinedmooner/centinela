@@ -15,7 +15,7 @@ import shutil
 import cases
 import pytest
 import tables
-from golden_support import GOLDEN, ROOT, load
+from golden_support import GOLDEN, ROOT, load, old_evidence
 
 from centinela import LEAD_LABELS, RulesDetector
 
@@ -54,7 +54,7 @@ def test_las_reglas_dan_las_mismas_decisiones_y_evidencias():
                 "ordenes_para_ia": h.ai_instructions,
                 "engano_a_personas": h.people_deception,
                 "trucos": list(h.tricks),
-                "evidencias": list(h.evidence),
+                "evidencias": [old_evidence(line) for line in h.evidence],
             }
             was_seen += 1
             if actual != expected[f"{split}:{case['id']}"]:

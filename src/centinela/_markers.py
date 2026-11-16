@@ -1,8 +1,11 @@
-"""Marcas que separan el mensaje de un cliente de las instrucciones del modelo."""
+"""Markers that separate a customer's message from the model's instructions."""
 
 
 def wrap(text: str, marker: str) -> str:
-    """Pone el mensaje entre marcas y neutraliza cualquier marca que traiga dentro."""
+    """Puts the message between markers and neutralizes any marker it contains.
+
+    The marker tag ``<mensaje_cliente>`` is Spanish on purpose: the model sees it.
+    """
     clean = text.replace("<mensaje_cliente", "<mensaje-cliente").replace(
         "</mensaje_cliente", "</mensaje-cliente"
     )

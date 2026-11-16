@@ -1,15 +1,16 @@
-"""Demostración: Centinela revisa la bandeja de entrada de un negocio.
+"""Demo: Centinela checks the inbox of a business.
 
-Cada mensaje que va a revisión humana se muestra como lo vería quien revisa: con enlaces,
-correos y números desactivados, y con las únicas tres decisiones posibles.
+Each message that goes to human review is shown as the reviewer would see it: with links,
+emails and numbers disabled, and with the only three possible decisions. The messages are in
+Spanish, as in real use; ``--lang`` chooses the language of everything else (``en`` by default).
 
-Sin clave, solo con reglas::
+Without a key, with the rules only::
 
-    uv run python ejemplos/demo_bandeja.py
+    uv run python examples/inbox_demo.py
 
-Con Claude como revisor y como clasificador (necesita ANTHROPIC_API_KEY en .env)::
+With Claude as reviewer and as classifier (needs ANTHROPIC_API_KEY in .env)::
 
-    uv run --extra llm python ejemplos/demo_bandeja.py --claude
+    uv run --extra llm python examples/inbox_demo.py --claude
 """
 
 from __future__ import annotations
@@ -26,6 +27,22 @@ from centinela import (
     render_card,
 )
 from centinela._env import load_env
+from centinela.catalog import DEFAULT_LANG, LANGS, t
+
+TEXTS = {
+    "en": {
+        "business": "Example business: a software company that sells over WhatsApp.",
+        "labels": "Its labels: {labels}. Each business defines its own (see examples/).",
+        "message": "Message {number}",
+        "guard": "Guard decision: {decision}",
+    },
+    "es": {
+        "business": "Negocio de ejemplo: una empresa de software que vende por WhatsApp.",
+        "labels": "Sus etiquetas: {labels}. Cada negocio define las suyas (ver examples/).",
+        "message": "Mensaje {number}",
+        "guard": "Decisión del guardia: {decision}",
+    },
+}
 
 INBOX = [
     (
@@ -55,10 +72,15 @@ INBOX = [
 def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     parser.add_argument(
-        "--claude", action="store_true", help="usa Claude como revisor y clasificador"
+        "--claude", action="store_true", help="use Claude as reviewer and classifier"
     )
     parser.add_argument("--model", default="claude-haiku-5-5")
+    parser.add_argument(
+        "--lang", choices=LANGS, default=DEFAULT_LANG, help="language of the output"
+    )
     args = parser.parse_args()
+    lang = args.lang
+    text = TEXTS[lang]
 
     detectors = [RulesDetector(labels=LEAD_LABELS)]
     classifier = None
@@ -69,26 +91,28 @@ def main() -> int:
 
         provider = AnthropicProvider(args.model)
         detectors.append(LLMDetector(provider))
-        classifier = SafeClassifier(provider, guard=Guard(detectors))
-    guard = Guard(detectors)
+        classifier = SafeClassifier(provider, guard=Guard(detectors, lang=lang), lang=lang)
+    guard = Guard(detectors, lang=lang)
 
-    print("Negocio de ejemplo: una empresa de software que vende por WhatsApp.")
-    print(
-        f"Sus etiquetas: {', '.join(LEAD_LABELS)}. Cada negocio define las suyas (ver ejemplos/)."
-    )
+    print(text["business"])
+    print(text["labels"].format(labels=", ".join(LEAD_LABELS)))
     for number, message in enumerate(INBOX, start=1):
-        print(f"\nMensaje {number}")
+        print("\n" + text["message"].format(number=number))
         print(textwrap.indent(textwrap.fill(message, 88), "  | "))
         if classifier:
             result = classifier.classify(message)
             verdict = result.verdict
-            print(f"  Etiqueta: {result.label} (decidió: {result.reason})")
+            reason = t(f"reason.{result.reason}", lang)
+            print("  " + t("cli.label", lang, label=result.label, reason=reason))
         else:
             verdict = guard.check(message)
-            print(f"  Decisión del guardia: {verdict.decision}")
-        print(textwrap.indent(textwrap.fill(f"Aviso: {verdict.notice}", 88), "  "))
-        if verdict.decision == "revisar":
-            # Lo que ve la persona que revisa: el mensaje desarmado y decisiones acotadas.
+            decision = t(f"decision.{verdict.decision}", lang)
+            print("  " + text["guard"].format(decision=decision))
+        print(
+            textwrap.indent(textwrap.fill(t("cli.notice", lang, notice=verdict.notice), 88), "  ")
+        )
+        if verdict.decision == "review":
+            # What the reviewer sees: the defanged message and bounded decisions.
             card = render_card(create_card(message, verdict))
             parts = [
                 textwrap.fill(line, 84, break_on_hyphens=False, break_long_words=False)

@@ -1,20 +1,20 @@
-"""Leer correos para revisarlos con Centinela, sin dependencias externas.
+"""Reads emails so Centinela can check them, without external dependencies.
 
-Un correo trae más de lo que se ve. El HTML puede esconder texto, por ejemplo órdenes para un
-asistente de IA en un párrafo invisible, y un enlace puede llevar a un dominio distinto del que
-muestra. Este módulo extrae:
+An email carries more than what is visible. The HTML can hide text, for example instructions
+for an AI assistant in an invisible paragraph, and a link can point to a different domain than
+the one it shows. This module extracts:
 
-- el texto que leería un asistente, con el texto oculto incluido y marcado como tal;
-- los destinos reales de los enlaces del HTML, para mostrarlos en la tarjeta de revisión;
-- los nombres de los adjuntos.
+- the text an assistant would read, with the hidden text included and marked as such;
+- the real destinations of the links in the HTML, to show them on the review card;
+- the names of the attachments.
 
-Uso::
+Usage::
 
-    from centinela import revisar
-    from centinela.correo import leer_correo, texto_a_revisar
+    from centinela import check
+    from centinela.mail import read_mail, text_to_check
 
-    correo = leer_correo(open("mensaje.eml", "rb").read())
-    veredicto = revisar(texto_a_revisar(correo))
+    mail = read_mail(open("message.eml", "rb").read())
+    verdict = check(text_to_check(mail))
 """
 
 from __future__ import annotations
@@ -35,7 +35,7 @@ _BLOCKS = frozenset(
     {"p", "div", "br", "li", "tr", "table", "h1", "h2", "h3", "h4", "h5", "h6", "blockquote"}
 )
 _IGNORE = frozenset({"script", "style", "head", "title", "template"})
-#: Estilos que esconden texto a una persona, aunque un asistente de IA sí lo lea.
+#: Styles that hide text from a person, even though an AI assistant does read it.
 _HIDDEN = re.compile(
     r"display\s*:\s*none|visibility\s*:\s*hidden|font-size\s*:\s*0(?![.\d]*[1-9])"
     r"|opacity\s*:\s*0(?:\.0+)?(?![.\d])|max-height\s*:\s*0(?![.\d]*[1-9])|mso-hide\s*:\s*all",
@@ -48,17 +48,17 @@ _WEB = re.compile(r"(?i)^(?:https?://|www\.)")
 class Mail:
     sender: str
     subject: str
-    #: Lo que leería un asistente: el texto del correo y, marcado, el texto oculto del HTML.
+    #: What an assistant would read: the email text plus, marked as such, the hidden HTML text.
     text: str
-    #: Destinos de los enlaces del HTML (solo web), que pueden no coincidir con lo que se ve.
+    #: Destinations of the links in the HTML (web links only), which may not match what is shown.
     links: tuple[str, ...]
     attachments: tuple[str, ...]
-    #: Cuántos fragmentos de texto oculto traía el HTML.
+    #: How many fragments of hidden text the HTML contained.
     hidden_fragments: int = 0
 
 
 class _HTMLReader(HTMLParser):
-    """Separa el texto visible del oculto y recoge los destinos de los enlaces."""
+    """Separates the visible text from the hidden text and collects the link destinations."""
 
     def __init__(self) -> None:
         super().__init__(convert_charrefs=True)
@@ -85,7 +85,7 @@ class _HTMLReader(HTMLParser):
         if tag in _IGNORE:
             self._ignore = max(0, self._ignore - 1)
             return
-        for i in range(len(self._stack) - 1, -1, -1):  # tolera HTML mal cerrado
+        for i in range(len(self._stack) - 1, -1, -1):  # tolerates badly closed HTML
             if self._stack[i][0] == tag:
                 del self._stack[i:]
                 break
@@ -97,9 +97,9 @@ class _HTMLReader(HTMLParser):
             self.parts.append((data, any(hidden for _, hidden in self._stack)))
 
     def result(self) -> tuple[str, list[str]]:
-        """Devuelve el texto visible y la lista de fragmentos ocultos."""
+        """Returns the visible text and the list of hidden fragments."""
         visible = _clean("".join(t for t, hidden in self.parts if not hidden))
-        # Los fragmentos ocultos seguidos (separados solo por espacios) forman uno solo.
+        # Consecutive hidden fragments (separated only by whitespace) form a single one.
         hidden_items: list[str] = []
         actual: list[str] = []
         for t, hidden in [*self.parts, ("fin", False)]:
@@ -134,7 +134,11 @@ def _words(text: str) -> set[str]:
 
 
 def read_mail(raw: bytes | str | Message) -> Mail:
-    """Lee un correo (bytes de un .eml o de IMAP, texto, o un ``Message`` ya leído)."""
+    """Reads an email (bytes from an .eml file or IMAP, text, or an already parsed ``Message``).
+
+    The notes it adds to the text (for hidden text and for a different HTML version) are in
+    Spanish on purpose: the model sees them.
+    """
     if isinstance(raw, Message):
         message = raw
     elif isinstance(raw, bytes):
@@ -151,11 +155,11 @@ def read_mail(raw: bytes | str | Message) -> Mail:
     visible_html, hidden_items = reader.result()
 
     text = plain or visible_html
-    # La versión HTML puede decir otra cosa que la de texto plano: un asistente podría leer
-    # cualquiera de las dos, así que se revisan ambas.
+    # The HTML version can say something different from the plain-text one: an assistant could
+    # read either of the two, so both are checked.
     if plain and visible_html:
-        new_ones = _words(visible_html) - _words(plain)
-        if len(new_ones) > 0.2 * max(1, len(_words(visible_html))):
+        new_words = _words(visible_html) - _words(plain)
+        if len(new_words) > 0.2 * max(1, len(_words(visible_html))):
             text += f"\n\n[versión HTML del correo, distinta del texto: {visible_html}]"
     for fragment in hidden_items:
         text += f"\n\n[texto oculto en el HTML: {fragment}]"
@@ -176,7 +180,10 @@ def read_mail(raw: bytes | str | Message) -> Mail:
 
 
 def text_to_check(mail: Mail, maximum: int = MAX_CHARS) -> str:
-    """El texto que se le pasa al guardia: remitente, asunto, cuerpo y adjuntos."""
+    """The text passed to the guard: sender, subject, body and attachments.
+
+    The labels ``De:``, ``Asunto:`` and ``Adjuntos:`` are Spanish on purpose: the model sees them.
+    """
     parts = [f"De: {mail.sender}", f"Asunto: {mail.subject}", "", mail.text]
     if mail.attachments:
         parts += ["", "Adjuntos: " + ", ".join(mail.attachments)]

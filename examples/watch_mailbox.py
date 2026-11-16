@@ -69,7 +69,7 @@ def process(raw: bytes, guard: Guard) -> tuple[Mail, Verdict, str | None]:
     text = text_to_check(mail)
     verdict = guard.check(text)
     card = None
-    if verdict.decision == "revisar":
+    if verdict.decision == "review":
         card = render_card(create_card(text, verdict, hidden_links=mail.links))
     return mail, verdict, card
 
@@ -81,7 +81,7 @@ def show(folder: str, mail: Mail, verdict: Verdict, card: str | None) -> None:
     print(f"Asunto: {mail.subject}")
     if mail.hidden_fragments:
         print(f"Trae {mail.hidden_fragments} fragmento(s) de texto oculto en el HTML.")
-    if verdict.decision == "permitir":
+    if verdict.decision == "allow":
         print("Decisión: permitir. El asistente puede leerlo.")
     else:
         print("Decisión: revisar. Va a la sala de revisión; el asistente no lo lee.\n")

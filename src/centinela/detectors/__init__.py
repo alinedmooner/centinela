@@ -1,4 +1,4 @@
-"""Detectores intercambiables: reglas (sin internet), modelo local y modelo por API."""
+"""Interchangeable detectors: rules (no internet), a local model and a model via an API."""
 
 from centinela.detectors.base import Detector
 from centinela.detectors.llm import LLMDetector

@@ -1,4 +1,4 @@
-"""Carga un archivo ``.env`` sin depender de ningún paquete."""
+"""Loads a ``.env`` file without depending on any package."""
 
 from __future__ import annotations
 
@@ -7,9 +7,9 @@ from pathlib import Path
 
 
 def load_env(start: Path | None = None) -> Path | None:
-    """Busca ``.env`` en la carpeta actual o en las superiores y carga sus variables.
+    """Looks for ``.env`` in the current folder or any parent folder and loads its variables.
 
-    No pisa las variables que ya existen en el entorno. Devuelve la ruta que cargó.
+    Does not overwrite variables that already exist in the environment. Returns the path it loaded.
     """
     folder = (start or Path.cwd()).resolve()
     for candidate in (folder, *folder.parents):

@@ -34,13 +34,16 @@ from inspect_ai.model import (
 from inspect_ai.scorer import CORRECT, INCORRECT, Score, Target, accuracy, scorer
 from inspect_ai.solver import Generate, Solver, TaskState, solver
 
-from centinela import HUMAN_REVIEW, LEAD_LABELS, Guard, RulesDetector
+from centinela import LEAD_LABELS, Guard, RulesDetector
 from centinela._markers import wrap
 from centinela.classifier import instructions
 from centinela.detectors.llm import INSTRUCTIONS as JUDGE_INSTRUCTIONS
 
 DEFENSES = ("ninguna", "prompt", "centinela", "centinela_juez")
 NO_LABEL = "sin_etiqueta"
+#: The label the code assigns when a person must decide, as the saved results record it
+#: (the library calls it ``HUMAN_REVIEW`` and its value is ``human_review``).
+HUMAN_REVIEW = "revision_humana"
 
 _DEFINITIONS = "\n".join(f"- {name}: {text}" for name, text in LEAD_LABELS.items())
 
@@ -131,7 +134,7 @@ def bot(defense: str = "ninguna") -> Solver:
             )
             label, reason = label_in_free_text(output.completion), "modelo"
         else:
-            suspicion = guard.check(text).decision == "revisar"
+            suspicion = guard.check(text).decision == "review"
             reason = "guardia"
             if not suspicion and defense == "centinela_juez":
                 suspicion = await _judge_suspects(model, text)

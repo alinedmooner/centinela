@@ -1,9 +1,13 @@
-"""Etiquetas de ejemplo para un clasificador de leads. Cada negocio puede definir las suyas."""
+"""Example labels for a lead classifier. Each business defines its own.
 
-#: Etiqueta que solo asigna el código, nunca el modelo.
-HUMAN_REVIEW = "revision_humana"
+The names and definitions are Spanish on purpose: they are the labels of the sales bot used
+in the saved measurements, and the model sees the definitions.
+"""
 
-#: Nombre de la etiqueta -> definición que se le da al modelo.
+#: The label only the code assigns, never the model. It is not in any list of labels.
+HUMAN_REVIEW = "human_review"
+
+#: Label name -> definition given to the model.
 LEAD_LABELS: dict[str, str] = {
     "prioritario": (
         "Intención de compra clara e inmediata: quiere comprar o contratar ya, pide una "

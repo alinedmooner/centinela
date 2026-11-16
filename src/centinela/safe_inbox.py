@@ -1,17 +1,17 @@
-"""Buzón seguro: Centinela entre las herramientas de correo de Composio y un agente de IA.
+"""Safe inbox: Centinela between Composio's email tools and an AI agent.
 
-Muchos agentes leen el correo con las herramientas de Gmail de Composio. Este módulo revisa
-cada correo en código, antes de que el agente lo vea. Los sospechosos se retienen: el agente
-recibe solo un aviso de que el correo quedó para revisión humana, nunca su texto. La decisión
-no depende de que el agente se acuerde de consultar a Centinela.
+Many agents read email with Composio's Gmail tools. This module checks each email in code,
+before the agent sees it. Suspicious ones are held: the agent receives only a notice that the
+email was left for human review, never its text. The decision does not depend on the agent
+remembering to consult Centinela.
 
-Uso con Composio (que es opcional: solo se importa al crear los modificadores)::
+Usage with Composio (optional: it is imported only when the modifiers are created)::
 
     from composio import Composio
-    from centinela.buzon_seguro import modificadores
+    from centinela.safe_inbox import modifiers
 
     composio = Composio()
-    herramientas = composio.tools.get(user_id, toolkits=["gmail"], modifiers=modificadores())
+    tools = composio.tools.get(user_id, toolkits=["gmail"], modifiers=modifiers())
 """
 
 from __future__ import annotations
@@ -30,13 +30,13 @@ from centinela.mail import Mail, read_mail, text_to_check
 from centinela.review import ReviewCard, create_card
 from centinela.verdict import Verdict
 
-#: Herramientas de Composio que entregan correos completos al agente.
+#: Composio tools that hand complete emails to the agent.
 READING_TOOLS = (
     "GMAIL_FETCH_EMAILS",
     "GMAIL_FETCH_MESSAGE_BY_MESSAGE_ID",
     "GMAIL_FETCH_MESSAGE_BY_THREAD_ID",
 )
-#: Campos que se conservan de un correo retenido: solo identificadores y metadatos.
+#: Fields kept from a held email: only identifiers and metadata.
 _SAFE_FIELDS = ("messageId", "id", "threadId", "labelIds", "messageTimestamp", "internalDate")
 
 OnHold = Callable[[Mail, Verdict, ReviewCard], None]
@@ -61,7 +61,7 @@ def _parts(payload: dict):
 
 
 def _from_payload(message: dict, payload: dict) -> Mail | None:
-    """Rehace un correo MIME mínimo con las partes de texto del formato «full» de Gmail."""
+    """Rebuilds a minimal MIME email from the text parts of Gmail's "full" format."""
     plain = html = ""
     for part in _parts(payload):
         data = (part.get("body") or {}).get("data")
@@ -80,7 +80,7 @@ def _from_payload(message: dict, payload: dict) -> Mail | None:
         rebuilt["From"] = _header(payload, "From") or str(message.get("sender", ""))
         rebuilt["Subject"] = _header(payload, "Subject") or str(message.get("subject", ""))
     except (ValueError, TypeError):
-        pass  # una cabecera mal formada no impide revisar el cuerpo
+        pass  # a malformed header does not prevent checking the body
     if plain:
         rebuilt.set_content(plain)
         if html:
@@ -91,7 +91,7 @@ def _from_payload(message: dict, payload: dict) -> Mail | None:
 
 
 def mail_from_gmail(message: dict[str, Any]) -> Mail:
-    """Arma un ``Correo`` con lo que devuelve Gmail por Composio: «raw», «payload» o campos sueltos."""
+    """Builds a ``Mail`` from what Gmail returns via Composio: "raw", "payload" or loose fields."""
     if message.get("raw"):
         return read_mail(_b64url(str(message["raw"])))
     payload = message.get("payload")
@@ -114,13 +114,13 @@ def mail_from_gmail(message: dict[str, Any]) -> Mail:
 def check_message(
     message: dict[str, Any], guard: Guard | None = None
 ) -> tuple[Mail, Verdict, ReviewCard | None]:
-    """Revisa un correo de Gmail. Si va a revisión, devuelve también su tarjeta."""
+    """Checks a Gmail email. If it goes to review, it also returns its review card."""
     guard = guard or Guard([RulesDetector(labels=LEAD_LABELS)])
     mail = mail_from_gmail(message)
     text = text_to_check(mail)
     verdict = guard.check(text)
     card = None
-    if verdict.decision == "revisar":
+    if verdict.decision == "review":
         card = create_card(text, verdict, hidden_links=mail.links)
     return mail, verdict, card
 
@@ -128,10 +128,13 @@ def check_message(
 def sanitize_message(
     message: dict[str, Any], guard: Guard | None = None, on_hold: OnHold | None = None
 ) -> dict[str, Any]:
-    """Deja pasar un correo normal y retiene uno sospechoso: el agente no recibe su texto."""
+    """Lets a normal email through and holds a suspicious one: the agent does not get its text.
+
+    The text that replaces a held email is Spanish on purpose: it is what the agent sees.
+    """
     mail, verdict, card = check_message(message, guard)
     if card is None:
-        return {**message, "centinela": {"decision": "permitir"}}
+        return {**message, "centinela": {"decision": "allow"}}
     if on_hold:
         on_hold(mail, verdict, card)
     held = {k: message[k] for k in _SAFE_FIELDS if k in message}
@@ -142,13 +145,13 @@ def sanitize_message(
             "Centinela retuvo este correo para revisión humana y no entrega su contenido. "
             f"Motivo: {verdict.notice}"
         ),
-        centinela={"decision": "revisar", "aviso": verdict.notice},
+        centinela={"decision": "review", "notice": verdict.notice},
     )
     return held
 
 
 def sanitize_response(data: Any, guard: Guard | None = None, on_hold: OnHold | None = None) -> Any:
-    """Aplica ``limpiar_mensaje`` a cada correo de una respuesta de las herramientas de Gmail."""
+    """Applies ``sanitize_message`` to each email in a response from the Gmail tools."""
     if isinstance(data, str):
         try:
             data = json.loads(data)
@@ -171,11 +174,11 @@ def sanitize_response(data: Any, guard: Guard | None = None, on_hold: OnHold | N
 
 
 def modifiers(guard: Guard | None = None, on_hold: OnHold | None = None) -> list:
-    """Modificadores de Composio que ponen a Centinela delante de las herramientas de lectura.
+    """Composio modifiers that put Centinela in front of the reading tools.
 
-    - Antes: pide a Gmail el contenido completo, para que el guardia revise el cuerpo y no solo
-      el asunto.
-    - Después: revisa cada correo y retiene los sospechosos antes de que los vea el agente.
+    - Before: asks Gmail for the full content, so the guard checks the body and not only the
+      subject.
+    - After: checks each email and holds the suspicious ones before the agent sees them.
     """
     from composio import after_execute, before_execute
 

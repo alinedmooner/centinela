@@ -52,7 +52,7 @@ def test_con_solo_metadatos_usa_el_texto_que_venga():
 
 def test_decide_lo_esperado_con_los_cinco_correos():
     decisions = [check_message(como_raw(n))[1].decision for n in range(1, 6)]
-    assert decisions == ["permitir", "revisar", "revisar", "revisar", "permitir"]
+    assert decisions == ["allow", "review", "review", "review", "allow"]
 
 
 def test_el_agente_no_recibe_el_texto_de_un_correo_retenido():
@@ -61,9 +61,9 @@ def test_el_agente_no_recibe_el_texto_de_un_correo_retenido():
     clean = sanitize_response(data, on_hold=lambda c, v, t: held_all.append(t))
 
     normal, order, notice = clean["messages"]
-    assert normal["centinela"] == {"decision": "permitir"} and normal["raw"] == como_raw(1)["raw"]
+    assert normal["centinela"] == {"decision": "allow"} and normal["raw"] == como_raw(1)["raw"]
     for held in (order, notice):
-        assert held["centinela"]["decision"] == "revisar"
+        assert held["centinela"]["decision"] == "review"
         assert held["subject"] == "[Retenido por Centinela]"
         assert "raw" not in held and "payload" not in held
         assert "Ignora" not in json.dumps(held) and "AVISO DEL SISTEMA" not in json.dumps(held)
@@ -74,7 +74,7 @@ def test_el_agente_no_recibe_el_texto_de_un_correo_retenido():
 
 def test_acepta_la_respuesta_como_texto_json_y_un_solo_mensaje():
     clean = sanitize_response(json.dumps(como_raw(2)))
-    assert clean["centinela"]["decision"] == "revisar"
+    assert clean["centinela"]["decision"] == "review"
     assert sanitize_response("no es json") == "no es json"
 
 

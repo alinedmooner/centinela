@@ -7,3 +7,9 @@ were translated to English. No pattern changed. The decisions and evidence on th
 benchmark cases that do not need SpaPhish are identical (tests/test_golden_data.py), and the
 file frozen above is still at tags v0.1.0 and v0.1.1.
 sha256 de src/centinela/detectors/rules.py: e10aa7aac3f3be45943dfc2775b0bf6497deb3d7a77b641891f32de55fcfe66f
+
+2026-11-16 (second translation): docstrings and comments were translated and the rule ids
+(anular_instrucciones -> override_instructions, and so on) and the evidence phrases of the
+hidden-text signals were renamed. No pattern changed; the decisions and the evidence, mapped
+back to the old ids, are identical on the same 652 cases (tests/test_golden_data.py).
+sha256 de src/centinela/detectors/rules.py: 81fb25ac9d1a32820439e66f03329fcc503a3e2d8fa41d0b1c94a657110e5e0d

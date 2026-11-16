@@ -1,53 +1,59 @@
-"""Tipos de datos que comparten los detectores, el guardia y el clasificador."""
+"""Data types shared by the detectors, the guard and the classifier."""
 
 from __future__ import annotations
 
 from dataclasses import asdict, dataclass
 from typing import Literal
 
-Decision = Literal["permitir", "revisar"]
+from centinela.catalog import DEFAULT_LANG
 
-#: Trucos de persuasión que Centinela nombra para la persona. Son los principios de
-#: Ferreira et al. (2015), los mismos que anota el conjunto SpaPhish.
-TRICKS: dict[str, str] = {
-    "autoridad": "se presenta como alguien con autoridad (jefe, banco, soporte, gobierno)",
-    "prueba_social": "dice que otras personas ya lo hicieron o lo aprueban",
-    "simpatia_engano": "finge cercanía o confianza para ganarse a la persona",
-    "compromiso_reciprocidad": "apela a un compromiso previo o a devolver un favor",
-    "distraccion_urgencia": "mete prisa, miedo o un premio para que la persona no piense",
-}
+Decision = Literal["allow", "review"]
+
+#: Persuasion tricks Centinela names for the person who reviews a message. They are the
+#: principles of Ferreira et al. (2015), the same ones the SpaPhish dataset annotates. The
+#: ids are in Spanish on purpose: they are part of the JSON schema a model answers with.
+#: What a person reads for each id is in :mod:`centinela.catalog` (``trick.<id>``).
+TRICKS: tuple[str, ...] = (
+    "autoridad",
+    "prueba_social",
+    "simpatia_engano",
+    "compromiso_reciprocidad",
+    "distraccion_urgencia",
+)
 
 
 @dataclass(frozen=True)
 class Finding:
-    """Lo que un detector encontró en un mensaje."""
+    """What one detector found in a message."""
 
     detector: str
-    #: El mensaje trae instrucciones dirigidas a la IA que lo lee.
+    #: The message carries instructions addressed to the AI that reads it.
     ai_instructions: bool = False
-    #: El mensaje parece un engaño dirigido a una persona (phishing, estafa).
+    #: The message looks like a deception aimed at a person (phishing, scam).
     people_deception: bool = False
-    #: Claves de :data:`TRUCOS` que el detector reconoció.
+    #: Ids from :data:`TRICKS` that the detector recognized.
     tricks: tuple[str, ...] = ()
-    #: Fragmentos o nombres de regla que justifican el hallazgo.
+    #: Fragments or rule names that justify the finding.
     evidence: tuple[str, ...] = ()
-    #: Si el detector no pudo responder, aquí va el motivo.
+    #: If the detector could not answer, the reason goes here.
     error: str | None = None
 
 
 @dataclass(frozen=True)
 class Verdict:
-    """Decisión del guardia sobre un mensaje."""
+    """The guard's decision about a message."""
 
     decision: Decision
     ai_instructions: bool
     people_deception: bool
     tricks: tuple[str, ...]
     evidence: tuple[str, ...]
-    #: Una línea para la persona que va a leer el mensaje.
+    #: One line for the person who is going to read the message, in ``lang``.
     notice: str
     findings: tuple[Finding, ...] = ()
+    #: Language of ``notice`` and of everything built from this verdict (``en`` or ``es``).
+    lang: str = DEFAULT_LANG
 
     def to_dict(self) -> dict:
-        """Versión serializable del veredicto."""
+        """A serializable version of the verdict."""
         return asdict(self)

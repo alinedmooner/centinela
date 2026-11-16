@@ -1,8 +1,8 @@
-"""Detector con un modelo abierto que corre en la propia máquina.
+"""Detector with an open model that runs on your own machine.
 
-Necesita el extra ``local`` (``pip install "centinela-ia[local]"``). El texto no sale del
-equipo. El modelo por defecto, ``protectai/deberta-v3-base-prompt-injection-v2``, fue
-entrenado para inglés: con ``traducir=True`` el mensaje se traduce antes al inglés con
+Needs the ``local`` extra (``pip install "centinela-ia[local]"``). The text does not leave the
+machine. The default model, ``protectai/deberta-v3-base-prompt-injection-v2``, was trained for
+English: with ``translate=True`` the message is first translated to English with
 ``Helsinki-NLP/opus-mt-es-en``.
 """
 
@@ -20,7 +20,7 @@ _SENTENCES = re.compile(r"(?<=[.!?\n])\s+")
 
 
 def chunks(text: str, length: int = 1500, overlap: int = 200) -> list[str]:
-    """Parte un texto largo en ventanas que se solapan, para no perder nada al recortar."""
+    """Splits a long text into overlapping windows, so nothing is lost when trimming."""
     if len(text) <= length:
         return [text]
     step = length - overlap
@@ -28,7 +28,7 @@ def chunks(text: str, length: int = 1500, overlap: int = 200) -> list[str]:
 
 
 def sentences(text: str, length: int = 400) -> list[str]:
-    """Agrupa las frases de un texto en bloques cortos, que es lo que traduce bien el modelo."""
+    """Groups the sentences of a text into short blocks, which the model translates well."""
     blocks: list[str] = []
     actual = ""
     for sentence in _SENTENCES.split(text):
@@ -46,10 +46,10 @@ def sentences(text: str, length: int = 400) -> list[str]:
 
 
 class LocalDetector:
-    """Detector de órdenes para la IA con un modelo de clasificación local.
+    """Detector of instructions aimed at the AI, using a local classification model.
 
-    ``clasificar`` y ``traducir_textos`` permiten inyectar funciones propias (por ejemplo
-    en pruebas). Si no se pasan, se cargan los modelos de Hugging Face al primer uso.
+    ``classify`` and ``translate_texts`` let you inject your own functions (for example in
+    tests). If they are not passed, the Hugging Face models are loaded on first use.
     """
 
     def __init__(

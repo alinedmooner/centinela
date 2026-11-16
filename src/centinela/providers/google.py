@@ -1,7 +1,7 @@
-"""Proveedor para los modelos de Google (Gemini y Gemma), con el SDK oficial google-genai.
+"""Provider for the Google models (Gemini and Gemma), with the official google-genai SDK.
 
-Necesita el extra ``google`` (``pip install "centinela-ia[google]"``) y una clave de
-Google AI Studio en ``GOOGLE_API_KEY`` (también sirve ``GEMINI_API_KEY``).
+It needs the ``google`` extra (``pip install "centinela-ia[google]"``) and a Google AI Studio
+key in ``GOOGLE_API_KEY`` (``GEMINI_API_KEY`` also works).
 """
 
 from __future__ import annotations
@@ -12,8 +12,8 @@ from centinela.providers.base import ModelResponse, ProviderError, is_error_from
 
 DEFAULT_MODEL = "gemini-3.5-flash-lite"
 KEY_VARIABLES = ("GOOGLE_API_KEY", "GEMINI_API_KEY", "GOOGLE_STUDIO_API_KEY")
-#: Motivos de parada que significan que Google bloqueó la respuesta.
-_BLOCKS_OF_CHARS = {"SAFETY", "PROHIBITED_CONTENT", "BLOCKLIST", "SPII", "RECITATION"}
+#: Finish reasons that mean Google blocked the answer.
+_BLOCKING_FINISH_REASONS = {"SAFETY", "PROHIBITED_CONTENT", "BLOCKLIST", "SPII", "RECITATION"}
 
 
 def _name(value) -> str | None:
@@ -21,11 +21,11 @@ def _name(value) -> str | None:
 
 
 class GoogleProvider:
-    """Pide a un modelo de Google un JSON que cumple un esquema.
+    """Asks a Google model for JSON that meets a schema.
 
-    ``razonamiento`` es el nivel de razonamiento de Gemini 3 o posterior. Va en
-    ``"minimal"`` porque revisar mensajes cortos no necesita más. Con ``None`` no se
-    envía, para modelos que no aceptan niveles (Gemma, Gemini 2.5).
+    ``reasoning`` is the reasoning level of Gemini 3 or later. It is ``"minimal"`` because
+    checking short messages needs no more. With ``None`` it is not sent, for models that do
+    not accept levels (Gemma, Gemini 2.5).
     """
 
     def __init__(
@@ -40,13 +40,19 @@ class GoogleProvider:
         if client is None:
             try:
                 from google import genai
-            except ImportError as error:  # pragma: no cover - depende de la instalación
+            except ImportError as error:  # pragma: no cover - depends on the installation
                 raise ProviderError(
-                    'Falta el SDK de Google. Instala el extra: pip install "centinela-ia[google]"'
+                    'The Google SDK is missing. Install the extra: pip install "centinela-ia[google]"',
+                    code="missing_sdk",
+                    hint='pip install "centinela-ia[google]"',
                 ) from error
             key = key or next((os.environ[v] for v in KEY_VARIABLES if os.environ.get(v)), None)
             if not key:
-                raise ProviderError("Falta la clave de Google: define GOOGLE_API_KEY.")
+                raise ProviderError(
+                    "The Google key is missing: set GOOGLE_API_KEY.",
+                    code="missing_key",
+                    variable="GOOGLE_API_KEY",
+                )
             client = genai.Client(api_key=key)
         self.client = client
         self.model = model
@@ -72,20 +78,22 @@ class GoogleProvider:
                 raise
             code = getattr(error, "code", None)
             if code == 429:
-                raise ProviderError("Se alcanzó el límite de peticiones de la API.") from error
+                raise ProviderError("The API rate limit was reached.", code="rate_limit") from error
             if isinstance(code, int):
-                raise ProviderError(f"La API respondió con el error {code}.") from error
-            raise ProviderError("No se pudo conectar con la API.") from error
+                raise ProviderError(
+                    f"The API answered with error {code}.", code="api_error", status=code
+                ) from error
+            raise ProviderError("Could not connect to the API.", code="connection") from error
 
-        uso = getattr(response, "usage_metadata", None)
-        input_count = getattr(uso, "prompt_token_count", 0) or 0
-        output = (getattr(uso, "candidates_token_count", 0) or 0) + (
-            getattr(uso, "thoughts_token_count", 0) or 0
+        usage = getattr(response, "usage_metadata", None)
+        input_count = getattr(usage, "prompt_token_count", 0) or 0
+        output = (getattr(usage, "candidates_token_count", 0) or 0) + (
+            getattr(usage, "thoughts_token_count", 0) or 0
         )
         candidates = getattr(response, "candidates", None) or []
-        fin = _name(getattr(candidates[0], "finish_reason", None)) if candidates else None
+        finish_reason = _name(getattr(candidates[0], "finish_reason", None)) if candidates else None
         block = getattr(getattr(response, "prompt_feedback", None), "block_reason", None)
-        if block or fin in _BLOCKS_OF_CHARS:
+        if block or finish_reason in _BLOCKING_FINISH_REASONS:
             return ModelResponse(None, refusal=True, input_tokens=input_count, output_tokens=output)
         return ModelResponse(
             json_from_text(getattr(response, "text", None) or ""),

@@ -59,7 +59,7 @@ def measure(row: dict, deception: bool | None, guard: Guard) -> dict:
     registered = registered_links(row.get("urls", ""))
     verdict = guard.check(text)
     if deception:
-        verdict = replace(verdict, decision="revisar", people_deception=True)
+        verdict = replace(verdict, decision="review", people_deception=True)
     card = create_card(text, verdict, hidden_links=registered)
     defanged = card.defanged_text
     lowercase = text.lower()
