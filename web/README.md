@@ -39,5 +39,6 @@ El botón «Revisar con Claude, en vivo» de la sala manda el texto a `POST /api
 
 - **Límites:** hasta 2000 caracteres por mensaje y 700 tokens de respuesta. Hay 6 revisiones por minuto por visitante y 60 por minuto en total, por ubicación de Cloudflare. Solo acepta peticiones con el origen del sitio. Cada revisión cuesta unos 0,0002 USD (unos 1400 tokens de entrada y 100 de salida).
 - **Privacidad:** el texto no se guarda ni se registra; viaja a la API de Anthropic para revisarlo.
-- **Apagarlo** (después de la presentación): en `cloudflare.config.ts`, `REVISION_EN_VIVO: bindings.text('apagada')`, y `pnpm exec cf deploy`. El botón muestra que está apagado y la demostración en el navegador sigue funcionando. Para borrar también la clave, usen `npx wrangler secret delete ANTHROPIC_API_KEY --name centinela-web`.
+- **Estado actual: apagada** desde el fin del hackathon (2026-11-16). Para volver a encenderla, cambien `REVISION_EN_VIVO` a `'activa'` y publiquen con `--secrets-file`.
+- **Apagarla** (después de una presentación): en `cloudflare.config.ts`, `REVISION_EN_VIVO: bindings.text('apagada')`, y `pnpm exec cf deploy`. El botón muestra que está apagado y la demostración en el navegador sigue funcionando. Para borrar también la clave, usen `npx wrangler secret delete ANTHROPIC_API_KEY --name centinela-web`.
 - **SDK:** el Worker usa el SDK oficial `@anthropic-ai/sdk` (licencia Apache 2.0).

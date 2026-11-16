@@ -10,8 +10,9 @@ export default defineConfig({
     env: {
       // Se sube con `cf deploy --secrets-file`; nunca va en el código ni en el navegador.
       ANTHROPIC_API_KEY: bindings.secret(),
-      // 'activa' o 'apagada'. Después de la presentación: 'apagada' y `cf deploy`.
-      REVISION_EN_VIVO: bindings.text('activa'),
+      // 'activa' o 'apagada'. Apagada desde el fin del hackathon (2026-11-16): cada revisión
+      // gasta saldo de la API. Para volver a encenderla: 'activa' y `cf deploy --secrets-file`.
+      REVISION_EN_VIVO: bindings.text('apagada'),
       // Límites por ubicación de Cloudflare, para cuidar el saldo de la API.
       LIMITE_VISITANTE: bindings.rateLimit({ namespace: '4101', simple: { limit: 6, period: 60 } }),
       LIMITE_TOTAL: bindings.rateLimit({ namespace: '4102', simple: { limit: 60, period: 60 } }),
