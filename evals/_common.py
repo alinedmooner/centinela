@@ -10,9 +10,11 @@ from collections.abc import Iterable
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-#: Folder with the benchmark data. It can be changed with the CENTINELA_DATOS environment variable.
-DATA = Path(os.environ.get("CENTINELA_DATOS", ROOT / "data"))
-RESULTS = ROOT / "results"
+#: Folder with the benchmark data. It can be changed with the CENTINELA_DATA environment variable.
+DATA = Path(os.environ.get("CENTINELA_DATA", ROOT / "data"))
+#: The saved records. CENTINELA_RESULTS points a rerun at a scratch folder, so it can be compared
+#: with the saved records before it replaces them.
+RESULTS = Path(os.environ.get("CENTINELA_RESULTS", ROOT / "results"))
 
 
 def read_jsonl(path: Path) -> list[dict]:
@@ -52,15 +54,3 @@ def wilson(k: int, n: int, z: float = 1.96) -> tuple[float, float]:
 def proportion(k: int, n: int) -> dict:
     low, high = wilson(k, n)
     return {"k": k, "n": n, "valor": k / n if n else None, "ic95": [low, high]}
-
-
-def pct(value: float | None) -> str:
-    """Percentage with a decimal comma, as it is written in Spanish."""
-    return "s. d." if value is None else f"{value * 100:.1f} %".replace(".", ",")
-
-
-def pct_ci(p: dict) -> str:
-    if not p["n"]:
-        return "s. d."
-    low, alto = p["ic95"]
-    return f"{pct(p['valor'])} ({p['k']}/{p['n']}; IC 95 %: {pct(low)} a {pct(alto)})"

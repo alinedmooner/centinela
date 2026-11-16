@@ -197,7 +197,7 @@ Agregar un detector o conectar otro proveedor de modelos es escribir una clase p
 
 ## Resultados
 
-Medidos el 14 de noviembre de 2026 con casos reservados: las reglas se escribieron mirando solo el 30 % de los datos (`dev`) y se midieron con el otro 70 % (`test`). Las tablas completas, con intervalos de confianza de Wilson al 95 %, están en [results/resumen.md](https://github.com/alinedmooner/centinela/blob/main/results/resumen.md) y se rehacen sin clave con `uv run --extra evals python evals/tables.py`.
+Medidos el 14 de noviembre de 2026 con casos reservados: las reglas se escribieron mirando solo el 30 % de los datos (`dev`) y se midieron con el otro 70 % (`test`). Las tablas completas, con intervalos de confianza de Wilson al 95 %, están en [results/summary.es.md](https://github.com/alinedmooner/centinela/blob/main/results/summary.es.md) y se rehacen sin clave con `uv run --extra evals python evals/tables.py`.
 
 ### Cómo se calcula cada número
 

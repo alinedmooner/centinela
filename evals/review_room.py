@@ -25,16 +25,21 @@ from difflib import SequenceMatcher
 from pathlib import Path
 from urllib.parse import urlsplit
 
+import legacy_v1
 from _common import RESULTS, proportion, read_jsonl, write_jsonl
 from cases import mail_text, read_spaphish
 
 from centinela import LEAD_LABELS, Guard, RulesDetector, create_card
-from centinela.review import SENSITIVE_ASKS
+from centinela.catalog import hidden_number_re
+from centinela.review import INSTRUCT_AI, SENSITIVE_ASKS
+
+#: The records were measured with the Spanish screens (and the Spanish placeholder of a hidden
+#: number), and a rerun must write the same records.
+LANG = "es"
 
 #: Signal of an active link, independent of the expressions the defanger uses.
 ACTIVE = re.compile(r"(?i)(?:https?|ftp)://\S|\bwww\.\S")
 WEB = re.compile(r"(?i)https?://|www\.")
-INSTRUCT_AI = "darle órdenes al asistente de IA"
 
 
 def registered_links(field: str) -> list[str]:
@@ -78,13 +83,14 @@ def measure(row: dict, deception: bool | None, guard: Guard) -> dict:
         "destinos": len(destinations),
         "destinos_ocultos": sum(d not in lowercase for d in destinations),
         "destinos_en_tarjeta": len(card.links),
-        "pide": [p for p in card.asks if p != INSTRUCT_AI],
-        "presiona_con": list(card.pressure),
+        # v1 records write the ask and the pressure as the Spanish phrase of the old card.
+        "pide": [legacy_v1.ask_phrase(p) for p in card.asks if p != INSTRUCT_AI],
+        "presiona_con": [legacy_v1.pressure_phrase(p) for p in card.pressure],
         "dice_ser": bool(card.claims_to_be),
         "segunda_persona": card.needs_second_person,
         "palabras": len(before),
         "palabras_iguales": sum(b.size for b in blocks),
-        "numeros_ocultos": defanged.count("[número oculto"),
+        "numeros_ocultos": len(hidden_number_re(LANG).findall(defanged)),
     }
 
 
@@ -115,7 +121,9 @@ def summarize(rows: list[dict]) -> dict:
         "con_destino_en_tarjeta": count_where(lambda f: f["destinos_en_tarjeta"] > 0),
         "con_pedido": count_where(lambda f: bool(f["pide"])),
         "con_presion": count_where(lambda f: bool(f["presiona_con"])),
-        "con_pedido_delicado": count_where(lambda f: any(p in SENSITIVE_ASKS for p in f["pide"])),
+        "con_pedido_delicado": count_where(
+            lambda f: any(legacy_v1.ask_id(p) in SENSITIVE_ASKS for p in f["pide"])
+        ),
         "con_remitente": count_where(lambda f: f["dice_ser"]),
         "exige_segunda_persona": count_where(lambda f: f["segunda_persona"]),
         "por_pedido": {p: count_where(lambda f, p=p: p in f["pide"]) for p in asks_found},
@@ -138,7 +146,7 @@ def main(argv: list[str] | None = None) -> int:
     mails = sorted(read_spaphish(args.spaphish), key=lambda f: f["hash"])[: args.maximum]
     saved = read_jsonl(RESULTS / "phishing" / f"{args.reviewer}.jsonl")
     deception = {r["id"]: bool(r.get("engano")) for r in saved}
-    guard = Guard([RulesDetector(labels=LEAD_LABELS)])
+    guard = Guard([RulesDetector(labels=LEAD_LABELS)], lang=LANG)
     rows = [measure(f, deception.get(f["hash"][:16]), guard) for f in mails]
 
     folder = RESULTS / "review"

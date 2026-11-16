@@ -1,6 +1,6 @@
 # Resultados
 
-Partición: `test`. Tablas generadas por `evals/tabla.py`.
+Partición: `test`. Tablas generadas por `evals/tables.py`.
 
 ## Prueba 2: el bot de leads frente a mensajes con trampa
 

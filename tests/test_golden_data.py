@@ -104,12 +104,19 @@ def test_the_last_line_of_the_frozen_rules_is_the_hash_of_the_current_file():
 
 def test_the_summary_tables_are_rebuilt_the_same_without_an_api_key(tmp_path, monkeypatch):
     copy_dir = tmp_path / "results"
-    shutil.copytree(_path("results"), copy_dir, ignore=shutil.ignore_patterns("raw"))
+    shutil.copytree(_path("resultados"), copy_dir, ignore=shutil.ignore_patterns("raw"))
     monkeypatch.setattr(tables, "RESULTS", copy_dir)
     assert tables.main([]) == 0
-    assert (copy_dir / "resumen.md").read_text(encoding="utf-8") == (
-        GOLDEN / "resumen.md"
-    ).read_text(encoding="utf-8")
-    assert (copy_dir / "resumen.json").read_text(encoding="utf-8") == (
+    # The Spanish tables are the published ones; only the name of the script changed.
+    spanish = (copy_dir / "summary.es.md").read_text(encoding="utf-8")
+    reference = (GOLDEN / "resumen.md").read_text(encoding="utf-8")
+    assert spanish == reference.replace("evals/tabla.py", "evals/tables.py")
+    # The data keeps the v1 names of the records, byte for byte.
+    assert (copy_dir / "summary.json").read_text(encoding="utf-8") == (
         GOLDEN / "resumen.json"
     ).read_text(encoding="utf-8")
+    # The repository holds the same files that the script writes.
+    for name in ("summary.md", "summary.es.md", "summary.json"):
+        assert (copy_dir / name).read_text(encoding="utf-8") == (_path("results") / name).read_text(
+            encoding="utf-8"
+        )
