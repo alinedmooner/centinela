@@ -1,8 +1,8 @@
-# Cómo contribuir
+# How to contribute
 
-Gracias por querer mejorar Centinela. Todo aporte entra por un pull request (PR) hacia `main`.
+Thank you for wanting to improve Centinela. Every contribution comes in as a pull request (PR) to `main`.
 
-## Preparar el entorno
+## Set up the environment
 
 ```bash
 uv sync
@@ -10,47 +10,50 @@ uv run pytest
 uv run ruff check .
 ```
 
-Las pruebas no usan internet ni claves. Si tu cambio necesita un modelo, pruébalo con un proveedor falso, como hacen `tests/test_clasificador.py` y `tests/test_detector_llm.py`.
+The tests use no internet and no keys. If your change needs a model, test it with a fake provider, as `tests/test_classifier.py` and `tests/test_llm_detector.py` do.
 
-## Tres aportes fáciles
+## Three easy contributions
 
-### 1. Agregar un caso al banco de pruebas
+### 1. Add a case to the benchmark
 
-Cada caso es una línea en un archivo de `data/`. El formato está en `data/README.md`.
+Each case is one line in a file in `data/`. The format is in `data/README.md`. The data stays in Spanish (see [Style](#style)).
 
-1. Agrega la línea al archivo que corresponda.
-2. Corre `python3 scripts/validate_data.py`.
-3. En el PR, di de dónde viene el caso y si lo escribiste tú o lo generó una IA.
+1. Add the line to the file that fits.
+2. Run `python3 scripts/validate_data.py`.
+3. In the PR, say where the case comes from and whether you wrote it or an AI generated it.
 
-No uses datos personales reales: nombres, teléfonos y correos deben ser inventados.
+Do not use real personal data: names, phone numbers and emails must be made up.
 
-### 2. Agregar un detector
+### 2. Add a detector
 
-Un detector es una clase con un atributo `nombre` y un método `revisar(texto)` que devuelve un `Hallazgo`. Mira `src/centinela/detectores/base.py`. Si no puede responder, devuelve un `Hallazgo` con `error` en vez de lanzar una excepción.
+A detector is a class with a `name` attribute and a `check(text)` method that returns a `Finding`. See `src/centinela/detectors/base.py`. If it cannot answer, it returns a `Finding` with `error` instead of raising an exception.
 
-### 3. Conectar otro proveedor de modelos
+### 3. Connect another model provider
 
-Un proveedor es una clase con un atributo `nombre` y un método `responder_json(sistema, mensaje, esquema)`. Mira `src/centinela/proveedores/base.py` y el ejemplo de `anthropic.py`.
+A provider is a class with a `name` attribute and a `respond_json(system, message, schema)` method. See `src/centinela/providers/base.py` and the example in `anthropic.py`.
 
-## Reglas del detector de reglas
+## Rules for the rules detector
 
-Las reglas se escriben mirando solo la partición `dev` de los datos. La partición `test` solo se usa para medir. Si cambias una regla, corre la prueba del filtro en `dev` y cuenta en el PR cómo cambiaron los números.
+The rules are written looking only at the `dev` split of the data. The `test` split is only used to measure. If you change a rule, run the filter test on `dev` and say in the PR how the numbers changed.
 
-## Estilo
+`src/centinela/detectors/rules.py` is pinned by a hash in `results/rules_frozen.txt`, and a test fails if the file changes without a new line there. If you change a rule on purpose, add a short paragraph at the end of that file saying what changed and why, followed by the line `sha256 de src/centinela/detectors/rules.py: <hash>` with the new hash. Never edit the older lines: they record what the published results were measured with.
 
-- Código y documentación en español, con nombres claros.
-- `uv run ruff format .` antes de subir.
-- Un PR por tema, con qué cambia, por qué y cómo probarlo.
-- Si una parte la escribió una IA, dilo en el PR.
+## Style
 
-## Publicar una versión
+- Code, comments and documentation in English, with clear names.
+- Spanish stays on purpose in the benchmark data, the patterns of the detection rules, the model prompts and label definitions, and the Spanish messages used in tests. See the Language policy in [README.md](README.md#language-policy).
+- Run `uv run ruff format .` before you push.
+- One PR per topic, saying what changes, why and how to test it.
+- If an AI wrote part of it, say so in the PR.
 
-Solo para quienes mantienen el proyecto.
+## Publish a release
 
-1. Sube la versión en `pyproject.toml` y en `src/centinela/__init__.py`, corre `uv lock` y fusiona el PR.
-2. Crea una versión (release) en GitHub con la etiqueta `vX.Y.Z`, igual a la versión del paquete.
-3. El flujo `publicar.yml` construye el paquete, lo prueba y espera la aprobación en el entorno `pypi`. Al aprobarla, se publica en PyPI sin claves guardadas (trusted publishing) y con atestaciones de origen.
+Only for the people who maintain the project.
 
-## Seguridad
+1. Bump the version in `pyproject.toml` and in `src/centinela/__init__.py`, run `uv lock` and merge the PR.
+2. Create a release on GitHub with the tag `vX.Y.Z`, the same as the package version.
+3. The `publish.yml` workflow builds the package, tests it and waits for approval in the `pypi` environment. Once approved, it publishes to PyPI without stored keys (trusted publishing) and with provenance attestations.
 
-Si encuentras una forma de saltarte el guardia, no abras un issue público. Sigue [SECURITY.md](SECURITY.md).
+## Security
+
+If you find a way around the guard, do not open a public issue. Follow [SECURITY.md](SECURITY.md).

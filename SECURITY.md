@@ -1,21 +1,21 @@
-# Seguridad
+# Security
 
-## Qué protege Centinela y qué no
+## What Centinela protects and what it does not
 
-Centinela reduce el riesgo de que un mensaje manipule a un asistente de IA o a la persona que lo lee. No es una garantía: un mensaje nuevo o ingenioso puede pasar el guardia. Por eso el diseño pone las decisiones delicadas en código y, ante la duda, se las deja a una persona.
+Centinela reduces the risk that a message manipulates an AI assistant or the person who reads it. It is not a guarantee: a new or clever message can get past the guard. That is why the design puts the delicate decisions in code and, when in doubt, leaves them to a person.
 
-## Cómo avisar de un problema
+## How to report a problem
 
-Si encuentras una forma de saltarte el guardia o el clasificador, o cualquier otro problema de seguridad:
+If you find a way around the guard or the classifier, or any other security problem:
 
-1. **No abras un issue público** ni publiques el mensaje que lo logra.
-2. Usa el aviso privado de GitHub: pestaña **Security** del repositorio, opción **Report a vulnerability**.
-3. Cuenta qué versión usaste, qué detector estaba activo y qué esperabas que pasara.
+1. **Do not open a public issue** and do not publish the message that does it.
+2. Use GitHub's private report: the **Security** tab of the repository, then **Report a vulnerability**.
+3. Tell us which version you used, which detector was active and what you expected to happen.
 
-Respondemos lo antes posible. Cuando el problema esté corregido, sumamos un caso al banco de pruebas para que no vuelva a pasar, con tu crédito si lo quieres.
+We reply as soon as we can. Once the problem is fixed, we add a case to the benchmark so it does not happen again, crediting you if you want.
 
-## Uso responsable
+## Responsible use
 
-- El banco de pruebas contiene mensajes de ataque porque hacen falta para medir defensas. Son traducciones de ataques ya públicos y ejemplos genéricos, no herramientas listas para atacar un sistema concreto.
-- No uses Centinela ni sus datos para probar sistemas de terceros sin permiso escrito.
-- Los ejemplos no deben contener datos personales reales.
+- The benchmark contains attack messages because they are needed to measure defenses. They are translations of attacks that are already public and generic examples, not tools ready to attack a specific system.
+- Do not use Centinela or its data to test third-party systems without written permission.
+- Examples must not contain real personal data.
