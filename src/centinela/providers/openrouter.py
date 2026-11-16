@@ -1,8 +1,8 @@
-"""Proveedor para cientos de modelos, abiertos y cerrados, por medio de OpenRouter.
+"""Provider for hundreds of models, open and closed, through OpenRouter.
 
-La API de OpenRouter es compatible con la de OpenAI, así que se usa el SDK oficial
-``openai``. Necesita el extra ``openrouter`` (``pip install "centinela-ia[openrouter]"``)
-y la variable ``OPENROUTER_API_KEY``.
+OpenRouter's API is compatible with OpenAI's, so the official ``openai`` SDK is used. It needs
+the ``openrouter`` extra (``pip install "centinela-ia[openrouter]"``) and the
+``OPENROUTER_API_KEY`` variable.
 """
 
 from __future__ import annotations
@@ -12,17 +12,17 @@ import os
 from centinela.providers.base import ModelResponse, ProviderError, is_error_from, json_from_text
 
 URL = "https://openrouter.ai/api/v1"
-#: Un modelo abierto y pequeño (Gemma 4, 4.000 millones de parámetros activos).
+#: A small open model (Gemma 4, 4 billion active parameters).
 DEFAULT_MODEL = "google/gemma-4-26b-a4b-it"
 KEY_VARIABLES = ("OPENROUTER_API_KEY", "OPEN_ROUTER_API_KEY")
 
 
 class OpenRouterProvider:
-    """Pide a un modelo de OpenRouter un JSON que cumple un esquema.
+    """Asks an OpenRouter model for JSON that meets a schema.
 
-    Envía el esquema como salida estructurada. Si el modelo no la soporta y responde
-    con texto, se busca el JSON en el texto; si no hay, el guardia manda el mensaje a
-    revisión humana.
+    It sends the schema as structured output. If the model does not support it and answers
+    with text, the JSON is looked for in the text; if there is none, the guard sends the
+    message to human review.
     """
 
     def __init__(
@@ -36,13 +36,19 @@ class OpenRouterProvider:
         if client is None:
             try:
                 import openai
-            except ImportError as error:  # pragma: no cover - depende de la instalación
+            except ImportError as error:  # pragma: no cover - depends on the installation
                 raise ProviderError(
-                    'Falta el SDK de OpenAI. Instala el extra: pip install "centinela-ia[openrouter]"'
+                    'The OpenAI SDK is missing. Install the extra: pip install "centinela-ia[openrouter]"',
+                    code="missing_sdk",
+                    hint='pip install "centinela-ia[openrouter]"',
                 ) from error
             key = key or next((os.environ[v] for v in KEY_VARIABLES if os.environ.get(v)), None)
             if not key:
-                raise ProviderError("Falta la clave de OpenRouter: define OPENROUTER_API_KEY.")
+                raise ProviderError(
+                    "The OpenRouter key is missing: set OPENROUTER_API_KEY.",
+                    code="missing_key",
+                    variable="OPENROUTER_API_KEY",
+                )
             client = openai.OpenAI(base_url=URL, api_key=key)
         self.client = client
         self.model = model
@@ -68,14 +74,16 @@ class OpenRouterProvider:
                 raise
             code = getattr(error, "status_code", None)
             if code == 429:
-                raise ProviderError("Se alcanzó el límite de peticiones de la API.") from error
+                raise ProviderError("The API rate limit was reached.", code="rate_limit") from error
             if isinstance(code, int):
-                raise ProviderError(f"La API respondió con el error {code}.") from error
-            raise ProviderError("No se pudo conectar con la API.") from error
+                raise ProviderError(
+                    f"The API answered with error {code}.", code="api_error", status=code
+                ) from error
+            raise ProviderError("Could not connect to the API.", code="connection") from error
 
-        uso = getattr(response, "usage", None)
-        input_count = getattr(uso, "prompt_tokens", 0) or 0
-        output = getattr(uso, "completion_tokens", 0) or 0
+        usage = getattr(response, "usage", None)
+        input_count = getattr(usage, "prompt_tokens", 0) or 0
+        output = getattr(usage, "completion_tokens", 0) or 0
         options = getattr(response, "choices", None) or []
         if not options:
             return ModelResponse(None, input_tokens=input_count, output_tokens=output)

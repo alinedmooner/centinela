@@ -16,11 +16,13 @@ from golden_support import (
     CLINIC_LABELS,
     GUARD,
     MESSAGES,
+    OLD_VALUES,
     FakeProvider,
     as_text,
     cli,
     demo_mails,
     load,
+    old_text,
     old_view,
     plain_json,
     verdict_of,
@@ -45,7 +47,7 @@ def test_la_cli_da_lo_mismo_en_json_y_en_texto(id_):
     assert old_view(json.loads(json_output["stdout"])) == expected["json"]["salida"]
     text_output = cli("check", "--card", MESSAGES[id_])
     assert text_output["exit"] == expected["texto"]["exit"]
-    assert text_output["stdout"] == expected["texto"]["stdout"]
+    assert old_text(text_output["stdout"]) == expected["texto"]["stdout"]
 
 
 @pytest.mark.parametrize("id_", [k.split("@")[0] for k in CLI if k.endswith("@clinica")])
@@ -99,17 +101,24 @@ def test_las_reglas_de_la_sala_de_revision_son_las_mismas(id_):
     card = create_card(MESSAGES[id_], verdict_of(id_))
     actual = []
     for action, label, segundo in itertools.product(
-        ("es_fraude", "es_legitimo", "no_estoy_seguro", "otra_cosa"),
+        ("is_fraud", "is_legitimate", "not_sure", "otra_cosa"),
         (None, "consulta", "inventada"),
         (None, "ana", "luis"),
     ):
-        row = {"accion": action, "etiqueta": label, "segundo": segundo}
+        row = {
+            "accion": OLD_VALUES["actions"].get(action, action),
+            "etiqueta": label,
+            "segundo": segundo,
+        }
         try:
             row["r"] = via_json(
                 asdict(resolve(card, action, "ana", label=label, second_reviewer=segundo))
             )
         except Exception as error:  # noqa: BLE001
-            row["error"] = [type(error).__name__, str(error)]
+            message = str(error)
+            for new, old in OLD_VALUES["actions"].items():
+                message = message.replace(new, old)
+            row["error"] = [type(error).__name__, message]
         actual.append(row)
     assert actual == ROOM[id_]
 
@@ -128,7 +137,7 @@ def test_el_lector_de_correo_y_el_buzon_seguro_dan_lo_mismo():
         verdict = GUARD.check(text)
         card = (
             create_card(text, verdict, hidden_links=mail.links)
-            if verdict.decision == "revisar"
+            if verdict.decision == "review"
             else None
         )
         assert (
@@ -144,11 +153,18 @@ def test_el_lector_de_correo_y_el_buzon_seguro_dan_lo_mismo():
             == expected[str(n)]
         ), f"correo {n}"
         raws.append({"messageId": f"id{n}", "threadId": f"hilo{n}", "raw": _b64(raw)})
-    clean = sanitize_response({"messages": raws, "nextPageToken": None})
+    clean = sanitize_response({"messages": raws, "nextPageToken": None}, GUARD)
     for m in clean["messages"]:
         m.pop("raw", None)  # trae la fecha y el Message-ID del momento
-    # A Gmail message, not a Mail object: its keys are Gmail's own.
-    assert plain_json(clean) == expected["gmail"]
+    # A Gmail message, not a Mail object: its keys are Gmail's own. Only the field Centinela
+    # adds (``centinela``) changed names and values.
+    actual = plain_json(clean)
+    for message in actual["messages"]:
+        field = message["centinela"]
+        field["decision"] = OLD_VALUES["decision"][field["decision"]]
+        if "notice" in field:
+            field["aviso"] = field.pop("notice")
+    assert actual == expected["gmail"]
 
 
 SCENARIOS = {
@@ -167,20 +183,20 @@ def test_el_clasificador_decide_lo_mismo_y_envia_lo_mismo(name, monkeypatch):
     monkeypatch.setattr(secrets, "token_hex", lambda n=8: "0123abcd")
     id_, response, error = SCENARIOS[name]
     provider = FakeProvider(response, error)
-    r = SafeClassifier(provider).classify(MESSAGES[id_])
+    r = SafeClassifier(provider, lang="es").classify(MESSAGES[id_])
     expected = load("classifier.json")[name]
     assert (
         via_json(
             {
-                "etiqueta": r.label,
-                "motivo": r.reason,
-                "etiqueta_modelo": r.model_label,
-                "veredicto": r.verdict.to_dict(),
+                "label": r.label,
+                "reason": r.reason,
+                "model_label": r.model_label,
+                "verdict": r.verdict.to_dict(),
             }
         )
         == expected["resultado"]
     )
-    # El orden de las claves del esquema también lo ve el modelo.
+    # The order of the schema keys is also seen by the model.
     assert as_text(provider.calls) == as_text(expected["llamadas"])
 
 

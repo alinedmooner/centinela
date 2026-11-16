@@ -1,13 +1,16 @@
-"""Clasificador seguro: las decisiones delicadas las toma el código, no el modelo.
+"""Safe classifier: the delicate decisions are made by the code, not by the model.
 
-Tres defensas, todas en código:
+Three defenses, all in code:
 
-1. El mensaje pasa primero por el guardia. Si hay sospecha, va a revisión humana y el
-   modelo ni siquiera lo lee.
-2. El mensaje viaja como dato, entre marcas con un identificador al azar que el remitente
-   no puede adivinar ni cerrar.
-3. La respuesta del modelo solo vale si es una etiqueta de la lista. Cualquier otra cosa,
-   un rechazo o un error terminan en revisión humana.
+1. The message goes through the guard first. If it is suspicious, it goes to human review and
+   the model never reads it.
+2. The message travels as data, between markers with a random identifier that the sender
+   cannot guess or close.
+3. The model's answer only counts if it is a label from the list. Anything else, a refusal
+   or an error ends in human review.
+
+The instructions the model receives are Spanish on purpose (see ``instructions``): they are
+what the saved measurements were made with.
 """
 
 from __future__ import annotations
@@ -18,6 +21,7 @@ from dataclasses import dataclass
 from typing import Literal
 
 from centinela._markers import wrap
+from centinela.catalog import DEFAULT_LANG
 from centinela.detectors.rules import RulesDetector
 from centinela.guard import Guard
 from centinela.labels import HUMAN_REVIEW, LEAD_LABELS
@@ -26,41 +30,46 @@ from centinela.verdict import Verdict
 
 __all__ = ["Classification", "SafeClassifier", "instructions", "schema", "wrap"]
 
-Reason = Literal["modelo", "guardia", "respuesta_invalida", "rechazo", "error"]
+Reason = Literal["model", "guard", "invalid_response", "refusal", "error"]
 
 
 @dataclass(frozen=True)
 class Classification:
-    """Resultado de clasificar un mensaje."""
+    """The result of classifying a message."""
 
-    #: Una etiqueta de la lista, o ``revision_humana``.
+    #: A label from the list, or ``human_review``.
     label: str
-    #: Quién decidió: el modelo, o el código y por qué.
+    #: Who decided: the model, or the code and why.
     reason: Reason
     verdict: Verdict
-    #: Lo que respondió el modelo, si se le consultó.
+    #: What the model answered, if it was asked.
     model_label: str | None = None
 
 
 class SafeClassifier:
-    """Clasifica mensajes en una lista cerrada de etiquetas."""
+    """Classifies messages into a closed list of labels.
+
+    The business defines the labels (``labels``); the library only ships ``LEAD_LABELS`` as an
+    example. ``lang`` is the language of the guard's notices (``en`` or ``es``).
+    """
 
     def __init__(
         self,
         provider: Provider,
         labels: Mapping[str, str] = LEAD_LABELS,
         guard: Guard | None = None,
+        lang: str = DEFAULT_LANG,
     ):
         if HUMAN_REVIEW in labels:
-            raise ValueError(f"«{HUMAN_REVIEW}» la asigna el código; no puede estar en la lista.")
+            raise ValueError(f"'{HUMAN_REVIEW}' is assigned by the code; it cannot be in the list.")
         self.provider = provider
         self.labels = dict(labels)
-        self.guard = guard or Guard([RulesDetector(labels=self.labels)])
+        self.guard = guard or Guard([RulesDetector(labels=self.labels)], lang=lang)
 
     def classify(self, text: str) -> Classification:
         verdict = self.guard.check(text)
-        if verdict.decision == "revisar":
-            return Classification(HUMAN_REVIEW, "guardia", verdict)
+        if verdict.decision == "review":
+            return Classification(HUMAN_REVIEW, "guard", verdict)
 
         marker = secrets.token_hex(4)
         try:
@@ -69,20 +78,20 @@ class SafeClassifier:
                 message=wrap(text, marker),
                 schema=schema(self.labels),
             )
-        except Exception:  # noqa: BLE001 - ante cualquier fallo decide una persona
+        except Exception:  # noqa: BLE001 - on any failure a person decides
             return Classification(HUMAN_REVIEW, "error", verdict)
 
         if response.refusal:
-            return Classification(HUMAN_REVIEW, "rechazo", verdict)
+            return Classification(HUMAN_REVIEW, "refusal", verdict)
         label = (response.data or {}).get("etiqueta")
         if label not in self.labels:
             model_text = label if isinstance(label, str) else None
-            return Classification(HUMAN_REVIEW, "respuesta_invalida", verdict, model_text)
-        return Classification(label, "modelo", verdict, label)
+            return Classification(HUMAN_REVIEW, "invalid_response", verdict, model_text)
+        return Classification(label, "model", verdict, label)
 
 
 def schema(labels: Mapping[str, str]) -> dict:
-    """Esquema JSON que solo admite una etiqueta de la lista."""
+    """JSON schema that admits only one label from the list. The key is Spanish on purpose."""
     return {
         "type": "object",
         "properties": {"etiqueta": {"type": "string", "enum": list(labels)}},
@@ -92,7 +101,7 @@ def schema(labels: Mapping[str, str]) -> dict:
 
 
 def instructions(labels: Mapping[str, str], marker: str) -> str:
-    """Instrucciones para el modelo. El mensaje del cliente nunca forma parte de ellas."""
+    """Instructions for the model (Spanish on purpose). The customer's message is never part of them."""
     definitions = "\n".join(f"- {name}: {definition}" for name, definition in labels.items())
     return (
         "Clasificas mensajes que los clientes le escriben a un negocio. Responde con una sola "

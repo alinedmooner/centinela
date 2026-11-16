@@ -1,7 +1,7 @@
-"""Proveedor para los modelos Claude, con el SDK oficial de Anthropic.
+"""Provider for the Claude models, with the official Anthropic SDK.
 
-Necesita el extra ``llm`` (``pip install "centinela-ia[llm]"``) y la variable
-``ANTHROPIC_API_KEY``.
+It needs the ``llm`` extra (``pip install "centinela-ia[llm]"``) and the ``ANTHROPIC_API_KEY``
+variable.
 """
 
 from __future__ import annotations
@@ -14,10 +14,10 @@ DEFAULT_MODEL = "claude-haiku-5-5"
 
 
 class AnthropicProvider:
-    """Pide a Claude un JSON que cumple un esquema.
+    """Asks Claude for JSON that meets a schema.
 
-    El esfuerzo va en ``low`` porque clasificar y revisar mensajes cortos no necesita más.
-    No se envía ``temperature``: los modelos actuales no la aceptan.
+    The effort is ``low`` because classifying and checking short messages needs no more.
+    ``temperature`` is not sent: current models do not accept it.
     """
 
     def __init__(
@@ -31,9 +31,11 @@ class AnthropicProvider:
         if client is None:
             try:
                 import anthropic
-            except ImportError as error:  # pragma: no cover - depende de la instalación
+            except ImportError as error:  # pragma: no cover - depends on the installation
                 raise ProviderError(
-                    'Falta el SDK de Anthropic. Instala el extra: pip install "centinela-ia[llm]"'
+                    'The Anthropic SDK is missing. Install the extra: pip install "centinela-ia[llm]"',
+                    code="missing_sdk",
+                    hint='pip install "centinela-ia[llm]"',
                 ) from error
             client = anthropic.Anthropic()
         self.client = client
@@ -57,16 +59,23 @@ class AnthropicProvider:
                 },
             )
         except anthropic.RateLimitError as error:
-            raise ProviderError("Se alcanzó el límite de peticiones de la API.") from error
+            raise ProviderError("The API rate limit was reached.", code="rate_limit") from error
         except anthropic.APIStatusError as error:
-            raise ProviderError(f"La API respondió con el error {error.status_code}.") from error
+            raise ProviderError(
+                f"The API answered with error {error.status_code}.",
+                code="api_error",
+                status=error.status_code,
+            ) from error
         except anthropic.APIConnectionError as error:
-            raise ProviderError("No se pudo conectar con la API.") from error
+            raise ProviderError("Could not connect to the API.", code="connection") from error
 
-        uso = response.usage
+        usage = response.usage
         if response.stop_reason == "refusal":
             return ModelResponse(
-                None, refusal=True, input_tokens=uso.input_tokens, output_tokens=uso.output_tokens
+                None,
+                refusal=True,
+                input_tokens=usage.input_tokens,
+                output_tokens=usage.output_tokens,
             )
 
         text = next((block.text for block in response.content if block.type == "text"), "")
@@ -76,4 +85,6 @@ class AnthropicProvider:
             data = None
         if not isinstance(data, dict):
             data = None
-        return ModelResponse(data, input_tokens=uso.input_tokens, output_tokens=uso.output_tokens)
+        return ModelResponse(
+            data, input_tokens=usage.input_tokens, output_tokens=usage.output_tokens
+        )

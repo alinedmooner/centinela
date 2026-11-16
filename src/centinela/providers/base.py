@@ -1,4 +1,4 @@
-"""Interfaz mínima para conectar cualquier modelo de lenguaje."""
+"""Minimal interface to connect any language model."""
 
 from __future__ import annotations
 
@@ -10,26 +10,36 @@ from typing import Protocol, runtime_checkable
 
 @dataclass(frozen=True)
 class ModelResponse:
-    """Lo que devolvió el modelo a una petición con esquema."""
+    """What the model returned to a request with a schema."""
 
-    #: El JSON que devolvió el modelo, o ``None`` si no devolvió un JSON válido.
+    #: The JSON the model returned, or ``None`` if it did not return valid JSON.
     data: dict | None
-    #: El modelo se negó a responder (por ejemplo, por sus filtros de seguridad).
+    #: The model refused to answer (for example, because of its safety filters).
     refusal: bool = False
     input_tokens: int = 0
     output_tokens: int = 0
 
 
 class ProviderError(RuntimeError):
-    """El proveedor no pudo responder (red, límites, credenciales)."""
+    """The provider could not answer (network, limits, credentials).
+
+    ``code`` says why (``rate_limit``, ``api_error``, ``connection``, ``missing_sdk``,
+    ``missing_key``) and ``details`` holds what the message needs (``status``, ``hint``,
+    ``variable``). The message is English; the command line translates it by code.
+    """
+
+    def __init__(self, message: str, code: str = "error", **details: object):
+        super().__init__(message)
+        self.code = code
+        self.details = details
 
 
 @runtime_checkable
 class Provider(Protocol):
-    """Modelo que responde con un JSON que cumple un esquema.
+    """A model that answers with JSON that meets a schema.
 
-    Para usar otro proveedor (OpenAI, Gemini, un modelo local) basta una clase con un
-    atributo ``nombre`` y este método.
+    To use another provider (OpenAI, a local model) a class with a ``name`` attribute and
+    this method is enough.
     """
 
     name: str
@@ -38,7 +48,7 @@ class Provider(Protocol):
 
 
 def json_from_text(text: str) -> dict | None:
-    """El objeto JSON de una respuesta, aunque venga entre marcas de bloque de código."""
+    """The JSON object of an answer, even if it comes inside code-block fences."""
     clean = re.sub(r"^```(?:json)?\s*|\s*```$", "", (text or "").strip())
     try:
         data = json.loads(clean)
@@ -48,5 +58,5 @@ def json_from_text(text: str) -> dict | None:
 
 
 def is_error_from(error: Exception, *packages: str) -> bool:
-    """El error viene de uno de estos paquetes (el SDK del proveedor o su cliente HTTP)."""
+    """The error comes from one of these packages (the provider SDK or its HTTP client)."""
     return type(error).__module__.split(".")[0] in packages
