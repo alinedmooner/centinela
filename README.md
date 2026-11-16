@@ -1,6 +1,6 @@
 # Centinela
 
-[![Pruebas](https://github.com/alinedmooner/centinela/actions/workflows/pruebas.yml/badge.svg)](https://github.com/alinedmooner/centinela/actions/workflows/pruebas.yml)
+[![Tests](https://github.com/alinedmooner/centinela/actions/workflows/tests.yml/badge.svg)](https://github.com/alinedmooner/centinela/actions/workflows/tests.yml)
 [![Licencia: MIT](https://img.shields.io/badge/licencia-MIT-blue.svg)](https://github.com/alinedmooner/centinela/blob/main/LICENSE)
 
 **Guardia de código abierto para asistentes de IA que leen mensajes en español.** Revisa cada mensaje antes de que lo lea el bot, avisa si trae órdenes escondidas o trucos de engaño, y deja las decisiones delicadas en manos del código.
