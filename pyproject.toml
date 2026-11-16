@@ -1,16 +1,17 @@
 [project]
 name = "centinela-ia"
-version = "0.1.1"
-description = "Guardia de código abierto para asistentes de IA que leen mensajes en español: detecta órdenes escondidas y trucos de engaño, y deja las decisiones delicadas en manos del código."
+version = "0.2.0"
+description = "Open-source guard for AI assistants that read messages in Spanish: it detects hidden instructions and deception tricks, and leaves the sensitive decisions to code."
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
 requires-python = ">=3.11"
-authors = [{ name = "Equipo Centinela" }]
-keywords = ["seguridad", "ia", "agentes", "prompt-injection", "phishing", "español"]
+authors = [{ name = "Centinela team" }]
+keywords = ["security", "ai", "agents", "prompt-injection", "phishing", "spanish"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
+    "Natural Language :: English",
     "Natural Language :: Spanish",
     "Programming Language :: Python :: 3",
     "Topic :: Security",
@@ -20,7 +21,7 @@ classifiers = [
     "Programming Language :: Python :: 3.12",
     "Programming Language :: Python :: 3.13",
 ]
-# El modo básico (reglas) no necesita ninguna dependencia.
+# The basic mode (rules) needs no dependency.
 dependencies = []
 
 [project.urls]
@@ -57,7 +58,7 @@ openrouter = [
 
 [dependency-groups]
 dev = ["pytest", "ruff"]
-# Para la demostración con Composio (examples/composio_mailbox.py); no es parte del paquete.
+# For the Composio demo (examples/composio_mailbox.py); it is not part of the package.
 composio = ["composio>=0.31.0"]
 
 [build-system]
@@ -67,13 +68,13 @@ build-backend = "hatchling.build"
 [tool.hatch.build.targets.wheel]
 packages = ["src/centinela"]
 
-# El paquete fuente lleva solo el código y los textos legales; los datos, los resultados
-# y el sitio web se quedan en el repositorio.
+# The source package carries only the code and the legal texts; the data, the results and the
+# website stay in the repository.
 [tool.hatch.build.targets.sdist]
-include = ["/src/centinela", "/README.md", "/LICENSE", "/ATRIBUCIONES.md"]
+include = ["/src/centinela", "/README.md", "/LICENSE", "/ATTRIBUTIONS.md"]
 
 [tool.uv]
-# Periodo de espera: no se instala nada publicado en los últimos 7 días.
+# Waiting period: nothing published in the last 7 days is installed.
 exclude-newer = "7 days"
 
 [tool.pytest.ini_options]
@@ -83,7 +84,7 @@ pythonpath = ["evals"]
 [tool.ruff]
 line-length = 100
 
-# El extra «local» usa PyTorch para CPU: los detectores son pequeños y no necesitan GPU.
+# The `local` extra uses the CPU build of PyTorch: the detectors are small and need no GPU.
 [tool.uv.sources]
 torch = { index = "pytorch-cpu" }
 
@@ -92,6 +93,6 @@ name = "pytorch-cpu"
 url = "https://download.pytorch.org/whl/cpu"
 explicit = true
 
-# El índice de PyTorch no publica fechas de subida, así que no pasa por el periodo de espera.
+# The PyTorch index does not publish upload dates, so it skips the waiting period.
 [tool.uv.exclude-newer-package]
 torch = false

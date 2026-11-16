@@ -22,7 +22,7 @@ from centinela.review import (
 )
 from centinela.verdict import TRICKS, Finding, Verdict
 
-__version__ = "0.1.1"
+__version__ = "0.2.0"
 
 __all__ = [
     "HUMAN_REVIEW",
