@@ -16,10 +16,10 @@ Las pruebas no usan internet ni claves. Si tu cambio necesita un modelo, pruéba
 
 ### 1. Agregar un caso al banco de pruebas
 
-Cada caso es una línea en un archivo de `datos/`. El formato está en `datos/README.md`.
+Cada caso es una línea en un archivo de `data/`. El formato está en `data/README.md`.
 
 1. Agrega la línea al archivo que corresponda.
-2. Corre `python3 scripts/validar_datos.py`.
+2. Corre `python3 scripts/validate_data.py`.
 3. En el PR, di de dónde viene el caso y si lo escribiste tú o lo generó una IA.
 
 No uses datos personales reales: nombres, teléfonos y correos deben ser inventados.

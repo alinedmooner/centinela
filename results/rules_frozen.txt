@@ -1,0 +1,9 @@
+Reglas congeladas antes de medir en la partición test.
+sha256 de src/centinela/detectores/reglas.py: 6091fa188b4aa7a1251013d099bcd62abf5177c5ace3f5334091c734d720765d
+hora: 2026-11-14 11:54 -0500
+
+2026-11-16: the rules file was moved to src/centinela/detectors/rules.py and its identifiers
+were translated to English. No pattern changed. The decisions and evidence on the 652
+benchmark cases that do not need SpaPhish are identical (tests/test_golden_data.py), and the
+file frozen above is still at tags v0.1.0 and v0.1.1.
+sha256 de src/centinela/detectors/rules.py: e10aa7aac3f3be45943dfc2775b0bf6497deb3d7a77b641891f32de55fcfe66f
