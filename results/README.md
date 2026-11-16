@@ -4,14 +4,14 @@ Aquí están las respuestas de cada detector y de cada modelo, para que cualquie
 
 | Ruta | Contenido |
 |---|---|
-| `resumen.md`, `resumen.json` | Las tablas de las cuatro pruebas, generadas por `evals/tables.py` |
+| `summary.md`, `summary.es.md`, `summary.json` | Las tablas de las cuatro pruebas en inglés y en español, y sus datos, generadas por `evals/tables.py` |
 | `bot/test/<modelo>__<defensa>.jsonl` | Prueba 2. Una línea por mensaje: etiqueta esperada, etiqueta que salió y quién decidió |
 | `filtro/test/<detector>.jsonl` | Prueba 1. Una línea por caso: si el detector lo marcó |
 | `filtro/test/casos.jsonl` | Índice de los casos (grupo, idioma, si es ataque), sin el texto |
 | `phishing/<modelo>.jsonl` | Prueba 3. Respuesta del revisor por correo, identificado por los primeros 16 caracteres de su `hash` en SpaPhish |
 | `phishing/resumen.json` | Métricas de la prueba 3 |
 | `revision/spaphish.jsonl` | Prueba 4. Una línea por correo, con el mismo identificador: enlaces activos antes y después de desarmar, destinos que muestra la tarjeta, qué pide y con qué presiona |
-| `revision/resumen.json` | Métricas de la prueba 4 |
+| `review/resumen.json` | Métricas de la prueba 4 |
 | `externos/asr_publico.json` | Prueba 5, externa: éxito del ataque «important_instructions» por modelo en los registros públicos de AgentDojo y AgentDyn (`evals/external.py`) |
 | `proveedores/<proveedor>-<modelo>.jsonl` y `.json` | Revisión con otros proveedores: el revisor de Centinela con Gemini en 20 casos en español de la partición de prueba (10 ataques y 10 mensajes normales), comparado con Claude Haiku 5.5 en los mismos casos (`evals/provider_eval.py`) |
 | `reglas_congeladas.txt` | Huella de las reglas en el momento en que se congelaron, antes de medir |

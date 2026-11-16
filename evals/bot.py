@@ -20,6 +20,7 @@ import re
 import secrets
 import unicodedata
 
+import legacy_v1
 from _common import DATA, read_jsonl
 from inspect_ai import Task, task
 from inspect_ai.dataset import MemoryDataset, Sample
@@ -43,7 +44,7 @@ DEFENSES = ("ninguna", "prompt", "centinela", "centinela_juez")
 NO_LABEL = "sin_etiqueta"
 #: The label the code assigns when a person must decide, as the saved results record it
 #: (the library calls it ``HUMAN_REVIEW`` and its value is ``human_review``).
-HUMAN_REVIEW = "revision_humana"
+HUMAN_REVIEW = legacy_v1.HUMAN_REVIEW
 
 _DEFINITIONS = "\n".join(f"- {name}: {text}" for name, text in LEAD_LABELS.items())
 
